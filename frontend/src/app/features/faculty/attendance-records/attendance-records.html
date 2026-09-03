@@ -1,0 +1,146 @@
+<div class="page-wrapper attendance-records-page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-clipboard-list"></i>
+      </div>
+      <div>
+        <h2>Attendance Records</h2>
+        <p>Search, filter and analyze student attendance logs across all your subjects</p>
+      </div>
+    </div>
+    <div class="banner-orb"></div>
+  </div>
+
+  <!-- Comprehensive Attendance History -->
+  <div class="va-card history-card">
+    <div class="card-header history-header">
+      <div class="header-icon-title">
+        <i class="fa-solid fa-database table-icon"></i>
+        <div>
+          <h3>All Attendance Logs</h3>
+          <p>Filtered list of class attendance history</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button mat-flat-button class="export-btn" (click)="exportToCSV()" [disabled]="filteredRecords.length === 0" style="font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(16,185,129,.25) !important;">
+          <i class="fa-solid fa-file-excel"></i> Export to Excel
+        </button>
+        <button mat-stroked-button class="reset-btn" (click)="resetFilters()">
+          <i class="fa-solid fa-rotate-left"></i> Reset Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-grid">
+      <!-- Search Input -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Search Student</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="Name or Enrollment No" />
+      </mat-form-field>
+
+      <!-- Subject Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter Subject</mat-label>
+        <mat-icon matPrefix>book</mat-icon>
+        <mat-select [(ngModel)]="filterSubject" (selectionChange)="applyFilters()">
+          <mat-option value="">All Subjects</mat-option>
+          @for (sub of subjects; track sub.id) {
+            <mat-option [value]="sub.name">{{ sub.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Department Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter Department</mat-label>
+        <mat-icon matPrefix>school</mat-icon>
+        <mat-select [(ngModel)]="filterDept" (selectionChange)="applyFilters()">
+          <mat-option value="">All Departments</mat-option>
+          @for (dept of uniqueDepts; track dept) {
+            <mat-option [value]="dept">{{ dept }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Semester Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter Semester</mat-label>
+        <mat-icon matPrefix>tag</mat-icon>
+        <mat-select [(ngModel)]="filterSem" (selectionChange)="applyFilters()">
+          <mat-option value="">All Semesters</mat-option>
+          @for (sem of uniqueSems; track sem) {
+            <mat-option [value]="sem">Semester {{ sem }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Division Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter Division</mat-label>
+        <mat-icon matPrefix>group</mat-icon>
+        <mat-select [(ngModel)]="filterDiv" (selectionChange)="applyFilters()">
+          <mat-option value="">All Divisions</mat-option>
+          @for (div of uniqueDivs; track div) {
+            <mat-option [value]="div">Division {{ div }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Date Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter Date</mat-label>
+        <input matInput type="date" [(ngModel)]="filterDate" (change)="applyFilters()" style="padding-top: 2px;" />
+      </mat-form-field>
+    </div>
+
+    <!-- History Table -->
+    @if (filteredRecords.length === 0) {
+      <div class="empty-list">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <p>No matching attendance records found.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="va-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th (click)="toggleSort('enrollment')" style="cursor: pointer; user-select: none;">
+                Enrollment No.
+                @if (sortColumn === 'enrollment') {
+                  <i class="fa-solid" [class.fa-arrow-down-1-9]="sortDirection === 'asc'" [class.fa-arrow-up-9-1]="sortDirection === 'desc'" style="margin-left: 6px; font-size: 11px; color: var(--primary);"></i>
+                } @else {
+                  <i class="fa-solid fa-sort" style="margin-left: 6px; font-size: 10px; opacity: 0.4;"></i>
+                }
+              </th>
+              <th>Subject</th>
+              <th>Department</th>
+              <th>Semester & Div</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (record of filteredRecords; track record.id) {
+              <tr>
+                <td style="font-weight: 600;">{{ record.studentName }}</td>
+                <td><span class="badge-neutral">#{{ record.enrollmentNo }}</span></td>
+                <td>{{ record.subjectName }}</td>
+                <td>{{ record.department }}</td>
+                <td>Sem {{ record.semester }} (Div {{ record.division }})</td>
+                <td>{{ record.date | date:'medium' }}</td>
+                <td><span class="badge badge-success">Present</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+</div>

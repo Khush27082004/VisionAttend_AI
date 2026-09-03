@@ -1,0 +1,70 @@
+<div class="page-wrapper student-dash">
+
+  <!-- Welcome Card -->
+  <div class="welcome-card va-card">
+    <div class="welcome-content">
+      <div class="stu-avatar">{{ userInitials }}</div>
+      <div>
+        <h2>Welcome back, {{ userName }}!</h2>
+        <p>Track your attendance and keep your face profile up to date.</p>
+      </div>
+    </div>
+    <div class="welcome-badge">
+      <i class="fa-solid fa-user-graduate"></i>
+      Student
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+
+    <a class="action-card va-card" routerLink="attendance" id="student-view-attendance">
+      <div class="action-icon icon-circle-primary">
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+      <div class="action-body">
+        <h3>My Attendance</h3>
+        <p>View all your attendance records, subject-wise breakdown and status</p>
+      </div>
+      <i class="fa-solid fa-arrow-right action-arrow"></i>
+    </a>
+
+    @if (faceRegistered) {
+      <div class="action-card va-card">
+        <div class="action-icon icon-circle-accent" style="background: linear-gradient(135deg, #10B981 0%, #34D399 100%);">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="action-body">
+          <h3>Face Registered</h3>
+          <p>Your face profile is registered. You are ready for AI-powered attendance.</p>
+        </div>
+        <span class="badge badge-success" style="background: #E0F2FE; color: #0369A1; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 700;">Active</span>
+      </div>
+    } @else {
+      <a class="action-card va-card" [routerLink]="['/dashboard/students', studentId, 'register-face']" id="student-register-face">
+        <div class="action-icon icon-circle-accent" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);">
+          <i class="fa-solid fa-camera"></i>
+        </div>
+        <div class="action-body">
+          <h3>Register Face Now</h3>
+          <p>Click here to register your face using the webcam to enable AI attendance.</p>
+        </div>
+        <i class="fa-solid fa-arrow-right action-arrow"></i>
+      </a>
+    }
+
+  </div>
+
+  <!-- Info Boxes -->
+  <div class="info-row">
+    <div class="info-box">
+      <i class="fa-solid fa-circle-info"></i>
+      <p>Attendance is marked automatically via face recognition during class sessions</p>
+    </div>
+    <div class="info-box">
+      <i class="fa-solid fa-shield-halved"></i>
+      <p>Your face data is stored securely and used only for attendance purposes</p>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,41 @@
+<header class="topbar">
+
+  <!-- Left: Page Title -->
+  <div class="topbar-left">
+    <button class="hamburger-btn" (click)="toggleSidebar()" title="Toggle Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="page-label">
+      <h3 class="topbar-title">{{ pageTitle }}</h3>
+      <span class="topbar-date">{{ today }}</span>
+    </div>
+  </div>
+
+  <!-- Right: Actions & Profile -->
+  <div class="topbar-right">
+
+    <!-- Notification Bell (decorative) -->
+    <button class="icon-btn" title="Notifications">
+      <i class="fa-regular fa-bell"></i>
+      <span class="notif-dot"></span>
+    </button>
+
+    <!-- Divider -->
+    <span class="topbar-divider"></span>
+
+    <!-- User Profile -->
+    <div class="user-profile">
+      <div class="user-avatar-top">{{ userInitials }}</div>
+      <div class="user-details">
+        <span class="user-name-top">{{ userName }}</span>
+        <span class="user-role-top">{{ userRole }}</span>
+      </div>
+    </div>
+
+    <!-- Logout -->
+    <button class="logout-btn" (click)="logout()" title="Sign out" id="topbar-logout-btn">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
+
+  </div>
+</header>

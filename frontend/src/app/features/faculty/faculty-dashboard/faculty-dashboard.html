@@ -1,0 +1,208 @@
+<div class="page-wrapper faculty-page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <h2>Welcome, Faculty</h2>
+        <p>Start today's attendance session by selecting a subject below</p>
+      </div>
+    </div>
+    <div class="banner-orb"></div>
+  </div>
+
+  <!-- Subject Selection Card -->
+  <div class="va-card subject-card">
+    <div class="subject-card-header">
+      <div class="icon-circle icon-circle-primary">
+        <i class="fa-solid fa-camera"></i>
+      </div>
+      <div>
+        <h3>Take Attendance</h3>
+        <p>Choose a subject and start face-recognition attendance</p>
+      </div>
+    </div>
+
+    <div class="subject-card-body" style="display: flex; flex-direction: column; gap: 12px; padding: 24px 28px;">
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; width: 100%;">
+        <mat-form-field appearance="outline" class="subject-field" subscriptSizing="dynamic" style="flex: 1.5; min-width: 250px; margin-bottom: 0;">
+          <mat-label>Select Subject</mat-label>
+          <mat-icon matPrefix>book</mat-icon>
+          <mat-select [(ngModel)]="selectedSubjectId" (selectionChange)="onSubjectChange()" [disabled]="attendanceActive">
+            @if (getFilteredSubjects().length === 0) {
+              <mat-option disabled>No subjects match selected schedule</mat-option>
+            }
+            @for (subject of getFilteredSubjects(); track subject.id) {
+              <mat-option [value]="subject.id">
+                {{ subject.name }} — Semester {{ subject.semester }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 180px; margin-bottom: 0;">
+          <mat-label>Class Date</mat-label>
+          <input matInput type="date" [(ngModel)]="selectedDate" (change)="onDateChange()" [disabled]="attendanceActive">
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          class="start-btn"
+          (click)="startAttendance()"
+          [disabled]="!selectedSubjectId || attendanceActive"
+          id="start-attendance-btn"
+          style="height: 56px;"
+        >
+          <i class="fa-solid fa-play"></i>
+          Start Attendance
+        </button>
+      </div>
+
+      <!-- Schedule filter toggle -->
+      <div style="display: flex; align-items: center; margin-top: 4px;">
+        <mat-checkbox [(ngModel)]="filterByDay" color="primary" [disabled]="attendanceActive">
+          <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-calendar-day" style="color: var(--primary);"></i>
+            Filter by schedule (shows only <strong>{{ getDayName(selectedDate) }}</strong> classes)
+          </span>
+        </mat-checkbox>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Live Camera & Attendance List -->
+  @if (selectedSubjectId) {
+    <div class="dashboard-grid" [class.active-session]="attendanceActive">
+      
+      <!-- Camera -->
+      @if (attendanceActive) {
+        <div class="camera-section">
+          <div class="live-header">
+            <div class="live-dot"></div>
+            <span>Live Attendance Session Running</span>
+          </div>
+          <app-attendance-camera [subjectId]="selectedSubjectId" [date]="selectedDate" (stop)="stopAttendance()" (studentMarked)="loadAttendance()"></app-attendance-camera>
+        </div>
+      }
+      
+      <!-- Attendance Records Table -->
+      <div class="va-card attendance-list-card">
+        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+          <div class="header-icon-title">
+            <i class="fa-solid fa-clipboard-user table-icon"></i>
+            <div>
+              <h3>Attendance Records</h3>
+              <p>Recent attendance logs for this subject</p>
+            </div>
+          </div>
+          @if (attendanceRecords.length > 0) {
+            <button mat-stroked-button color="warn" (click)="resetTodaySession()" style="font-size: 11px; font-weight: 600; padding: 4px 10px; border-color: var(--warn) !important; color: var(--warn) !important; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <i class="fa-solid fa-trash-can"></i> Reset Session
+            </button>
+          }
+        </div>
+        
+        @if (attendanceRecords.length === 0) {
+          <div class="empty-list">
+            <i class="fa-solid fa-users-slash"></i>
+            <p>No attendance records recorded yet.</p>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="va-table">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Enrollment No.</th>
+                  <th class="hide-active">Department</th>
+                  <th>Date/Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (record of attendanceRecords; track record.id) {
+                  <tr>
+                    <td>{{ record.studentName }}</td>
+                    <td><span class="badge-neutral">#{{ record.enrollmentNo }}</span></td>
+                    <td class="hide-active">{{ record.department }} (Sem {{ record.semester }}, Div {{ record.division }})</td>
+                    <td>
+                      <span class="hide-active">{{ record.date | date:'medium' }}</span>
+                      <span class="show-active">{{ record.date | date:'shortTime' }}</span>
+                    </td>
+                    <td><span class="badge badge-success">Present</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Student Roster (Manual Override) -->
+    <div class="va-card roster-card" style="margin-top: 24px;">
+      <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; background: #FAFAFA;">
+        <div class="header-icon-title" style="display: flex; align-items: center; gap: 12px;">
+          <i class="fa-solid fa-users table-icon" style="font-size: 20px; color: var(--primary); background: #EEF2FF; padding: 10px; border-radius: 10px;"></i>
+          <div>
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px 0;">Class Roster</h3>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Verify enrolled students and manually mark attendance if face recognition is missed</p>
+          </div>
+        </div>
+      </div>
+
+      @if (enrolledStudents.length === 0) {
+        <div class="empty-list">
+          <i class="fa-solid fa-users-slash"></i>
+          <p>No students enrolled in this subject's class yet.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="va-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Enrollment No.</th>
+                <th>Division</th>
+                <th>Status Today</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (student of enrolledStudents; track student.id) {
+                <tr>
+                  <td>{{ student.fullName }}</td>
+                  <td><span class="badge-neutral">#{{ student.enrollmentNo }}</span></td>
+                  <td>Division {{ student.division }}</td>
+                  <td>
+                    @if (isStudentPresent(student.enrollmentNo)) {
+                      <span class="badge badge-success">Present</span>
+                    } @else {
+                      <span class="badge badge-warn">Absent</span>
+                    }
+                  </td>
+                  <td style="text-align: right;">
+                    @if (!isStudentPresent(student.enrollmentNo)) {
+                      <button mat-stroked-button color="primary" (click)="markPresentManually(student.id)" style="font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 8px;">
+                        <i class="fa-solid fa-check icon-left" style="margin-right: 4px;"></i>
+                        Mark Present
+                      </button>
+                    } @else {
+                      <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Confirmed</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -1,0 +1,100 @@
+<div class="login-container">
+
+  <!-- Left Brand Panel -->
+  <div class="left-panel">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="brand-content">
+      <div class="brand-logo">
+        <i class="fa-solid fa-eye"></i>
+      </div>
+      <h1 class="brand-name">VisionAttend AI</h1>
+      <p class="brand-tagline">Smart Attendance Management<br>Powered by Face Recognition</p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+          <span>AI-powered face recognition</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+          <span>Real-time attendance tracking</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <span>Insightful reports & analytics</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <span>Secure role-based access</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="right-panel">
+    <div class="login-card">
+
+      <div class="login-header">
+        <h2>Login 👋</h2>
+        <p>Sign in to your VisionAttend AI account</p>
+      </div>
+
+      <!-- Error Banner -->
+      @if (errorMessage) {
+        <div class="error-banner">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email address</mat-label>
+          <mat-icon matPrefix>alternate_email</mat-icon>
+          <input matInput type="email" [(ngModel)]="loginData.email" placeholder="you@example.com" autocomplete="email" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="loginData.password" placeholder="Enter your password" autocomplete="current-password" />
+          <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <button
+        mat-flat-button
+        class="login-btn"
+        (click)="login()"
+        [disabled]="loading"
+        id="login-submit-btn"
+      >
+        @if (loading) {
+          <mat-spinner diameter="20" color="accent"></mat-spinner>
+          <span>Signing in…</span>
+        } @else {
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>Sign In</span>
+        }
+      </button>
+
+      <p class="login-footer">
+        Don't have an account? <a routerLink="/register" style="color: #4F46E5; text-decoration: none; font-weight: 600;">Register as Student</a>
+      </p>
+
+      <p class="login-footer" style="margin-top: 8px;">
+        VisionAttend AI &copy; {{ currentYear }}
+      </p>
+
+    </div>
+  </div>
+
+</div>

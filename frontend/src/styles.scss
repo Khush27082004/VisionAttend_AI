@@ -1,0 +1,211 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+  --sidebar-width: 240px;
+  --sidebar-bg: #1E1B4B;
+  --topbar-height: 64px;
+  --bg: #F8FAFC;
+  --bg-main: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --border-color: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --primary-light: rgba(79, 70, 229, 0.08);
+  --secondary: #06B6D4;
+  --accent: #8B5CF6;
+  --success: #10B981;
+  --warn: #EF4444;
+  --warn-light: #FEE2E2;
+  --warning: #F59E0B;
+  --transition: all 0.2s ease;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+.page-wrapper {
+  padding: 28px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+}
+
+.welcome-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.welcome-content h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.welcome-content p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.add-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #ffffff !important;
+  color: #4F46E5 !important;
+  font-weight: 700 !important;
+  padding: 10px 20px !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 13px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+  transition: var(--transition) !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    background: #F8FAFC !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+.va-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.va-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+
+  th {
+    padding: 12px 16px;
+    background: #F1F5F9;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.badge-success {
+    background-color: #D1FAE5;
+    color: #065F46;
+  }
+
+  &.badge-warn {
+    background-color: #FEE2E2;
+    color: #991B1B;
+  }
+
+  &.badge-primary {
+    background-color: #E0E7FF;
+    color: #3730A3;
+  }
+
+  &.badge-neutral {
+    background-color: #F1F5F9;
+    color: #475569;
+  }
+}

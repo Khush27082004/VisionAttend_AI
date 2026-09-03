@@ -1,0 +1,142 @@
+<div class="login-container">
+
+  <!-- Left Brand Panel -->
+  <div class="left-panel">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="brand-content">
+      <div class="brand-logo">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <h1 class="brand-name">VisionAttend AI</h1>
+      <p class="brand-tagline">Student Registration Portal<br>Create your account to register your face</p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-qrcode"></i></div>
+          <span>Enroll with your student details</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-camera"></i></div>
+          <span>Register your face with a webcam</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-user-check"></i></div>
+          <span>View your live attendance report</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="right-panel">
+    <div class="login-card registration-card">
+
+      <div class="login-header">
+        <h2>Join Us 🚀</h2>
+        <p>Create a student profile to get started</p>
+      </div>
+
+      <!-- Error Banner -->
+      @if (errorMessage) {
+        <div class="error-banner">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <div class="form-grid">
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Full Name</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput type="text" [(ngModel)]="registerData.fullName" placeholder="John Doe" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email address</mat-label>
+            <mat-icon matPrefix>alternate_email</mat-icon>
+            <input matInput type="email" [(ngModel)]="registerData.email" placeholder="john@example.com" autocomplete="email" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <mat-icon matPrefix>lock_outline</mat-icon>
+            <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="registerData.password" placeholder="Choose a secure password" autocomplete="new-password" required />
+            <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Enrollment No.</mat-label>
+            <mat-icon matPrefix>badge</mat-icon>
+            <input matInput type="text" [(ngModel)]="registerData.enrollmentNo" placeholder="e.g. EN123456" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Department</mat-label>
+            <mat-icon matPrefix>school</mat-icon>
+            <input matInput type="text" [(ngModel)]="registerData.department" placeholder="e.g. Computer Science" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Semester</mat-label>
+            <mat-icon matPrefix>tag</mat-icon>
+            <input matInput type="number" [(ngModel)]="registerData.semester" min="1" max="8" placeholder="e.g. 5" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Division</mat-label>
+            <mat-icon matPrefix>group</mat-icon>
+            <input matInput type="text" [(ngModel)]="registerData.division" placeholder="e.g. A" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Phone (Optional)</mat-label>
+            <mat-icon matPrefix>phone</mat-icon>
+            <input matInput type="tel" [(ngModel)]="registerData.phone" placeholder="e.g. +1234567890" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <button
+        mat-flat-button
+        class="login-btn"
+        (click)="register()"
+        [disabled]="loading"
+        id="register-submit-btn"
+      >
+        @if (loading) {
+          <mat-spinner diameter="20" color="accent"></mat-spinner>
+          <span>Registering…</span>
+        } @else {
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Create Account</span>
+        }
+      </button>
+
+      <p class="login-footer">
+        Already have an account? <a routerLink="/">Sign In</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>

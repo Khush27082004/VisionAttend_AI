@@ -1,0 +1,141 @@
+/* ========================================
+   Attendance Camera Styles
+   ======================================== */
+
+.camera-card {
+  overflow: hidden;
+}
+
+/* ── Status Bar ───────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+  animation: cameraPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cameraPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
+  50%       { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+}
+
+.status-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stop-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  border-color: var(--warn) !important;
+  color: var(--warn) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 13px !important;
+  padding: 8px 18px !important;
+  transition: var(--transition) !important;
+}
+
+.stop-btn:hover {
+  background: var(--warn-light) !important;
+}
+
+/* ── Webcam ───────────────────────────── */
+.camera-wrapper {
+  position: relative;
+  background: #000;
+  height: 480px;
+  overflow: hidden;
+}
+
+::ng-deep webcam {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+::ng-deep webcam > div {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+}
+
+::ng-deep webcam video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(79,70,229,.7), transparent);
+  animation: scan 2s linear infinite;
+}
+
+.scan-line.scanning { animation-play-state: running; }
+
+@keyframes scan {
+  0%   { top: 10%; }
+  100% { top: 90%; }
+}
+
+.processing-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hint */
+.camera-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.camera-hint i { color: var(--accent); }

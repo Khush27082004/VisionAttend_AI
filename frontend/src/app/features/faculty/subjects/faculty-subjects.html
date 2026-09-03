@@ -1,0 +1,125 @@
+<div class="page-wrapper subjects-page">
+  
+  <!-- Add Subject Form -->
+  <div class="va-card form-card">
+    <div class="card-header">
+      <div class="header-icon-title">
+        <i class="fa-solid fa-plus-circle table-icon"></i>
+        <div>
+          <h3>Add New Subject</h3>
+          <p>Create a subject with course, division, and scheduling details</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-body">
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Subject Name</mat-label>
+          <mat-icon matPrefix>book</mat-icon>
+          <input matInput placeholder="e.g. Data Structures" [(ngModel)]="name" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Department</mat-label>
+          <mat-icon matPrefix>business</mat-icon>
+          <input matInput placeholder="e.g. Computer Engineering" [(ngModel)]="department" required>
+        </mat-form-field>
+      </div>
+
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Semester</mat-label>
+          <mat-icon matPrefix>school</mat-icon>
+          <input matInput type="number" min="1" max="8" placeholder="e.g. 6" [(ngModel)]="semester" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Division (Class)</mat-label>
+          <mat-icon matPrefix>groups</mat-icon>
+          <input matInput placeholder="e.g. IT-1" [(ngModel)]="division">
+        </mat-form-field>
+      </div>
+
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Lecture Day</mat-label>
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-select [(ngModel)]="selectedDay">
+            <mat-option value="">-- Select Day --</mat-option>
+            <mat-option value="Monday">Monday</mat-option>
+            <mat-option value="Tuesday">Tuesday</mat-option>
+            <mat-option value="Wednesday">Wednesday</mat-option>
+            <mat-option value="Thursday">Thursday</mat-option>
+            <mat-option value="Friday">Friday</mat-option>
+            <mat-option value="Saturday">Saturday</mat-option>
+            <mat-option value="Sunday">Sunday</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Lecture Start Time</mat-label>
+          <mat-icon matPrefix>access_time</mat-icon>
+          <input matInput placeholder="e.g. 10:30 AM" [(ngModel)]="lectureTime">
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-button (click)="clearForm()" class="cancel-btn">Clear</button>
+        <button mat-flat-button color="primary" (click)="saveSubject()" class="save-btn">
+          <i class="fa-solid fa-floppy-disk icon-left"></i> Save Subject
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subjects Directory -->
+  <div class="va-card list-card" style="margin-top: 24px;">
+    <div class="card-header">
+      <div class="header-icon-title">
+        <i class="fa-solid fa-folder-open table-icon"></i>
+        <div>
+          <h3>My Subjects</h3>
+          <p>Directory of classes created and assigned to you</p>
+        </div>
+      </div>
+    </div>
+
+    @if (subjects.length === 0) {
+      <div class="empty-list">
+        <i class="fa-solid fa-book-open"></i>
+        <p>No subjects created yet. Fill out the form above to add one.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="va-table">
+          <thead>
+            <tr>
+              <th>Subject Name & Schedule Details</th>
+              <th>Department</th>
+              <th>Semester</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (subj of subjects; track subj.id) {
+              <tr>
+                <td>
+                  <span style="font-weight: 600; color: var(--text-primary);">{{ subj.name }}</span>
+                </td>
+                <td>{{ subj.department }}</td>
+                <td><span class="badge-neutral">Sem {{ subj.semester }}</span></td>
+                <td style="text-align: right;">
+                  <button mat-stroked-button class="delete-btn" (click)="deleteSubject(subj.id)">
+                    <i class="fa-solid fa-trash-can"></i> Delete
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+</div>

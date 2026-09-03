@@ -1,0 +1,108 @@
+<div class="page-wrapper">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-user-graduate"></i>
+      </div>
+      <div>
+        <h2>Student Directory</h2>
+        <p>Manage enrolled students and face registrations</p>
+      </div>
+    </div>
+    <a mat-flat-button routerLink="/dashboard/students/add" class="add-btn" id="add-student-btn">
+      <i class="fa-solid fa-plus"></i>
+      <span>Add Student</span>
+    </a>
+  </div>
+
+  <!-- Table Card -->
+  <div class="va-card">
+
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="state-placeholder">
+        <div class="skeleton-rows">
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <div class="skeleton-row">
+              <div class="skel skel-avatar"></div>
+              <div class="skel skel-text"></div>
+              <div class="skel skel-text skel-short"></div>
+              <div class="skel skel-text skel-short"></div>
+              <div class="skel skel-badge"></div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (students.length === 0) {
+      <div class="state-placeholder empty-state" style="padding: 48px; text-align: center;">
+        <div class="state-icon icon-circle-primary" style="width: 56px; height: 56px; border-radius: 50%; background: #EEF2FF; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px;">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">No Students Enrolled Yet</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Add your first student to get started with face registration.</p>
+        <a mat-flat-button color="primary" routerLink="/dashboard/students/add" style="background: var(--primary) !important; color: #fff !important; font-weight: 600; padding: 10px 20px; border-radius: 8px;">
+          <i class="fa-solid fa-plus" style="margin-right: 6px;"></i> Add Student
+        </a>
+      </div>
+    }
+
+    <!-- Table -->
+    @else {
+      <div class="table-responsive">
+        <table class="va-table student-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Email</th>
+              <th>Enrollment No.</th>
+              <th>Face Status</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of students; track student.id) {
+              <tr>
+                <td>
+                  <div class="name-cell" style="display: flex; align-items: center; gap: 12px;">
+                    <div class="avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%); color: #fff; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; text-transform: uppercase;">{{ student.user.fullName | slice:0:2 }}</div>
+                    <div>
+                      <div class="student-name" style="font-weight: 600; font-size: 13px;">{{ student.user.fullName }}</div>
+                      <div class="student-id" style="font-size: 11px; color: var(--text-muted);">ID #{{ student.id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ student.user.email }}</td>
+                <td><span class="badge-neutral" style="background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">#{{ student.enrollmentNo }}</span></td>
+                <td>
+                  <span [class]="student.faceRegistered ? 'badge badge-success' : 'badge badge-neutral'">
+                    <i [class]="student.faceRegistered ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'" style="margin-right: 4px;"></i>
+                    {{ student.faceRegistered ? 'Registered' : 'Not Registered' }}
+                  </span>
+                </td>
+                <td style="text-align: right;">
+                  <div class="action-group" style="display: flex; justify-content: flex-end; gap: 8px;">
+                    <a mat-stroked-button
+                       [routerLink]="['/dashboard/students', student.id, 'register-face']"
+                       class="action-btn"
+                       style="font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 6px;"
+                       title="Register Face">
+                      <i class="fa-solid fa-camera" style="margin-right: 4px;"></i>
+                      Register Face
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </div>
+
+</div>

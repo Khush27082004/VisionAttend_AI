@@ -1,0 +1,11 @@
+<h2>Select Subject</h2>
+
+<select [(ngModel)]="selectedSubject">
+  <option *ngFor="let s of subjects" [ngValue]="s">
+    {{ s.name }}
+  </option>
+</select>
+
+<br><br>
+
+<button>Start Attendance</button>

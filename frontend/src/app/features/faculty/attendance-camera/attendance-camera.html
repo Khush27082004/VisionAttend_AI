@@ -1,0 +1,38 @@
+<div class="camera-card va-card">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-indicator">
+      <div class="pulse-dot"></div>
+      <span class="status-text">{{ status }}</span>
+    </div>
+    <button mat-stroked-button class="stop-btn" type="button" (click)="stopAttendance()" id="stop-attendance-btn">
+      <i class="fa-solid fa-stop"></i>
+      Stop Session
+    </button>
+  </div>
+
+  <!-- Webcam -->
+  <div class="camera-wrapper">
+    <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" (initError)="handleCameraError($event)" class="webcam-view"></webcam>
+
+    <!-- Scanning overlay -->
+    <div class="scan-overlay">
+      <div class="scan-line" [class.scanning]="!processing"></div>
+    </div>
+
+    <!-- Processing indicator -->
+    @if (processing) {
+      <div class="processing-badge">
+        <mat-spinner diameter="14"></mat-spinner>
+        <span>Analyzing…</span>
+      </div>
+    }
+  </div>
+
+  <p class="camera-hint">
+    <i class="fa-solid fa-circle-info"></i>
+    A frame is automatically captured and analyzed every 2 seconds
+  </p>
+
+</div>

@@ -1,0 +1,96 @@
+/* ========================================
+   Add Student Styles
+   ======================================== */
+
+.form-card {
+  max-width: 880px;
+}
+
+.form-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.form-card-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.form-card-header p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.student-form {
+  padding: 28px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+}
+
+.form-grid mat-form-field {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.cancel-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 13px !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-secondary) !important;
+}
+
+.save-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  padding: 10px 24px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 13px !important;
+  box-shadow: 0 4px 14px rgba(79,70,229,.3) !important;
+}
+
+.save-btn[disabled] { opacity: .7; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .student-form { padding: 20px 16px; }
+}

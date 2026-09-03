@@ -1,0 +1,140 @@
+.subjects-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAFAFA;
+}
+
+.header-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.table-icon {
+  font-size: 20px;
+  color: var(--primary);
+  background: #EEF2FF;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.card-body {
+  padding: 24px 28px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-grid-three {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.5fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.cancel-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+
+.save-btn {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  padding: 0 20px !important;
+  height: 46px !important;
+  box-shadow: 0 4px 12px rgba(79,70,229,.25) !important;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(79,70,229,.35) !important;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+/* Table Directory Styling */
+.list-card {
+  padding: 0 !important;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.empty-list {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-muted);
+  
+  i {
+    font-size: 36px;
+    opacity: 0.4;
+    margin-bottom: 12px;
+    display: block;
+    color: var(--primary);
+  }
+  
+  p {
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+}
+
+/* Material Select Panel Backdrop Transparency Fix */
+::ng-deep {
+  .mat-mdc-select-panel {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+  .mat-mdc-option {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+}
+
+.delete-btn {
+  border-color: var(--warn) !important;
+  color: var(--warn) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: var(--warn-light) !important;
+  }
+}

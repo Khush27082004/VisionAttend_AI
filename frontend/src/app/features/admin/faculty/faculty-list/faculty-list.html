@@ -1,0 +1,89 @@
+<div class="page-wrapper">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <h2>Faculty Directory</h2>
+        <p>Manage system faculty members and their profile information</p>
+      </div>
+    </div>
+    <a mat-flat-button routerLink="/dashboard/admin/faculty/add" class="add-btn">
+      <i class="fa-solid fa-plus"></i>
+      <span>Add Faculty Member</span>
+    </a>
+  </div>
+
+  <!-- Table Card -->
+  <div class="va-card table-card">
+    
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="state-placeholder">
+        <div class="skeleton-rows">
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <div class="skeleton-row"></div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (faculties.length === 0) {
+      <div class="state-placeholder empty-state" style="padding: 48px; text-align: center;">
+        <div class="state-icon icon-circle-primary" style="width: 56px; height: 56px; border-radius: 50%; background: #EEF2FF; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px;">
+          <i class="fa-solid fa-user-tie"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">No Faculty Members Found</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Start by adding a new faculty member to assign them to subjects.</p>
+        <a mat-flat-button color="primary" routerLink="/dashboard/admin/faculty/add" style="background: var(--primary) !important; color: #fff !important; font-weight: 600; padding: 10px 20px; border-radius: 8px;">
+          <i class="fa-solid fa-plus" style="margin-right: 6px;"></i> Add Faculty Member
+        </a>
+      </div>
+    }
+
+    <!-- Table -->
+    @else {
+      <div class="table-responsive">
+        <table class="va-table faculty-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Employee ID</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Designation</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (faculty of faculties; track faculty.id) {
+              <tr>
+                <td>
+                  <div class="name-cell" style="display: flex; align-items: center; gap: 12px;">
+                    <div class="avatar" style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%); color: #fff; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; text-transform: uppercase;">{{ faculty.user.fullName | slice:0:2 }}</div>
+                    <div>
+                      <div class="faculty-name" style="font-weight: 600; font-size: 13px;">{{ faculty.user.fullName }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge-neutral" style="background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">#{{ faculty.employeeId }}</span>
+                </td>
+                <td>{{ faculty.user.email }}</td>
+                <td>{{ faculty.department }}</td>
+                <td>
+                  <span class="badge badge-primary">{{ faculty.designation || 'Lecturer' }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </div>
+
+</div>

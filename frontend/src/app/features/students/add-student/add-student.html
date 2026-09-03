@@ -1,0 +1,123 @@
+<div class="page-wrapper form-page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <div>
+        <h2>Add New Student</h2>
+        <p>Fill in the details below to enroll a new student account</p>
+      </div>
+    </div>
+    <a mat-flat-button routerLink="/dashboard/students" class="add-btn">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Back to Directory</span>
+    </a>
+  </div>
+
+  <div class="va-card form-card">
+
+    <form [formGroup]="studentForm" (ngSubmit)="saveStudent()" class="student-form">
+
+      <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Full Name *</mat-label>
+          <mat-icon matPrefix>person_outline</mat-icon>
+          <input matInput type="text" formControlName="fullName" placeholder="e.g. Khush Ranpura" />
+          @if (studentForm.get('fullName')?.invalid && studentForm.get('fullName')?.touched) {
+            <mat-error>Full name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Email Address *</mat-label>
+          <mat-icon matPrefix>alternate_email</mat-icon>
+          <input matInput type="email" formControlName="email" placeholder="student@example.com" />
+          @if (studentForm.get('email')?.errors?.['required'] && studentForm.get('email')?.touched) {
+            <mat-error>Email is required</mat-error>
+          }
+          @if (studentForm.get('email')?.errors?.['email'] && studentForm.get('email')?.touched) {
+            <mat-error>Enter a valid email</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Password *</mat-label>
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <input matInput type="password" formControlName="password" placeholder="Minimum 6 characters" />
+          @if (studentForm.get('password')?.invalid && studentForm.get('password')?.touched) {
+            <mat-error>Password is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Enrollment No. *</mat-label>
+          <mat-icon matPrefix>badge</mat-icon>
+          <input matInput type="text" formControlName="enrollmentNo" placeholder="e.g. EN2024001" />
+          @if (studentForm.get('enrollmentNo')?.invalid && studentForm.get('enrollmentNo')?.touched) {
+            <mat-error>Enrollment number is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Department *</mat-label>
+          <mat-icon matPrefix>school</mat-icon>
+          <input matInput type="text" formControlName="department" placeholder="e.g. Computer Science" />
+          @if (studentForm.get('department')?.invalid && studentForm.get('department')?.touched) {
+            <mat-error>Department is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Semester *</mat-label>
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-select formControlName="semester">
+            @for (sem of [1,2,3,4,5,6,7,8]; track sem) {
+              <mat-option [value]="sem">Semester {{ sem }}</mat-option>
+            }
+          </mat-select>
+          @if (studentForm.get('semester')?.invalid && studentForm.get('semester')?.touched) {
+            <mat-error>Semester is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Division *</mat-label>
+          <mat-icon matPrefix>group</mat-icon>
+          <input matInput type="text" formControlName="division" placeholder="e.g. A" />
+          @if (studentForm.get('division')?.invalid && studentForm.get('division')?.touched) {
+            <mat-error>Division is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Phone Number</mat-label>
+          <mat-icon matPrefix>phone</mat-icon>
+          <input matInput type="tel" formControlName="phone" placeholder="e.g. 9876543210" />
+        </mat-form-field>
+
+      </div>
+
+      <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <a mat-stroked-button routerLink="/dashboard/students" class="cancel-btn" style="border-radius: 8px; font-weight: 600; text-decoration: none;">
+          Cancel
+        </a>
+        <button mat-flat-button color="primary" type="submit" class="save-btn" [disabled]="saving" id="save-student-btn" style="background: var(--primary) !important; color: #fff !important; font-weight: 700; border-radius: 8px; padding: 10px 24px;">
+          @if (saving) {
+            <mat-spinner diameter="18" color="accent"></mat-spinner>
+            <span>Saving…</span>
+          } @else {
+            <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>
+            <span>Save Student</span>
+          }
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

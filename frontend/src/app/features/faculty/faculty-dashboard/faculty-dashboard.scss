@@ -1,0 +1,254 @@
+/* ========================================
+   Faculty Dashboard Styles
+   ======================================== */
+
+.faculty-page { max-width: 1400px; }
+
+/* ── Welcome Banner ───────────────────── */
+.welcome-banner {
+  background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcome-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.welcome-content h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.welcome-content p {
+  font-size: 13px;
+  color: rgba(255,255,255,.8);
+}
+
+.banner-orb {
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  pointer-events: none;
+}
+
+/* ── Subject Card ─────────────────────── */
+.subject-card {
+  margin-bottom: 24px;
+}
+
+.subject-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.subject-card-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.subject-card-header p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.subject-card-body {
+  padding: 24px 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.subject-field {
+  flex: 1;
+  min-width: 280px;
+}
+
+.start-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  padding: 14px 28px !important;
+  font-size: 14px !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 4px 16px rgba(79,70,229,.35) !important;
+  height: 56px !important;
+  flex-shrink: 0 !important;
+}
+
+.start-btn[disabled] { opacity: .5; }
+
+.start-btn:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(79,70,229,.45) !important;
+}
+
+/* ── Live Session ─────────────────────── */
+.camera-section { margin-top: 8px; }
+
+.live-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px rgba(16,185,129,.25);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,.25); }
+  50%       { box-shadow: 0 0 0 8px rgba(16,185,129,.1); }
+}
+
+.show-active {
+  display: none;
+}
+
+/* ── Live Attendance Grid ──────────────── */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  
+  &.active-session {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+    }
+
+    .hide-active {
+      display: none !important;
+    }
+
+    .show-active {
+      display: inline !important;
+    }
+
+    .va-table thead th {
+      padding: 12px 10px;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .va-table tbody td {
+      padding: 12px 10px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .badge, .badge-neutral {
+      white-space: nowrap;
+    }
+  }
+}
+
+.attendance-list-card {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  
+  .card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FAFAFA;
+  }
+  
+  .header-icon-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .table-icon {
+    font-size: 20px;
+    color: var(--primary);
+    background: #EEF2FF;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  
+  p {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+}
+
+.empty-list {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-muted);
+  
+  i {
+    font-size: 32px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    font-size: 13px;
+  }
+}
+

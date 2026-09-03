@@ -1,0 +1,94 @@
+<div class="page-wrapper form-page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <div>
+        <h2>Add Faculty Member</h2>
+        <p>Create a new faculty account to assign subjects and manage attendance</p>
+      </div>
+    </div>
+    <a mat-flat-button routerLink="/dashboard/admin/faculty" class="add-btn">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Back to Directory</span>
+    </a>
+  </div>
+
+  <!-- Form Card -->
+  <div class="va-card form-card">
+    <form (ngSubmit)="save()" #facultyForm="ngForm">
+      
+      <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+            <mat-label>Full Name</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput [(ngModel)]="facultyData.fullName" name="fullName" placeholder="Dr. John Doe" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+            <mat-label>Email Address</mat-label>
+            <mat-icon matPrefix>alternate_email</mat-icon>
+            <input matInput type="email" [(ngModel)]="facultyData.email" name="email" placeholder="john.doe@university.edu" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+            <mat-label>Password</mat-label>
+            <mat-icon matPrefix>lock_outline</mat-icon>
+            <input matInput type="password" [(ngModel)]="facultyData.password" name="password" placeholder="Secure Password" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+            <mat-label>Employee ID</mat-label>
+            <mat-icon matPrefix>badge</mat-icon>
+            <input matInput [(ngModel)]="facultyData.employeeId" name="employeeId" placeholder="e.g. EMP4051" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+            <mat-label>Department</mat-label>
+            <mat-icon matPrefix>school</mat-icon>
+            <input matInput [(ngModel)]="facultyData.department" name="department" placeholder="e.g. Computer Engineering" required />
+          </mat-form-field>
+        </div>
+
+        <div class="form-group">
+          <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
+            <mat-label>Designation (Optional)</mat-label>
+            <mat-icon matPrefix>workspace_premium</mat-icon>
+            <input matInput [(ngModel)]="facultyData.designation" name="designation" placeholder="e.g. Associate Professor" />
+          </mat-form-field>
+        </div>
+
+      </div>
+
+      <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button mat-stroked-button type="button" routerLink="/dashboard/admin/faculty" style="border-radius: 8px; font-weight: 600;">
+          Cancel
+        </button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving || !facultyForm.valid" class="save-btn" style="background: var(--primary) !important; color: #fff !important; font-weight: 700; border-radius: 8px; padding: 10px 24px;">
+          @if (saving) {
+            <mat-spinner diameter="18" color="accent"></mat-spinner>
+            <span>Saving…</span>
+          } @else {
+            <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>
+            <span>Save Faculty Member</span>
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

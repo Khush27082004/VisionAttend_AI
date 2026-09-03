@@ -1,0 +1,15 @@
+<div class="layout-wrapper" [class.sidebar-open]="sidebarOpen">
+  <app-sidebar></app-sidebar>
+
+  @if (sidebarOpen) {
+    <div class="sidebar-backdrop" (click)="toggleSidebar()"></div>
+  }
+
+  <div class="main-area">
+    <app-topbar (logoutEvent)="logout()" (toggleSidebarEvent)="toggleSidebar()"></app-topbar>
+
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

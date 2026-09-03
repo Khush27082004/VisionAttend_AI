@@ -1,0 +1,56 @@
+<aside class="sidebar">
+
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <i class="fa-solid fa-eye"></i>
+    </div>
+    <div class="logo-text">
+      <span class="logo-brand">VisionAttend</span>
+      <span class="logo-sub">AI</span>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="sidebar-nav">
+
+    <span class="nav-section-label">MAIN MENU</span>
+
+    @for (item of primaryItems; track item.label) {
+    @if (item.route) {
+    <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
+      <i class="fa-solid {{ item.icon }} nav-icon"></i>
+      <span>{{ item.label }}</span>
+    </a>
+    } @else {
+    <div class="nav-item nav-item-disabled" title="Coming soon">
+      <i class="fa-solid {{ item.icon }} nav-icon"></i>
+      <span>{{ item.label }}</span>
+      <span class="nav-soon">Soon</span>
+    </div>
+    }
+    }
+
+    <span class="nav-section-label" style="margin-top: 12px;">SYSTEM</span>
+
+    @for (item of systemItems; track item.label) {
+    <div class="nav-item nav-item-disabled" title="Coming soon">
+      <i class="fa-solid {{ item.icon }} nav-icon"></i>
+      <span>{{ item.label }}</span>
+      <span class="nav-soon">Soon</span>
+    </div>
+    }
+
+  </nav>
+
+  <!-- User Info Footer -->
+  <div class="sidebar-footer">
+    <div class="user-avatar">{{ userInitials }}</div>
+    <div class="user-info">
+      <span class="user-name">{{ userName }}</span>
+      <span class="user-role">{{ userRole }}</span>
+    </div>
+  </div>
+
+</aside>

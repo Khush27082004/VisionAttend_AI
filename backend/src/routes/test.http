@@ -1,0 +1,25 @@
+### Create Admin
+POST http://localhost:5000/auth/create-admin
+Content-Type: application/json
+
+{
+  "fullName": "Admin",
+  "email": "admin@gmail.com",
+  "password": "admin123"
+}
+
+### Login
+
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "admin123"
+}
+
+### Profile
+
+GET http://localhost:5000/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzg0MzI3NjE4LCJleHAiOjE3ODQ0MTQwMTh9.pFGzBm3WMDHzR0SSt1HnAZt2dKyo7HjUFPtFf0zobcA
+

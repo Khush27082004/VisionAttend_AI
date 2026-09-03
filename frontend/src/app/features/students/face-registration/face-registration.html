@@ -1,0 +1,90 @@
+<div class="page-wrapper">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Face Registration</h1>
+      <p class="page-subtitle">Capture a clear face image to enable AI-powered attendance</p>
+    </div>
+  </div>
+
+  <mat-card class="registration-card va-card">
+
+    <div class="reg-layout">
+
+      <!-- Instructions Panel -->
+      <div class="reg-instructions">
+        <div class="reg-icon">
+          <i class="fa-solid fa-face-smile"></i>
+        </div>
+        <h3>How it works</h3>
+        <div class="instruction-steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <p>Position your face clearly in the camera frame</p>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <p>Make sure you have good lighting and look straight</p>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <p>Click <strong>Capture</strong> to take the photo</p>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <p>Review the preview, then click <strong>Register Face</strong></p>
+          </div>
+        </div>
+        <div class="tips-box">
+          <i class="fa-solid fa-lightbulb"></i>
+          <p>Tip: Ensure only one face is visible in the frame for accurate AI recognition.</p>
+        </div>
+      </div>
+
+      <!-- Camera Panel -->
+      <div class="reg-camera-panel">
+
+        @if (cameraError) {
+          <div class="error-banner" style="background: #FFF1F2; border: 1px solid #FECDD3; border-radius: 10px; padding: 12px; margin-bottom: 16px; color: #9F1239; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>{{ cameraError }}</span>
+          </div>
+        }
+
+        <div class="camera-wrapper">
+          <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" (initError)="handleCameraError($event)" class="webcam-feed"></webcam>
+          <div class="camera-overlay">
+            <div class="camera-frame"></div>
+          </div>
+        </div>
+
+        @if (webcamImage) {
+          <div class="preview-section">
+            <h4>Captured Preview</h4>
+            <img class="preview-img" [src]="webcamImage.imageAsDataUrl" alt="Captured face preview" />
+          </div>
+        }
+
+        <div class="camera-actions">
+          <button mat-stroked-button type="button" (click)="capture()" [disabled]="saving" class="capture-btn" id="face-capture-btn">
+            <i class="fa-solid fa-camera"></i>
+            Capture
+          </button>
+          <button mat-flat-button type="button" (click)="register()" [disabled]="!webcamImage || saving" class="register-btn" id="face-register-btn">
+            @if (saving) {
+              <mat-spinner diameter="18" color="accent"></mat-spinner>
+              <span>Registering…</span>
+            } @else {
+              <i class="fa-solid fa-fingerprint"></i>
+              <span>Register Face</span>
+            }
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </mat-card>
+
+</div>

@@ -1,0 +1,172 @@
+<div class="page-wrapper dashboard">
+
+  <!-- Stat Cards -->
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-card-inner">
+        <div>
+          <p class="stat-label">Total Students</p>
+          <h2 class="stat-value">{{ stats.totalStudents }}</h2>
+          <p class="stat-trend neutral"><i class="fa-solid fa-user-graduate"></i> Active student directory</p>
+        </div>
+        <div class="icon-circle icon-circle-primary">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-inner">
+        <div>
+          <p class="stat-label">Faculty Members</p>
+          <h2 class="stat-value">{{ stats.totalFaculty }}</h2>
+          <p class="stat-trend neutral"><i class="fa-solid fa-chalkboard-user"></i> Active teachers</p>
+        </div>
+        <div class="icon-circle icon-circle-accent">
+          <i class="fa-solid fa-chalkboard-user"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-inner">
+        <div>
+          <p class="stat-label">Today's Attendance</p>
+          <h2 class="stat-value">{{ stats.todaysAttendance }}</h2>
+          <p class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> of {{ stats.totalStudents }} students</p>
+        </div>
+        <div class="icon-circle icon-circle-success">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-inner">
+        <div>
+          <p class="stat-label">Attendance Rate</p>
+          <h2 class="stat-value">{{ stats.attendanceRate }}%</h2>
+          <p class="stat-trend up"><i class="fa-solid fa-chart-pie"></i> Overall dynamic rate</p>
+        </div>
+        <div class="icon-circle icon-circle-warn">
+          <i class="fa-solid fa-chart-pie"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="dashboard-bottom">
+
+    <!-- Recent Attendance Table -->
+    <div class="va-card recent-card">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">Recent Attendance</h3>
+          <p class="card-subtitle">Latest check-ins today</p>
+        </div>
+        <span class="badge badge-success">Live</span>
+      </div>
+
+      @if (stats.recentLogs.length === 0) {
+        <div class="state-placeholder" style="min-height: 160px; padding: 24px;">
+          <i class="fa-solid fa-users-slash" style="font-size: 24px; opacity: 0.5;"></i>
+          <p style="font-size: 13px; margin: 0;">No logs checked in today yet.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="va-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (log of stats.recentLogs; track log.id) {
+                <tr>
+                  <td>
+                    <div class="name-cell" style="display: flex; align-items: center; gap: 10px;">
+                      <div class="avatar" [style.background]="getAvatarColor(log.studentName)">{{ getInitials(log.studentName) }}</div>
+                      <span>{{ log.studentName }}</span>
+                    </div>
+                  </td>
+                  <td>{{ log.subjectName }}</td>
+                  <td>{{ log.time | date:'shortTime' }}</td>
+                  <td><span class="badge badge-success">{{ log.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Today's Classes -->
+    <div class="va-card classes-card">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">Subject Courses</h3>
+          <p class="card-subtitle">{{ todayDate }}</p>
+        </div>
+      </div>
+
+      @if (stats.classes.length === 0) {
+        <div class="state-placeholder" style="min-height: 160px; padding: 24px;">
+          <i class="fa-solid fa-book-bookmark" style="font-size: 24px; opacity: 0.5;"></i>
+          <p style="font-size: 13px; margin: 0;">No subjects registered in the system.</p>
+        </div>
+      } @else {
+        <div class="class-list" style="padding: 16px 24px; display: flex; flex-direction: column; gap: 14px;">
+          @for (cls of stats.classes; track cls.id) {
+            <div class="class-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="class-dot" [style.background]="getAvatarColor(cls.name)" style="width: 8px; height: 8px; border-radius: 50%;"></div>
+                <div class="class-info" style="display: flex; flex-direction: column;">
+                  <span class="class-name" style="font-weight: 600; font-size: 13px;">{{ cls.name }}</span>
+                  <span class="class-meta" style="font-size: 11px; color: var(--text-muted);">
+                    {{ cls.department }} (Sem {{ cls.semester }}) · {{ cls.room }} · {{ cls.time }}
+                  </span>
+                </div>
+              </div>
+              <span class="badge badge-primary" style="font-size: 10px;">{{ cls.facultyName }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- Admin Control Area -->
+  @if (userRole === 'ADMIN') {
+    <div class="va-card admin-alert-card" style="margin-top: 24px; border: 1px solid var(--warn); background: #FFF1F2; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; border-radius: 12px; box-shadow: 0 4px 12px rgba(244,63,94,.08);">
+      <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 24px; color: var(--warn); flex-shrink: 0;"></i>
+        <div>
+          <h3 style="font-size: 14px; font-weight: 700; color: #9F1239; margin: 0 0 2px 0;">System Administrator Control</h3>
+          <p style="font-size: 12px; color: #B91C1C; margin: 0;">Perform administrative database actions. <strong>Warning:</strong> All actions are destructive and cannot be undone.</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button mat-stroked-button color="warn" (click)="clearAllRecords()" style="border-color: var(--warn) !important; color: var(--warn) !important; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; background: transparent; cursor: pointer; height: 32px;">
+          <i class="fa-solid fa-calendar-minus" style="font-size: 11px;"></i> Clear Logs Only
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearStudents()" style="border-color: var(--warn) !important; color: var(--warn) !important; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; background: transparent; cursor: pointer; height: 32px;">
+          <i class="fa-solid fa-user-xmark" style="font-size: 11px;"></i> Wipe Students
+        </button>
+        <button mat-stroked-button color="warn" (click)="clearFaculty()" style="border-color: var(--warn) !important; color: var(--warn) !important; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; background: transparent; cursor: pointer; height: 32px;">
+          <i class="fa-solid fa-user-lock" style="font-size: 11px;"></i> Wipe Faculty
+        </button>
+        <button mat-flat-button color="warn" (click)="resetAllData()" style="background: var(--warn) !important; color: #fff !important; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(244,63,94,.2) !important; border: none; cursor: pointer; height: 32px;">
+          <i class="fa-solid fa-dumpster-fire" style="font-size: 11px;"></i> Complete Factory Reset
+        </button>
+      </div>
+    </div>
+  }
+
+</div>

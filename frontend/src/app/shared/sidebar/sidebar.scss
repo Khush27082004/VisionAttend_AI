@@ -1,0 +1,224 @@
+/* ========================================
+   Sidebar Styles
+   ======================================== */
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--sidebar-bg);
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 4px 0 24px rgba(0,0,0,.15);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Top accent gradient */
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, #4F46E5, #06B6D4) 1;
+}
+
+/* ── Logo ─────────────────────────────── */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(79,70,229,.4);
+}
+
+.logo-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.logo-brand {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.3px;
+}
+
+.logo-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #818CF8;
+  background: rgba(79,70,229,.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ── Navigation ───────────────────────── */
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar { display: none; }
+
+.nav-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,.3);
+  padding: 8px 10px 4px;
+  display: block;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  color: rgba(255,255,255,.6);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .18s ease;
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.95);
+}
+
+.nav-item.active {
+  background: rgba(79,70,229,.3);
+  color: #fff;
+  font-weight: 600;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #818CF8, #4F46E5);
+  border-radius: 0 4px 4px 0;
+}
+
+.nav-item.active .nav-icon {
+  color: #818CF8;
+}
+
+.nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  color: rgba(255,255,255,.45);
+  transition: color .18s;
+}
+
+.nav-item:hover .nav-icon { color: rgba(255,255,255,.9); }
+
+.nav-item-disabled {
+  cursor: default;
+  opacity: .5;
+}
+
+.nav-item-disabled:hover {
+  background: transparent;
+  color: rgba(255,255,255,.6);
+}
+
+.nav-soon {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.5);
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+/* ── Footer ───────────────────────────── */
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: rgba(0,0,0,.15);
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(79,70,229,.4);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #818CF8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+}

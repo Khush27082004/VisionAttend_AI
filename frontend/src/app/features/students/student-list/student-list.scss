@@ -1,0 +1,107 @@
+/* ========================================
+   Student List Styles
+   ======================================== */
+
+.add-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 13px !important;
+  box-shadow: 0 4px 14px rgba(79,70,229,.3) !important;
+  transition: var(--transition) !important;
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(79,70,229,.4) !important;
+}
+
+/* Name cell */
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.student-id {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.enroll-no {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Actions */
+.action-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 6px 14px !important;
+  border-radius: 8px !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-secondary) !important;
+  transition: var(--transition) !important;
+}
+
+.action-btn:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  background: #EEF2FF !important;
+}
+
+/* Skeleton loader */
+.skeleton-rows {
+  padding: 8px 0;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.skel {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.skel-avatar { width: 36px; height: 36px; border-radius: 50%; }
+.skel-text   { height: 14px; width: 140px; }
+.skel-short  { width: 80px; }
+.skel-badge  { width: 90px; height: 24px; border-radius: 12px; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
