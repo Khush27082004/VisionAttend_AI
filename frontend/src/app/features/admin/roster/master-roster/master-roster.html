@@ -11,7 +11,7 @@
         <p>Control authorized college students. Only pre-verified enrollment numbers can register and attend classes.</p>
       </div>
     </div>
-    <div style="display: flex; gap: 10px; align-items: center; z-index: 2;">
+    <div style="display: flex; gap: 10px; align-items: center; z-index: 2; flex-wrap: wrap;">
       <button mat-flat-button class="sync-btn" (click)="syncExisting()" [disabled]="syncing" style="background: rgba(255,255,255,0.2) !important; color: #fff !important; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px;">
         @if (syncing) {
           <mat-spinner diameter="16" color="accent"></mat-spinner>
@@ -23,7 +23,7 @@
       </button>
       <button mat-flat-button class="add-btn" (click)="showAddForm = !showAddForm">
         <i class="fa-solid" [ngClass]="showAddForm ? 'fa-xmark' : 'fa-plus'"></i>
-        <span>{{ showAddForm ? 'Close Form' : 'Authorize Student' }}</span>
+        <span>{{ showAddForm ? 'Close Form' : 'Authorize Students' }}</span>
       </button>
     </div>
     <div class="banner-orb"></div>
@@ -64,68 +64,170 @@
 
   </div>
 
-  <!-- Add Student Form Collapsible Card -->
+  <!-- Add / Upload Student Collapsible Card -->
   @if (showAddForm) {
-    <div class="va-card form-card" style="margin-bottom: 24px; border: 1.5px solid var(--primary); animation: slideDown 0.3s ease-out;">
-      <div class="card-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #FAFAFA;">
+    <div class="va-card form-card" style="margin-bottom: 24px; border: 1.5px solid var(--primary); animation: slideDown 0.3s ease-out; padding: 0 !important; overflow: hidden; border-radius: var(--radius-lg);">
+      
+      <!-- Card Header with Method Tabs -->
+      <div class="card-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #FAFAFA; flex-wrap: wrap; gap: 12px;">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <i class="fa-solid fa-user-plus" style="color: var(--primary);"></i>
-          <h3 style="font-size: 14px; font-weight: 700; margin: 0;">Add Authorized Student to Master Roster</h3>
+          <i class="fa-solid fa-user-plus" style="color: var(--primary); font-size: 18px;"></i>
+          <h3 style="font-size: 15px; font-weight: 700; margin: 0;">Authorize Students into University Master Roster</h3>
         </div>
-      </div>
-      <div class="card-body" style="padding: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Official Full Name</mat-label>
-            <mat-icon matPrefix>person</mat-icon>
-            <input matInput [(ngModel)]="newStudent.fullName" placeholder="e.g. John Doe" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Enrollment Number</mat-label>
-            <mat-icon matPrefix>badge</mat-icon>
-            <input matInput [(ngModel)]="newStudent.enrollmentNo" placeholder="e.g. 22BEIT3001" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Department</mat-label>
-            <mat-icon matPrefix>school</mat-icon>
-            <input matInput [(ngModel)]="newStudent.department" placeholder="e.g. Computer Engineering" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Semester</mat-label>
-            <mat-icon matPrefix>tag</mat-icon>
-            <input matInput type="number" min="1" max="8" [(ngModel)]="newStudent.semester" placeholder="e.g. 5" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Division / Class</mat-label>
-            <mat-icon matPrefix>group</mat-icon>
-            <input matInput [(ngModel)]="newStudent.division" placeholder="e.g. A" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Institutional Email (Optional)</mat-label>
-            <mat-icon matPrefix>email</mat-icon>
-            <input matInput [(ngModel)]="newStudent.email" placeholder="e.g. student@college.edu">
-          </mat-form-field>
-
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-          <button mat-button (click)="showAddForm = false">Cancel</button>
-          <button mat-flat-button color="primary" (click)="saveStudent()" [disabled]="addingStudent" style="background: var(--primary) !important; color: #fff !important; font-weight: 700; border-radius: 8px; padding: 0 20px; height: 44px;">
-            @if (addingStudent) {
-              <mat-spinner diameter="18" color="accent"></mat-spinner>
-              <span>Saving…</span>
-            } @else {
-              <i class="fa-solid fa-check" style="margin-right: 6px;"></i>
-              <span>Save to Master Roster</span>
-            }
+        
+        <!-- Toggle Tabs -->
+        <div class="tab-toggle-group" style="display: flex; background: #E2E8F0; padding: 3px; border-radius: 8px;">
+          <button type="button" class="toggle-tab-btn" [class.active]="activeTab === 'csv'" (click)="activeTab = 'csv'">
+            <i class="fa-solid fa-file-csv" style="margin-right: 4px;"></i> Upload CSV File
+          </button>
+          <button type="button" class="toggle-tab-btn" [class.active]="activeTab === 'manual'" (click)="activeTab = 'manual'">
+            <i class="fa-solid fa-pen-to-square" style="margin-right: 4px;"></i> Single Entry
           </button>
         </div>
+      </div>
+
+      <div class="card-body" style="padding: 24px;">
+
+        <!-- TAB 1: CSV BULK UPLOAD -->
+        @if (activeTab === 'csv') {
+          <div class="csv-upload-section">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px 0;">Bulk Upload Student List</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Upload a CSV file containing columns: <code>Name</code>, <code>Enrollment</code>, <code>Department</code>, <code>Sem</code>, <code>Div</code>, <code>Email</code></p>
+              </div>
+              <button mat-stroked-button type="button" (click)="downloadSampleCsv()" style="font-size: 12px; font-weight: 600; border-radius: 8px; color: var(--primary);">
+                <i class="fa-solid fa-download" style="margin-right: 6px;"></i> Download Sample CSV
+              </button>
+            </div>
+
+            <!-- Upload Dropzone -->
+            <div class="upload-dropzone" (click)="fileInput.click()" style="border: 2px dashed #CBD5E1; border-radius: 12px; padding: 32px 20px; text-align: center; background: #F8FAFC; cursor: pointer; transition: all 0.2s ease;">
+              <input #fileInput type="file" (change)="onFileSelected($event)" accept=".csv,.txt" style="display: none;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: #EEF2FF; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 12px;">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <h5 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 0 0 4px 0;">
+                {{ csvFileName ? csvFileName : 'Click to select or drop your Student List CSV' }}
+              </h5>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 0;">Supports .csv and text spreadsheets</p>
+            </div>
+
+            <!-- CSV Error Alert -->
+            @if (csvError) {
+              <div class="error-banner" style="background: #FFF1F2; border: 1px solid #FECDD3; border-radius: 8px; padding: 12px 16px; margin-top: 14px; color: #9F1239; font-size: 12.5px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>{{ csvError }}</span>
+              </div>
+            }
+
+            <!-- Parsed Preview -->
+            @if (parsedStudents.length > 0) {
+              <div class="parsed-preview-box" style="margin-top: 20px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;">
+                <div style="padding: 12px 16px; background: #F1F5F9; display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                    ✨ {{ parsedStudents.length }} Student{{ parsedStudents.length === 1 ? '' : 's' }} Ready to Import
+                  </span>
+                  <button mat-flat-button color="primary" (click)="importParsedStudents()" [disabled]="importingCsv" style="background: #10B981 !important; color: #fff !important; font-weight: 700; border-radius: 8px; font-size: 12px;">
+                    @if (importingCsv) {
+                      <mat-spinner diameter="16" color="accent"></mat-spinner>
+                      <span>Importing…</span>
+                    } @else {
+                      <i class="fa-solid fa-file-import" style="margin-right: 6px;"></i>
+                      <span>Confirm & Import All</span>
+                    }
+                  </button>
+                </div>
+
+                <div class="table-responsive" style="max-height: 240px; overflow-y: auto;">
+                  <table class="va-table" style="font-size: 12.5px;">
+                    <thead>
+                      <tr>
+                        <th>Enrollment No.</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th>Sem & Div</th>
+                        <th>Email</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (s of parsedStudents; track s.enrollmentNo) {
+                        <tr>
+                          <td><strong>#{{ s.enrollmentNo }}</strong></td>
+                          <td>{{ s.fullName }}</td>
+                          <td>{{ s.department }}</td>
+                          <td>Sem {{ s.semester }} ({{ s.division }})</td>
+                          <td>{{ s.email || '—' }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- TAB 2: MANUAL ENTRY -->
+        @if (activeTab === 'manual') {
+          <div class="manual-entry-section">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Official Full Name</mat-label>
+                <mat-icon matPrefix>person</mat-icon>
+                <input matInput [(ngModel)]="newStudent.fullName" placeholder="e.g. John Doe" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Enrollment Number</mat-label>
+                <mat-icon matPrefix>badge</mat-icon>
+                <input matInput [(ngModel)]="newStudent.enrollmentNo" placeholder="e.g. 22BEIT3001" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Department</mat-label>
+                <mat-icon matPrefix>school</mat-icon>
+                <input matInput [(ngModel)]="newStudent.department" placeholder="e.g. Computer Engineering" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Semester</mat-label>
+                <mat-icon matPrefix>tag</mat-icon>
+                <input matInput type="number" min="1" max="8" [(ngModel)]="newStudent.semester" placeholder="e.g. 5" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Division / Class</mat-label>
+                <mat-icon matPrefix>group</mat-icon>
+                <input matInput [(ngModel)]="newStudent.division" placeholder="e.g. A" required>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Institutional Email (Optional)</mat-label>
+                <mat-icon matPrefix>email</mat-icon>
+                <input matInput [(ngModel)]="newStudent.email" placeholder="e.g. student@college.edu">
+              </mat-form-field>
+
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+              <button mat-button (click)="showAddForm = false">Cancel</button>
+              <button mat-flat-button color="primary" (click)="saveStudent()" [disabled]="addingStudent" style="background: var(--primary) !important; color: #fff !important; font-weight: 700; border-radius: 8px; padding: 0 20px; height: 44px;">
+                @if (addingStudent) {
+                  <mat-spinner diameter="18" color="accent"></mat-spinner>
+                  <span>Saving…</span>
+                } @else {
+                  <i class="fa-solid fa-check" style="margin-right: 6px;"></i>
+                  <span>Save to Master Roster</span>
+                }
+              </button>
+            </div>
+          </div>
+        }
+
       </div>
     </div>
   }
@@ -140,7 +242,7 @@
         <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1; max-width: 320px; margin-bottom: 0;">
           <mat-label>Search Student or Enrollment</mat-label>
           <mat-icon matPrefix>search</mat-icon>
-          <input matInput [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="e.g. 22BEIT or Rahul">
+          <input matInput [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="e.g. 230410 or Maitra">
         </mat-form-field>
 
         <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 170px; margin-bottom: 0;">
@@ -169,7 +271,7 @@
       <div style="padding: 48px; text-align: center; color: var(--text-muted);">
         <i class="fa-solid fa-address-book" style="font-size: 36px; opacity: 0.4; margin-bottom: 12px; display: block; color: var(--primary);"></i>
         <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">No Master Roster Records Found</h3>
-        <p style="font-size: 13px; margin-bottom: 16px;">Click "Sync DB Students" to import current students, or click "Authorize Student" to add new enrollment entries.</p>
+        <p style="font-size: 13px; margin-bottom: 16px;">Upload a student list CSV or click "Sync DB Students" to import students.</p>
       </div>
     } @else {
       <div class="table-responsive">
@@ -180,6 +282,7 @@
               <th>Official Full Name</th>
               <th>Department</th>
               <th>Semester & Div</th>
+              <th>Email</th>
               <th>Onboarding Status</th>
               <th style="text-align: right;">Action</th>
             </tr>
@@ -194,6 +297,9 @@
                 <td>{{ student.department }}</td>
                 <td>
                   <span class="badge-neutral">Sem {{ student.semester }} (Div {{ student.division }})</span>
+                </td>
+                <td style="color: var(--text-muted); font-size: 12px;">
+                  {{ student.email || '—' }}
                 </td>
                 <td>
                   @if (student.isClaimed) {

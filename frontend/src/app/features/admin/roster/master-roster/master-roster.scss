@@ -69,6 +69,36 @@
   }
 }
 
+.toggle-tab-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--primary);
+  }
+
+  &.active {
+    background: #ffffff;
+    color: var(--primary);
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+}
+
+.upload-dropzone {
+  &:hover {
+    border-color: var(--primary) !important;
+    background: #EEF2FF !important;
+  }
+}
+
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
