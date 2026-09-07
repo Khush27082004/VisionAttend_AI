@@ -48,17 +48,19 @@
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  border-color: var(--warn) !important;
-  color: var(--warn) !important;
-  font-weight: 600 !important;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
   border-radius: var(--radius-sm) !important;
   font-size: 13px !important;
   padding: 8px 18px !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
   transition: var(--transition) !important;
-}
 
-.stop-btn:hover {
-  background: var(--warn-light) !important;
+  &:hover {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.45) !important;
+  }
 }
 
 /* ── Webcam ───────────────────────────── */

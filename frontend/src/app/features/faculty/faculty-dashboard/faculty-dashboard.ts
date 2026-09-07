@@ -15,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-faculty-dashboard', standalone: true,
@@ -41,6 +41,7 @@ export class FacultyDashboard implements OnInit {
   private attendanceService = inject(Attendance);
   private facultyService = inject(Faculty);
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   subjects: any[] = [];
@@ -253,10 +254,27 @@ export class FacultyDashboard implements OnInit {
     }
   }
 
-  stopAttendance() { 
-    this.attendanceActive = false; 
+  endLecture() {
+    if (!this.attendanceActive && !this.selectedSubjectId) return;
+
+    const presentCount = this.attendanceRecords.length;
+    this.attendanceActive = false;
     this.loadAttendance();
     this.loadEnrolledStudents();
+
+    const snackRef = this.snackBar.open(
+      `🎓 Lecture Ended! ${presentCount} student(s) marked Present. Attendance records are saved & updated in reports.`,
+      'View Reports',
+      { duration: 6000 }
+    );
+
+    snackRef.onAction().subscribe(() => {
+      this.router.navigate(['/dashboard/faculty/reports']);
+    });
+  }
+
+  stopAttendance() { 
+    this.endLecture();
   }
 
   onStudentMarked() {

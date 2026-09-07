@@ -111,18 +111,31 @@
           <input matInput type="date" [(ngModel)]="selectedDate" (change)="onDateChange()" [disabled]="attendanceActive">
         </mat-form-field>
 
-        <button
-          mat-flat-button
-          class="start-btn"
-          [class.proxy-start-btn]="isProxyMode"
-          (click)="startAttendance()"
-          [disabled]="!selectedSubjectId || attendanceActive"
-          id="start-attendance-btn"
-          style="height: 56px;"
-        >
-          <i class="fa-solid" [ngClass]="isProxyMode ? 'fa-bolt' : 'fa-play'"></i>
-          {{ isProxyMode ? 'Start Proxy Attendance' : 'Start Attendance' }}
-        </button>
+        @if (!attendanceActive) {
+          <button
+            mat-flat-button
+            class="start-btn"
+            [class.proxy-start-btn]="isProxyMode"
+            (click)="startAttendance()"
+            [disabled]="!selectedSubjectId"
+            id="start-attendance-btn"
+            style="height: 56px;"
+          >
+            <i class="fa-solid" [ngClass]="isProxyMode ? 'fa-bolt' : 'fa-play'"></i>
+            <span>{{ isProxyMode ? 'Start Proxy Attendance' : 'Start Attendance' }}</span>
+          </button>
+        } @else {
+          <button
+            mat-flat-button
+            class="end-lec-btn"
+            (click)="endLecture()"
+            id="end-lecture-btn"
+            style="height: 56px;"
+          >
+            <i class="fa-solid fa-flag-checkered"></i>
+            <span>End Lecture & Finalize</span>
+          </button>
+        }
       </div>
 
       <!-- Schedule filter toggle -->
@@ -145,9 +158,15 @@
       <!-- Camera -->
       @if (attendanceActive) {
         <div class="camera-section" [class.proxy-camera-border]="isProxyMode">
-          <div class="live-header" [class.proxy-live-header]="isProxyMode">
-            <div class="live-dot" [class.proxy-live-dot]="isProxyMode"></div>
-            <span>{{ isProxyMode ? 'Proxy Session Active (Covering for ' + getSelectedAbsentFacultyName() + ')' : 'Live Attendance Session Running' }}</span>
+          <div class="live-header" [class.proxy-live-header]="isProxyMode" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="live-dot" [class.proxy-live-dot]="isProxyMode"></div>
+              <span>{{ isProxyMode ? 'Proxy Session Active (Covering for ' + getSelectedAbsentFacultyName() + ')' : 'Live Attendance Session Running' }}</span>
+            </div>
+            <button mat-flat-button class="end-lec-small-btn" (click)="endLecture()">
+              <i class="fa-solid fa-flag-checkered" style="margin-right: 6px;"></i>
+              <span>End Lecture</span>
+            </button>
           </div>
           <app-attendance-camera 
             [subjectId]="selectedSubjectId" 

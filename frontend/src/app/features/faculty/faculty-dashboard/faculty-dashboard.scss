@@ -236,6 +236,48 @@
   box-shadow: 0 8px 24px rgba(79,70,229,.45) !important;
 }
 
+.end-lec-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  padding: 14px 28px !important;
+  font-size: 14px !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35) !important;
+  height: 56px !important;
+  flex-shrink: 0 !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45) !important;
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
+  }
+}
+
+.end-lec-small-btn {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  padding: 4px 14px !important;
+  border-radius: 8px !important;
+  height: 32px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+  }
+}
+
 /* ── Live Session ─────────────────────── */
 .camera-section { margin-top: 8px; }
 
