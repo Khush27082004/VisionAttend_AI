@@ -32,10 +32,10 @@ async function main() {
 
   await prisma.faculty.upsert({
     where: { userId: facultyUser.id },
-    update: { department: "Computer Science", employeeId: "EMP-001" },
+    update: { department: "Computer Engineering", employeeId: "EMP-001" },
     create: {
       userId: facultyUser.id,
-      department: "Computer Science",
+      department: "Computer Engineering",
       employeeId: "EMP-001"
     }
   });
@@ -54,13 +54,13 @@ async function main() {
 
   await prisma.student.upsert({
     where: { userId: studentUser.id },
-    update: { enrollmentNo: "22CS001", department: "Computer Science", semester: 6, division: "A" },
+    update: { enrollmentNo: "22CS001", department: "Computer Engineering", semester: 6, division: "CE-1" },
     create: {
       userId: studentUser.id,
       enrollmentNo: "22CS001",
-      department: "Computer Science",
+      department: "Computer Engineering",
       semester: 6,
-      division: "A"
+      division: "CE-1"
     }
   });
 

@@ -53,18 +53,16 @@ export class AddSubjectComponent implements OnInit {
 
   departmentOptions: string[] = [
     'Computer Engineering',
+    'Computer Science & Design',
     'Information Technology',
     'Artificial Intelligence & Data Science',
-    'Computer Science & Engineering',
     'Electronics & Communication Engineering',
     'Electrical Engineering',
     'Mechanical Engineering',
     'Civil Engineering',
     'Chemical Engineering',
     'Master of Computer Applications (MCA)',
-    'Bachelor of Computer Applications (BCA)',
-    'Data Science & Analytics',
-    'Cyber Security & Forensics'
+    'Bachelor of Computer Applications (BCA)'
   ];
 
   semesterOptions = [

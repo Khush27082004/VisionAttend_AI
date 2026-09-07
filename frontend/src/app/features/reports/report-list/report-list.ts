@@ -64,8 +64,8 @@ export class ReportList implements OnInit {
   // Data Sources
   subjects: any[] = [];
   uniqueDepartments: string[] = [
-    'Computer Science & Engineering',
     'Computer Engineering',
+    'Computer Science & Design',
     'Information Technology',
     'Artificial Intelligence & Data Science',
     'Electronics & Communication Engineering',
@@ -134,9 +134,12 @@ export class ReportList implements OnInit {
           next: (faculties) => {
             const currentFaculty = (faculties || []).find((f: any) => f.userId === user.id);
             if (currentFaculty && currentFaculty.department) {
-              this.currentFacultyDept = currentFaculty.department;
+              let dept = currentFaculty.department.trim();
+              if (dept === 'IT') dept = 'Information Technology';
+              if (dept === 'Computer Science' || dept === 'Computer Science & Engineering') dept = 'Computer Science & Design';
+              this.currentFacultyDept = dept;
               if (!this.selectedDept) {
-                this.selectedDept = currentFaculty.department;
+                this.selectedDept = dept;
               }
               this.cdr.detectChanges();
             }
@@ -150,11 +153,18 @@ export class ReportList implements OnInit {
     this.subjectService.getSubjects().subscribe({
       next: (data) => {
         this.subjects = data || [];
-        // Extract distinct departments from subjects
+        // Extract distinct departments from subjects and normalize
         const depts = new Set(this.uniqueDepartments);
         this.subjects.forEach(s => {
-          if (s.department) depts.add(s.department);
+          let d = (s.department || '').trim();
+          if (d === 'IT') d = 'Information Technology';
+          if (d === 'Computer Science' || d === 'Computer Science & Engineering') d = 'Computer Science & Design';
+          if (d) depts.add(d);
         });
+        // Ensure legacy strings are purged
+        depts.delete('IT');
+        depts.delete('Computer Science & Engineering');
+        depts.delete('Computer Science');
         this.uniqueDepartments = Array.from(depts);
 
         // Auto select first subject if available

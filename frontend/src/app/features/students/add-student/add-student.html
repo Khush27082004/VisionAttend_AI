@@ -65,7 +65,7 @@
         <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Department *</mat-label>
           <mat-icon matPrefix>school</mat-icon>
-          <input matInput type="text" formControlName="department" placeholder="e.g. Computer Science" />
+          <input matInput type="text" formControlName="department" placeholder="e.g. Computer Engineering" />
           @if (studentForm.get('department')?.invalid && studentForm.get('department')?.touched) {
             <mat-error>Department is required</mat-error>
           }

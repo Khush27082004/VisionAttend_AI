@@ -49,18 +49,16 @@ export class FacultySubjectsComponent implements OnInit {
   // Metadata Catalogs
   departmentOptions: string[] = [
     'Computer Engineering',
+    'Computer Science & Design',
     'Information Technology',
     'Artificial Intelligence & Data Science',
-    'Computer Science & Engineering',
     'Electronics & Communication Engineering',
     'Electrical Engineering',
     'Mechanical Engineering',
     'Civil Engineering',
     'Chemical Engineering',
     'Master of Computer Applications (MCA)',
-    'Bachelor of Computer Applications (BCA)',
-    'Data Science & Analytics',
-    'Cyber Security & Forensics'
+    'Bachelor of Computer Applications (BCA)'
   ];
 
   semesterOptions = [
@@ -212,12 +210,17 @@ export class FacultySubjectsComponent implements OnInit {
       return ['CE-1', 'CE-2', 'CE-3'];
     }
 
-    // 1. Computer Engineering / Computer Science / CSE / CE
+    // 1. Computer Science & Design / CSD
+    if (d.includes('design') || d.includes('csd')) {
+      return ['CSD-1', 'CSD-2', 'CSD-3'];
+    }
+
+    // 2. Computer Engineering / CE
     if (d.includes('comp') || d.includes('cse') || d.includes('ce') || d.includes('software')) {
       return ['CE-1', 'CE-2', 'CE-3'];
     }
 
-    // 2. Information Technology / IT
+    // 3. Information Technology
     if (d.includes('information') || d.includes('it') || d.includes('infotech')) {
       return ['IT-1', 'IT-2', 'IT-3'];
     }

@@ -37,14 +37,16 @@ export class AddFacultyComponent {
   private snackBar = inject(MatSnackBar);
 
   departments: string[] = [
-    'Computer Science & Engineering',
     'Computer Engineering',
+    'Computer Science & Design',
     'Information Technology',
     'Artificial Intelligence & Data Science',
     'Electronics & Communication Engineering',
     'Electrical Engineering',
     'Mechanical Engineering',
-    'Civil Engineering'
+    'Civil Engineering',
+    'Master of Computer Applications (MCA)',
+    'Bachelor of Computer Applications (BCA)'
   ];
 
   facultyData = {

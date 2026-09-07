@@ -52,8 +52,8 @@ export class FacultyReportComponent implements OnInit {
 
   departmentList: string[] = [
     'ALL',
-    'Computer Science & Engineering',
     'Computer Engineering',
+    'Computer Science & Design',
     'Information Technology',
     'Artificial Intelligence & Data Science',
     'Electronics & Communication Engineering',
