@@ -261,24 +261,26 @@ input, select, textarea {
   }
 }
 
-/* Material Datepicker Dialog & Calendar Theme (Matching Reference) */
+/* Material Datepicker Popup & Calendar Theme (Compact Normal Size) */
 .mat-datepicker-content,
 .mat-datepicker-dialog {
   background-color: #ffffff !important;
-  border-radius: 16px !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.06) !important;
   border: 1px solid #E2E8F0 !important;
   overflow: hidden !important;
+  max-width: 310px !important;
 
   .mat-datepicker-content-container {
     background-color: #ffffff !important;
+    width: 296px !important;
   }
 
   /* Datepicker Header Banner */
   .mat-calendar-header {
     background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%) !important;
     color: #ffffff !important;
-    padding: 16px !important;
+    padding: 8px 12px !important;
 
     .mat-calendar-controls {
       margin: 0 !important;
@@ -287,7 +289,7 @@ input, select, textarea {
       .mat-calendar-period-button {
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 14px !important;
+        font-size: 13px !important;
       }
 
       .mat-calendar-arrow {
@@ -308,27 +310,35 @@ input, select, textarea {
   /* Calendar Table & Days */
   .mat-calendar {
     font-family: var(--font-family) !important;
+    width: 296px !important;
+    height: auto !important;
   }
 
   .mat-calendar-table-header th {
     color: var(--text-secondary) !important;
     font-weight: 700 !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
+    padding: 4px 0 !important;
   }
 
-  /* Selected Date Circle (Purple fill) */
+  .mat-calendar-body-cell-content {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+  }
+
+  /* Selected Date Circle */
   .mat-calendar-body-selected {
     background-color: #4F46E5 !important;
     color: #ffffff !important;
     font-weight: 700 !important;
     border-radius: 50% !important;
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4) !important;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35) !important;
   }
 
   /* Today Circle Outline */
   .mat-calendar-body-today:not(.mat-calendar-body-selected) {
     border-color: #4F46E5 !important;
-    border-width: 2px !important;
+    border-width: 1.5px !important;
     font-weight: 700 !important;
     color: #4F46E5 !important;
   }
@@ -342,19 +352,22 @@ input, select, textarea {
 
   /* Actions (Cancel / OK) */
   .mat-datepicker-actions {
-    padding: 12px 20px !important;
+    padding: 8px 14px !important;
     border-top: 1px solid #F1F5F9 !important;
     background: #ffffff !important;
     display: flex !important;
     justify-content: flex-end !important;
-    gap: 8px !important;
+    gap: 6px !important;
 
     button {
       font-weight: 700 !important;
-      font-size: 12.5px !important;
+      font-size: 11.5px !important;
       text-transform: uppercase !important;
       letter-spacing: 0.5px !important;
-      border-radius: 8px !important;
+      border-radius: 6px !important;
+      padding: 0 10px !important;
+      height: 32px !important;
+      line-height: 32px !important;
     }
 
     .mat-datepicker-cancel {
