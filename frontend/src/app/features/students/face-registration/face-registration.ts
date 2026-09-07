@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WebcamImage, WebcamModule } from 'ngx-webcam';
@@ -21,6 +21,7 @@ export class FaceRegistrationComponent implements OnInit {
   private ai = inject(AiService);
   private students = inject(StudentService);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   studentId = Number(this.route.snapshot.paramMap.get('id'));
   trigger = new Subject<void>();
@@ -36,6 +37,7 @@ export class FaceRegistrationComponent implements OnInit {
           if (profile.id !== this.studentId) {
             this.router.navigate([`/dashboard/students/${profile.id}/register-face`]);
           }
+          this.cdr.detectChanges();
         },
         error: () => this.router.navigate(['/dashboard/student'])
       });
@@ -43,46 +45,72 @@ export class FaceRegistrationComponent implements OnInit {
   }
 
   get triggerObservable() { return this.trigger.asObservable(); }
-  capture() { this.trigger.next(); }
-  handleImage(image: WebcamImage) { this.webcamImage = image; }
+
+  capture() { 
+    this.saving = false;
+    this.trigger.next(); 
+    this.cdr.detectChanges();
+  }
+
+  handleImage(image: WebcamImage) { 
+    this.webcamImage = image; 
+    this.saving = false;
+    this.cdr.detectChanges();
+  }
 
   handleCameraError(error: any) {
     this.cameraError = error.message || 'Camera permission denied or device not found.';
     this.snackBar.open(this.cameraError || 'Camera error', 'Close', { duration: 5000 });
+    this.cdr.detectChanges();
   }
 
   register() {
     if (!this.webcamImage || !Number.isInteger(this.studentId)) return;
     this.saving = true;
-    fetch(this.webcamImage.imageAsDataUrl).then(response => response.blob()).then(blob => {
-      const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
-      this.ai.registerFace(this.studentId, file).subscribe({
-        next: result => {
-          if (!result.success) {
-            // AI returned a specific error (no face, multiple faces, etc.)
-            this.saving = false;
-            this.webcamImage = null; // Allow retake
-            this.snackBar.open(result.message || 'Face registration failed. Please try again.', 'Retake', { duration: 6000 });
-            return;
-          }
-          this.students.markFaceRegistered(this.studentId).subscribe({
-            next: () => {
-              this.snackBar.open('✅ Face registered successfully!', 'Close', { duration: 4000 });
+    this.cdr.detectChanges();
+
+    fetch(this.webcamImage.imageAsDataUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
+        this.ai.registerFace(this.studentId, file).subscribe({
+          next: result => {
+            if (!result.success) {
+              // AI returned validation error (no face, multiple faces, etc.)
               this.saving = false;
-              const user = JSON.parse(localStorage.getItem('user') ?? '{}');
-              if (user.role === 'STUDENT') {
-                this.router.navigate(['/dashboard/student']);
-              } else {
-                this.router.navigate(['/dashboard/students']);
-              }
-            },
-            error: () => this.finish('Face was stored, but the student record could not be updated.')
-          });
-        },
-        error: () => this.finish('Face registration service is unavailable. Please ensure the AI server is running.')
+              this.snackBar.open(result.message || 'Face registration failed. Please capture again.', 'Close', { duration: 6000 });
+              this.cdr.detectChanges();
+              return;
+            }
+            this.students.markFaceRegistered(this.studentId).subscribe({
+              next: () => {
+                this.snackBar.open('✅ Face registered successfully!', 'Close', { duration: 4000 });
+                this.saving = false;
+                this.cdr.detectChanges();
+                const user = JSON.parse(localStorage.getItem('user') ?? '{}');
+                if (user.role === 'STUDENT') {
+                  this.router.navigate(['/dashboard/student']);
+                } else {
+                  this.router.navigate(['/dashboard/students']);
+                }
+              },
+              error: () => this.finish('Face was stored, but the student record could not be updated.')
+            });
+          },
+          error: (err: any) => {
+            const msg = err.error?.message || 'Face registration service is unavailable. Please ensure AI service is running.';
+            this.finish(msg);
+          }
+        });
+      })
+      .catch(() => {
+        this.finish('Failed to process captured image.');
       });
-    });
   }
 
-  private finish(message: string) { this.saving = false; this.snackBar.open(message, 'Close', { duration: 4000 }); }
+  private finish(message: string) { 
+    this.saving = false; 
+    this.snackBar.open(message, 'Close', { duration: 5000 }); 
+    this.cdr.detectChanges();
+  }
 }
