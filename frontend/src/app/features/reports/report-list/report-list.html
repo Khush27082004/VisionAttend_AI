@@ -110,9 +110,9 @@
           </mat-select>
         </mat-form-field>
 
-        <!-- Division (Class) Selection -->
+        <!-- Division Selection -->
         <mat-form-field appearance="outline" class="form-field">
-          <mat-label>Division (Class)</mat-label>
+          <mat-label>Division</mat-label>
           <mat-icon matPrefix>groups</mat-icon>
           <mat-select [(ngModel)]="selectedDivision" (selectionChange)="generateReport()">
             @for (div of getDivisionOptions(); track div) {
@@ -281,7 +281,7 @@
                 <th style="width: 50px;">#</th>
                 <th>Student Details</th>
                 <th>Enrollment No.</th>
-                <th>Class / Div</th>
+                <th>Sem / Div</th>
                 <th style="text-align: center;">Attended / Total</th>
                 <th style="min-width: 140px;">Attendance Bar</th>
                 <th style="text-align: center;">Percentage</th>
@@ -305,7 +305,7 @@
                   </td>
                   <td>
                     <span class="badge-neutral" [class.badge-defaulter-enrollment]="st.isDefaulter">
-                      #{{ st.enrollmentNo }}
+                      {{ st.enrollmentNo }}
                     </span>
                   </td>
                   <td>

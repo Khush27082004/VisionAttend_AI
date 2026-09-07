@@ -408,6 +408,18 @@ router.get("/report/classwise", authenticate, authorize("FACULTY", "ADMIN"), asy
       }
       totalPercentageSum += percentage;
 
+      let div = (s.division || "").trim();
+      if (!div || div === "A" || div === "B" || div === "C" || div === "D") {
+        const deptStr = (s.department || effDept || "").toLowerCase();
+        if (deptStr.includes("design") || deptStr.includes("csd")) {
+          div = div === "B" ? "CSD-2" : div === "C" ? "CSD-3" : "CSD-1";
+        } else if (deptStr.includes("information") || deptStr.includes("it")) {
+          div = div === "B" ? "IT-2" : div === "C" ? "IT-3" : "IT-1";
+        } else {
+          div = div === "B" ? "CE-2" : div === "C" ? "CE-3" : "CE-1";
+        }
+      }
+
       return {
         studentId: s.id,
         fullName: s.user.fullName,
@@ -415,7 +427,7 @@ router.get("/report/classwise", authenticate, authorize("FACULTY", "ADMIN"), asy
         enrollmentNo: s.enrollmentNo,
         department: s.department,
         semester: s.semester,
-        division: s.division,
+        division: div,
         attendedLectures: attended,
         absentLectures: absent,
         totalLectures: total,

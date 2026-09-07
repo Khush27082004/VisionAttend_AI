@@ -77,7 +77,7 @@
                   </div>
                 </td>
                 <td>{{ student.user.email }}</td>
-                <td><span class="badge-neutral" style="background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">#{{ student.enrollmentNo }}</span></td>
+                <td><span class="badge-neutral" style="background: #F1F5F9; color: #475569; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">{{ student.enrollmentNo }}</span></td>
                 <td>
                   <span [class]="student.faceRegistered ? 'badge badge-success' : 'badge badge-neutral'">
                     <i [class]="student.faceRegistered ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'" style="margin-right: 4px;"></i>

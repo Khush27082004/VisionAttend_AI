@@ -199,7 +199,7 @@
                 @for (record of attendanceRecords; track record.id) {
                   <tr>
                     <td>{{ record.studentName }}</td>
-                    <td><span class="badge-neutral">#{{ record.enrollmentNo }}</span></td>
+                    <td><span class="badge-neutral">{{ record.enrollmentNo }}</span></td>
                     <td class="hide-active">{{ record.department }} (Sem {{ record.semester }}, Div {{ record.division }})</td>
                     <td>
                       <span class="hide-active">{{ record.date | date:'medium' }}</span>
@@ -254,7 +254,7 @@
               <tr>
                 <th>Student Name</th>
                 <th>Enrollment No.</th>
-                <th>Division</th>
+                <th>Sem / Div</th>
                 <th>Status Today</th>
                 <th style="text-align: right;">Action</th>
               </tr>
@@ -263,7 +263,7 @@
               @for (student of enrolledStudents; track student.id) {
                 <tr>
                   <td>{{ student.fullName }}</td>
-                  <td><span class="badge-neutral">#{{ student.enrollmentNo }}</span></td>
+                  <td><span class="badge-neutral">{{ student.enrollmentNo }}</span></td>
                   <td>Division {{ student.division }}</td>
                   <td>
                     @if (isStudentPresent(student.enrollmentNo)) {

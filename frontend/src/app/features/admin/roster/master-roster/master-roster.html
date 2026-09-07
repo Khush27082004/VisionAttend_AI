@@ -154,7 +154,7 @@
                     <tbody>
                       @for (s of parsedStudents; track s.enrollmentNo) {
                         <tr>
-                          <td><strong>#{{ s.enrollmentNo }}</strong></td>
+                          <td><strong>{{ s.enrollmentNo }}</strong></td>
                           <td>{{ s.fullName }}</td>
                           <td>{{ s.department }}</td>
                           <td>Sem {{ s.semester }} ({{ s.division }})</td>
@@ -291,7 +291,7 @@
             @for (student of filteredRoster; track student.id) {
               <tr>
                 <td>
-                  <span class="badge-neutral" style="font-weight: 700; font-size: 12px;">#{{ student.enrollmentNo }}</span>
+                  <span class="badge-neutral" style="font-weight: 700; font-size: 12px;">{{ student.enrollmentNo }}</span>
                 </td>
                 <td style="font-weight: 600;">{{ student.fullName }}</td>
                 <td>{{ student.department }}</td>
