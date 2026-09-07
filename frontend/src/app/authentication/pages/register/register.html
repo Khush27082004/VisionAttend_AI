@@ -78,6 +78,7 @@
             matInput 
             type="text" 
             [(ngModel)]="registerData.enrollmentNo" 
+            (input)="onEnrollmentChange()"
             (blur)="verifyEnrollmentNumber()"
             (keyup.enter)="verifyEnrollmentNumber()"
             placeholder="e.g. 22BEIT3001" 

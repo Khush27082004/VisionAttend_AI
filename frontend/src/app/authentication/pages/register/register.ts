@@ -59,25 +59,44 @@ export class RegisterComponent {
   errorMessage = '';
   currentYear = new Date().getFullYear();
 
-  onEnrollmentChange() {
+  clearFields() {
+    this.registerData.fullName = '';
+    this.registerData.email = '';
+    this.registerData.department = '';
+    this.registerData.semester = '';
+    this.registerData.division = '';
+    this.registerData.password = '';
+    this.registerData.phone = '';
     this.isVerifiedInRoster = false;
     this.verificationMessage = '';
     this.verificationError = '';
     this.isClaimed = false;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+  }
 
-    const enNo = this.registerData.enrollmentNo.trim();
-    if (enNo.length >= 3) {
-      this.verifyEnrollmentNumber();
-    }
+  onEnrollmentChange() {
+    // Instantly wipe previous student's loaded details when typing a new enrollment number
+    this.clearFields();
   }
 
   verifyEnrollmentNumber() {
     const enNo = this.registerData.enrollmentNo.trim();
     if (!enNo) return;
 
+    // Reset previous loaded student data before verifying the new number
+    this.registerData.fullName = '';
+    this.registerData.email = '';
+    this.registerData.department = '';
+    this.registerData.semester = '';
+    this.registerData.division = '';
+    this.registerData.password = '';
+
     this.verifyingEnrollment = true;
     this.verificationError = '';
     this.verificationMessage = '';
+    this.isVerifiedInRoster = false;
+    this.cdr.detectChanges();
 
     this.rosterService.verifyEnrollment(enNo).subscribe({
       next: (res: VerifyRosterResult) => {
@@ -85,11 +104,11 @@ export class RegisterComponent {
         if (res.valid) {
           if (res.data) {
             this.isVerifiedInRoster = true;
-            this.registerData.fullName = res.data.fullName || this.registerData.fullName;
-            this.registerData.department = res.data.department;
-            this.registerData.semester = String(res.data.semester);
-            this.registerData.division = res.data.division;
-            if (res.data.email && !this.registerData.email) {
+            this.registerData.fullName = res.data.fullName || '';
+            this.registerData.department = res.data.department || '';
+            this.registerData.semester = res.data.semester ? String(res.data.semester) : '';
+            this.registerData.division = res.data.division || '';
+            if (res.data.email) {
               this.registerData.email = res.data.email;
             }
             this.verificationMessage = `Verified by Master Roster: ${res.data.fullName} — ${res.data.department} (Sem ${res.data.semester})`;
@@ -104,6 +123,14 @@ export class RegisterComponent {
       error: (err: any) => {
         this.verifyingEnrollment = false;
         this.isVerifiedInRoster = false;
+        // Ensure all fields remain blank on error
+        this.registerData.fullName = '';
+        this.registerData.email = '';
+        this.registerData.department = '';
+        this.registerData.semester = '';
+        this.registerData.division = '';
+        this.registerData.password = '';
+
         if (err.status === 409) {
           this.isClaimed = true;
           this.verificationError = 'This enrollment number is already registered with an active student account.';
