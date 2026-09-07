@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WebcamImage, WebcamModule } from 'ngx-webcam';
 import { Subject } from 'rxjs';
@@ -14,7 +14,7 @@ import { Attendance } from '../../../core/services/attendance';
   imports: [CommonModule, WebcamModule, MatButtonModule, MatCardModule, MatSnackBarModule, MatProgressSpinnerModule],
   templateUrl: './attendance-camera.html', styleUrl: './attendance-camera.scss'
 })
-export class AttendanceCameraComponent implements OnInit, OnDestroy {
+export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
   @Input({ required: true }) subjectId = 0;
   @Input() date = '';
   @Output() stop = new EventEmitter<void>();
@@ -29,25 +29,62 @@ export class AttendanceCameraComponent implements OnInit, OnDestroy {
   trigger = new Subject<void>();
   processing = false;
   status = 'Starting camera…';
+  recognizedCount = 0;
 
   get triggerObservable() { return this.trigger.asObservable(); }
 
+  ngOnChanges(changes: SimpleChanges) {
+    // Reset session state when subject or date changes
+    if (changes['subjectId'] || changes['date']) {
+      this.markedStudentIds.clear();
+      this.recognizedCount = 0;
+      this.processing = false;
+      this.status = 'Scanning for faces…';
+    }
+  }
+
   ngOnInit() {
     this.status = 'Scanning for faces…';
-    this.scanTimer = setInterval(() => this.captureFrame(), 2000);
+    this.markedStudentIds.clear();
+    this.recognizedCount = 0;
+    // Fast scan: capture every 1.2 seconds for responsive recognition
+    this.scanTimer = setInterval(() => this.captureFrame(), 1200);
   }
 
   handleImage(image: WebcamImage) {
     if (!this.subjectId || this.processing) return;
     this.processing = true;
 
-    fetch(image.imageAsDataUrl)
-      .then(response => response.blob())
-      .then(blob => this.ai.recognize(new File([blob], 'attendance-face.jpg', { type: 'image/jpeg' })).subscribe({
-        next: recognition => this.handleRecognition(recognition),
-        error: () => this.finishFrame('Recognition service unavailable. Retrying…')
-      }))
-      .catch(() => this.finishFrame('Unable to capture camera frame. Retrying…'));
+    // Compress image via canvas for much faster upload + AI processing
+    this.compressAndSend(image.imageAsDataUrl);
+  }
+
+  private compressAndSend(dataUrl: string) {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 320; // small image = fast upload + fast AI processing
+      let w = img.width, h = img.height;
+      if (Math.max(w, h) > MAX) {
+        const scale = MAX / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        if (!blob) { this.finishFrame('Unable to capture camera frame. Retrying…'); return; }
+        const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
+        this.ai.recognize(file).subscribe({
+          next: recognition => this.handleRecognition(recognition),
+          error: () => this.finishFrame('Recognition service unavailable. Retrying…')
+        });
+      }, 'image/jpeg', 0.65); // 65% quality — sufficient for face recognition, faster transfer
+    };
+    img.onerror = () => this.finishFrame('Unable to capture camera frame. Retrying…');
+    img.src = dataUrl;
   }
 
   captureFrame() {
@@ -85,7 +122,9 @@ export class AttendanceCameraComponent implements OnInit, OnDestroy {
     const newIds = idsToMark.filter(id => !this.markedStudentIds.has(id));
 
     if (newIds.length === 0) {
-      this.finishFrame('Scanning for faces…');
+      this.finishFrame(this.recognizedCount > 0
+        ? `${this.recognizedCount} student(s) marked. Scanning for more…`
+        : 'Already marked. Scanning for new faces…');
       return;
     }
 
@@ -98,6 +137,7 @@ export class AttendanceCameraComponent implements OnInit, OnDestroy {
         next: result => {
           if (result.success) {
             this.markedStudentIds.add(studentId);
+            this.recognizedCount++;
             this.studentMarked.emit(studentId);
             successCount++;
           }
@@ -118,8 +158,8 @@ export class AttendanceCameraComponent implements OnInit, OnDestroy {
 
   private showSummaryAndFinish(successCount: number) {
     if (successCount > 0) {
-      this.snackBar.open(`Attendance marked for ${successCount} student(s)`, 'Close', { duration: 3000 });
-      this.finishFrame('Attendance marked. Continuing scan…');
+      this.snackBar.open(`✅ Attendance marked for ${successCount} student(s)`, 'Close', { duration: 3000 });
+      this.finishFrame(`✅ ${this.recognizedCount} student(s) marked total. Scanning…`);
     } else {
       this.finishFrame('No new attendance marked. Continuing scan…');
     }

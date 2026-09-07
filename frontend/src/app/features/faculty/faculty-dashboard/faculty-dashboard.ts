@@ -41,7 +41,7 @@ export class FacultyDashboard implements OnInit {
   attendanceActive = false;
   attendanceRecords: any[] = [];
   enrolledStudents: any[] = [];
-  filterByDay = true;
+  filterByDay = false;
 
   // Custom Date selection
   selectedDate: string = (() => {
@@ -157,6 +157,11 @@ export class FacultyDashboard implements OnInit {
 
   stopAttendance() { 
     this.attendanceActive = false; 
+    this.loadAttendance();
+    this.loadEnrolledStudents();
+  }
+
+  onStudentMarked() {
     this.loadAttendance();
     this.loadEnrolledStudents();
   }

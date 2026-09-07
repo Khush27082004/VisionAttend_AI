@@ -75,6 +75,6 @@ export class Topbar implements OnInit {
     // Try to match dynamic segments like /students/:id/register-face
     if (clean.includes('register-face')) { this.pageTitle = 'Register Face'; return; }
     if (clean.includes('/students/edit')) { this.pageTitle = 'Edit Student'; return; }
-    this.pageTitle = ROUTE_TITLES[clean] ?? 'VisionAttend AI';
+    this.pageTitle = ROUTE_TITLES[clean] ?? 'FacultyEase Ai';
   }
 }

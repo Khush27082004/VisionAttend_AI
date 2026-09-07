@@ -85,7 +85,7 @@
             <div class="live-dot"></div>
             <span>Live Attendance Session Running</span>
           </div>
-          <app-attendance-camera [subjectId]="selectedSubjectId" [date]="selectedDate" (stop)="stopAttendance()" (studentMarked)="loadAttendance()"></app-attendance-camera>
+          <app-attendance-camera [subjectId]="selectedSubjectId" [date]="selectedDate" (stop)="stopAttendance()" (studentMarked)="onStudentMarked()"></app-attendance-camera>
         </div>
       }
       

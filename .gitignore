@@ -45,6 +45,10 @@ ai-service/.venv/
 ai-service/venv/
 ai-service/*.pyc
 ai-service/face_data/
+ai-service/embeddings/*.npy
+ai-service/uploads/*
+!ai-service/uploads/.gitkeep
+!ai-service/embeddings/.gitkeep
 
 # Test files
 backend/test-login.ts

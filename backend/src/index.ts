@@ -30,7 +30,7 @@ app.use("/attendance", attendanceRoutes);
 app.use("/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
-  res.json({ message: "VisionAttend-AI API is running" });
+  res.json({ message: "FacultyEase Ai API is running" });
 });
 
 app.listen(PORT, () => {

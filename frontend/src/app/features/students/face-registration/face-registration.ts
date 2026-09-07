@@ -58,10 +58,17 @@ export class FaceRegistrationComponent implements OnInit {
       const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
       this.ai.registerFace(this.studentId, file).subscribe({
         next: result => {
-          if (!result.success) { this.finish(result.message); return; }
+          if (!result.success) {
+            // AI returned a specific error (no face, multiple faces, etc.)
+            this.saving = false;
+            this.webcamImage = null; // Allow retake
+            this.snackBar.open(result.message || 'Face registration failed. Please try again.', 'Retake', { duration: 6000 });
+            return;
+          }
           this.students.markFaceRegistered(this.studentId).subscribe({
             next: () => {
-              this.finish('Face registered successfully');
+              this.snackBar.open('✅ Face registered successfully!', 'Close', { duration: 4000 });
+              this.saving = false;
               const user = JSON.parse(localStorage.getItem('user') ?? '{}');
               if (user.role === 'STUDENT') {
                 this.router.navigate(['/dashboard/student']);
@@ -72,7 +79,7 @@ export class FaceRegistrationComponent implements OnInit {
             error: () => this.finish('Face was stored, but the student record could not be updated.')
           });
         },
-        error: () => this.finish('Face registration service is unavailable.')
+        error: () => this.finish('Face registration service is unavailable. Please ensure the AI server is running.')
       });
     });
   }
