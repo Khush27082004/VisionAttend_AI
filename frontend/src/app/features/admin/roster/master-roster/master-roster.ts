@@ -274,7 +274,7 @@ Maitra Patel,230410116092,Information Technology,7,C,maitra.patel@college.edu`;
           enrollmentNo: '',
           department: 'Computer Engineering',
           semester: 5,
-          division: 'A',
+          division: 'CE-1',
           email: ''
         };
         this.loadRoster();
@@ -303,6 +303,20 @@ Maitra Patel,230410116092,Information Technology,7,C,maitra.patel@college.edu`;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  clearAllRoster() {
+    if (confirm('Are you sure you want to completely clear the Master Student Roster? All pre-authorized enrollment numbers will be removed.')) {
+      this.rosterService.clearAllRoster().subscribe({
+        next: (res) => {
+          this.snackBar.open(res.message || 'Master roster cleared successfully.', 'Close', { duration: 3000 });
+          this.loadRoster();
+        },
+        error: (err) => {
+          this.snackBar.open(err.error?.message || 'Could not clear master roster.', 'Close', { duration: 3000 });
+        }
+      });
+    }
   }
 
   deleteEntry(id: number) {

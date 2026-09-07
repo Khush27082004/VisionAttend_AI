@@ -70,6 +70,10 @@ export class RosterService {
     return this.http.delete<any>(`${this.api}/${id}`);
   }
 
+  clearAllRoster(): Observable<any> {
+    return this.http.delete<any>(`${this.api}/clear-all`);
+  }
+
   syncExistingStudents(): Observable<any> {
     return this.http.post<any>(`${this.api}/sync-existing`, {});
   }

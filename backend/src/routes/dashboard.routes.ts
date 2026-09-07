@@ -86,13 +86,14 @@ router.get("/stats", authenticate, async (req, res) => {
   }
 });
 
-// Admin command: delete all students & their user accounts
+// Admin command: delete all students & their user accounts + master roster
 router.delete("/reset/students", authenticate, authorize("ADMIN"), async (req, res) => {
   try {
     await prisma.attendance.deleteMany();
     await prisma.student.deleteMany();
+    await prisma.masterStudentRoster.deleteMany();
     await prisma.user.deleteMany({ where: { role: "STUDENT" } });
-    return res.json({ success: true, message: "All student records and user credentials successfully deleted." });
+    return res.json({ success: true, message: "All student records, directory entries, and master roster successfully deleted." });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: "Could not delete student records." });
@@ -119,6 +120,7 @@ router.delete("/reset/all", authenticate, authorize("ADMIN"), async (req, res) =
     await prisma.attendance.deleteMany();
     await prisma.subject.deleteMany();
     await prisma.student.deleteMany();
+    await prisma.masterStudentRoster.deleteMany();
     await prisma.faculty.deleteMany();
     await prisma.user.deleteMany({ where: { role: { not: "ADMIN" } } });
     return res.json({ success: true, message: "Entire database successfully reset (excluding Administrators)." });

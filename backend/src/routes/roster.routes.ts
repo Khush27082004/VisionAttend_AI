@@ -219,7 +219,18 @@ router.post("/bulk", authenticate, authorize("ADMIN"), async (req: AuthRequest, 
   }
 });
 
-// 5. Delete Entry from Master Roster (Admin)
+// 5. Clear Entire Master Roster (Admin)
+router.delete("/clear-all", authenticate, authorize("ADMIN"), async (req: AuthRequest, res) => {
+  try {
+    await prisma.masterStudentRoster.deleteMany();
+    return res.json({ message: "Master student roster cleared successfully." });
+  } catch (error) {
+    console.error("Error clearing master roster:", error);
+    return res.status(500).json({ message: "Could not clear master roster." });
+  }
+});
+
+// 6. Delete Single Entry from Master Roster (Admin)
 router.delete("/:id", authenticate, authorize("ADMIN"), async (req: AuthRequest, res) => {
   try {
     const id = Number(req.params.id);

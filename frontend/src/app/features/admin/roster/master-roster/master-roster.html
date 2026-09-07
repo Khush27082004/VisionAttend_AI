@@ -21,6 +21,10 @@
           <span>Sync DB Students</span>
         }
       </button>
+      <button mat-flat-button (click)="clearAllRoster()" [disabled]="roster.length === 0" style="background: rgba(239, 68, 68, 0.85) !important; color: #fff !important; font-weight: 600; border-radius: 8px;">
+        <i class="fa-solid fa-trash-can" style="margin-right: 6px;"></i>
+        <span>Clear Roster</span>
+      </button>
       <button mat-flat-button class="add-btn" (click)="showAddForm = !showAddForm">
         <i class="fa-solid" [ngClass]="showAddForm ? 'fa-xmark' : 'fa-plus'"></i>
         <span>{{ showAddForm ? 'Close Form' : 'Authorize Students' }}</span>
