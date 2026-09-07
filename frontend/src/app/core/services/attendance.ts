@@ -68,4 +68,18 @@ export class Attendance {
   seedDemoReportData(): Observable<any> {
     return this.http.post<any>(`${this.api}/seed-demo`, {});
   }
+
+  getFacultyWorkloadReport(params: {
+    department?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Observable<{ summary: any; faculties: any[] }> {
+    const queryParts: string[] = [];
+    if (params.department && params.department !== 'ALL') queryParts.push(`department=${encodeURIComponent(params.department)}`);
+    if (params.startDate) queryParts.push(`startDate=${encodeURIComponent(params.startDate)}`);
+    if (params.endDate) queryParts.push(`endDate=${encodeURIComponent(params.endDate)}`);
+
+    const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
+    return this.http.get<{ summary: any; faculties: any[] }>(`${this.api}/report/faculty-workload${queryString}`);
+  }
 }

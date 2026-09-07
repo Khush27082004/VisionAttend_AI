@@ -11,10 +11,16 @@
         <p>Manage system faculty members and their profile information</p>
       </div>
     </div>
-    <a mat-flat-button routerLink="/dashboard/admin/faculty/add" class="add-btn">
-      <i class="fa-solid fa-plus"></i>
-      <span>Add Faculty Member</span>
-    </a>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a mat-stroked-button routerLink="/dashboard/admin/faculty-reports" style="background: rgba(99, 102, 241, 0.1); color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.3); font-weight: 600; padding: 0 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; height: 38px;">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Faculty Workload Report</span>
+      </a>
+      <a mat-flat-button routerLink="/dashboard/admin/faculty/add" class="add-btn">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add Faculty Member</span>
+      </a>
+    </div>
   </div>
 
   <!-- Table Card -->

@@ -1,0 +1,394 @@
+<div class="page-wrapper faculty-report-page">
+
+  <!-- Printable Header (Only in Print / PDF mode) -->
+  <div class="print-only-header">
+    <div class="print-logo-row">
+      <div>
+        <h2>FacultyEase Ai &mdash; Institutional Faculty Activity Report</h2>
+        <p>FACULTY LECTURE, PROXY & LEAVE AUDIT SUMMARY</p>
+      </div>
+      <div class="print-timestamp">
+        <span>Generated: {{ summary?.endDate || startDate }}</span>
+      </div>
+    </div>
+    <div class="print-meta-grid">
+      <div><strong>Department:</strong> {{ selectedDept }}</div>
+      <div><strong>Date Range:</strong> {{ startDate }} to {{ endDate }}</div>
+      <div><strong>Total Faculty:</strong> {{ summary?.totalFaculty }}</div>
+      <div><strong>Total Regular Lectures:</strong> {{ summary?.totalRegularLectures }}</div>
+      <div><strong>Total Proxy Lectures:</strong> {{ summary?.totalProxyLectures }}</div>
+      <div><strong>Total Leave Instances Covered:</strong> {{ summary?.totalLeaveInstances }}</div>
+    </div>
+  </div>
+
+  <!-- Screen Header Banner -->
+  <div class="welcome-banner no-print">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <h2>Faculty Workload, Proxy & Leave Report</h2>
+        <p>Comprehensive audit of regular lectures taught, peer proxy coverage, and leaves taken across all departments</p>
+      </div>
+    </div>
+
+    <div class="banner-actions">
+      <button mat-flat-button class="demo-seed-btn" (click)="loadDemoData()" [disabled]="seeding" title="Populate realistic faculty teaching and proxy logs to test immediately">
+        @if (seeding) {
+          <mat-spinner diameter="16" color="accent"></mat-spinner>
+          <span>Loading…</span>
+        } @else {
+          <i class="fa-solid fa-wand-magic-sparkles icon-left"></i>
+          <span>Load Test Data</span>
+        }
+      </button>
+      <button mat-flat-button class="export-excel-btn" (click)="exportToCSV()" [disabled]="faculties.length === 0">
+        <i class="fa-solid fa-file-excel icon-left"></i> Export Excel (CSV)
+      </button>
+      <button mat-flat-button class="print-pdf-btn" (click)="printReport()" [disabled]="faculties.length === 0">
+        <i class="fa-solid fa-print icon-left"></i> Print / PDF Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="va-card filter-card no-print">
+    <div class="card-header filter-header">
+      <div class="header-icon-title">
+        <i class="fa-solid fa-sliders table-icon"></i>
+        <div>
+          <h3>Workload Audit Filters</h3>
+          <p>Filter teaching activity by department, date range, or proxy status</p>
+        </div>
+      </div>
+
+      <!-- Date Presets -->
+      <div class="preset-pill-group">
+        <button class="preset-pill" (click)="setPresetRange('thisMonth')">This Month</button>
+        <button class="preset-pill" (click)="setPresetRange('last30')">Last 30 Days</button>
+        <button class="preset-pill" (click)="setPresetRange('semester')">Semester</button>
+        <button class="preset-pill" (click)="setPresetRange('today')">Today</button>
+      </div>
+    </div>
+
+    <div class="filter-card-body">
+      <div class="filters-grid">
+        
+        <!-- Department Filter -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Department</mat-label>
+          <mat-icon matPrefix>business</mat-icon>
+          <mat-select [(ngModel)]="selectedDept" (selectionChange)="loadReport()">
+            @for (dept of departmentList; track dept) {
+              <mat-option [value]="dept">{{ dept === 'ALL' ? 'All Departments' : dept }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Status / Activity Filter -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Activity Filter</mat-label>
+          <mat-icon matPrefix>filter_list</mat-icon>
+          <mat-select [(ngModel)]="statusFilter">
+            <mat-option value="ALL">All Faculty Members</mat-option>
+            <mat-option value="PROXY_CONDUCTED">Conducted Proxy for Peers</mat-option>
+            <mat-option value="ON_LEAVE">Had Leaves (Proxy Received)</mat-option>
+            <mat-option value="HIGH">High Teaching Activity (&ge; 5 Lectures)</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Start Date Material Picker -->
+        <mat-form-field appearance="outline" class="form-field datepicker-field">
+          <mat-label>Start Date</mat-label>
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <input
+            matInput
+            [matDatepicker]="startPicker"
+            [(ngModel)]="startDateObj"
+            (dateChange)="onStartDateChange()"
+            placeholder="Select start date"
+            (click)="startPicker.open()"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker [touchUi]="true"></mat-datepicker>
+        </mat-form-field>
+
+        <!-- End Date Material Picker -->
+        <mat-form-field appearance="outline" class="form-field datepicker-field">
+          <mat-label>End Date</mat-label>
+          <mat-icon matPrefix>event</mat-icon>
+          <input
+            matInput
+            [matDatepicker]="endPicker"
+            [(ngModel)]="endDateObj"
+            (dateChange)="onEndDateChange()"
+            placeholder="Select end date"
+            (click)="endPicker.open()"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker [touchUi]="true"></mat-datepicker>
+        </mat-form-field>
+
+      </div>
+
+      <div class="filter-actions-row">
+        <div class="search-box">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput [(ngModel)]="searchQuery" placeholder="Search faculty name, employee ID, or designation..." />
+          </mat-form-field>
+        </div>
+
+        <div class="filter-toggles">
+          <button mat-button class="reset-btn" (click)="resetFilters()">
+            <i class="fa-solid fa-rotate-left"></i> Reset
+          </button>
+          
+          <button mat-flat-button color="primary" class="apply-btn" (click)="loadReport()">
+            <i class="fa-solid fa-bolt icon-left"></i> Apply Filter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-container no-print">
+      <mat-spinner diameter="44" color="primary"></mat-spinner>
+      <p>Calculating faculty regular lectures, proxy sessions, and leave coverage…</p>
+    </div>
+  }
+
+  <!-- Institutional KPI Summary Cards -->
+  @if (!loading && summary) {
+    <div class="stats-grid">
+      
+      <!-- Total Faculty -->
+      <div class="stat-card">
+        <div class="stat-icon-wrapper icon-blue">
+          <i class="fa-solid fa-chalkboard-user"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Faculty Members</span>
+          <h3 class="stat-value">{{ summary.totalFaculty }}</h3>
+          <span class="stat-sub">In {{ summary.department }}</span>
+        </div>
+      </div>
+
+      <!-- Regular Lectures Taken -->
+      <div class="stat-card">
+        <div class="stat-icon-wrapper icon-emerald">
+          <i class="fa-solid fa-book-open-reader"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Regular Lectures</span>
+          <h3 class="stat-value text-emerald">{{ summary.totalRegularLectures }}</h3>
+          <span class="stat-sub">Sessions taught as scheduled</span>
+        </div>
+      </div>
+
+      <!-- Proxy Lectures Conducted -->
+      <div class="stat-card">
+        <div class="stat-icon-wrapper icon-amber">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Proxy Conducted</span>
+          <h3 class="stat-value text-amber">{{ summary.totalProxyLectures }}</h3>
+          <span class="stat-sub">Covered on behalf of absent peers</span>
+        </div>
+      </div>
+
+      <!-- Leaves / Proxy Received -->
+      <div class="stat-card">
+        <div class="stat-icon-wrapper icon-purple">
+          <i class="fa-solid fa-handshake-angle"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Leaves / Proxy Received</span>
+          <h3 class="stat-value text-purple">{{ summary.totalLeaveInstances }}</h3>
+          <span class="stat-sub">Classes covered during faculty leave</span>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- Faculty Performance Table -->
+  @if (!loading) {
+    <div class="va-card report-table-card">
+      <div class="card-header table-header no-print">
+        <div class="header-icon-title">
+          <i class="fa-solid fa-users-viewfinder table-icon"></i>
+          <div>
+            <h3>Faculty Workload & Activity Breakdown</h3>
+            <p>Showing {{ filteredFaculties.length }} faculty member{{ filteredFaculties.length === 1 ? '' : 's' }}</p>
+          </div>
+        </div>
+
+        <div class="table-legend">
+          <span class="legend-item"><span class="legend-dot dot-emerald"></span> Regular Sessions</span>
+          <span class="legend-item"><span class="legend-dot dot-amber"></span> Proxy Conducted</span>
+          <span class="legend-item"><span class="legend-dot dot-purple"></span> Leaves / Proxy Received</span>
+        </div>
+      </div>
+
+      @if (filteredFaculties.length === 0) {
+        <div class="empty-list">
+          <i class="fa-solid fa-user-xmark"></i>
+          <p>No faculty activity found for the selected timeframe.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="va-table report-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Faculty Member</th>
+                <th>Employee ID</th>
+                <th>Department</th>
+                <th style="text-align: center;">Regular Lectures</th>
+                <th style="text-align: center;">Proxy Conducted</th>
+                <th style="text-align: center;">Leaves (Proxy Received)</th>
+                <th style="text-align: center;">Total Taught</th>
+                <th style="text-align: right;" class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fac of filteredFaculties; track fac.facultyId; let i = $index) {
+                <tr [class.highlighted-proxy-row]="fac.proxyReceivedCount > 0">
+                  <td class="index-col">{{ i + 1 }}</td>
+                  <td>
+                    <div class="faculty-name-cell">
+                      <div class="faculty-avatar">
+                        {{ fac.fullName[0] }}
+                      </div>
+                      <div>
+                        <div class="faculty-name-text">{{ fac.fullName }}</div>
+                        <div class="faculty-sub-text">{{ fac.designation }} &bull; {{ fac.email }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge-neutral">#{{ fac.employeeId }}</span>
+                  </td>
+                  <td>
+                    <span class="dept-text">{{ fac.department }}</span>
+                  </td>
+                  
+                  <!-- Regular Lectures -->
+                  <td style="text-align: center;">
+                    <span class="pill-metric pill-regular">
+                      <i class="fa-solid fa-book"></i> {{ fac.regularLecturesCount }}
+                    </span>
+                  </td>
+
+                  <!-- Proxy Conducted (Covered for peers) -->
+                  <td style="text-align: center;">
+                    <span class="pill-metric" [ngClass]="fac.proxyConductedCount > 0 ? 'pill-proxy-conducted' : 'pill-zero'">
+                      <i class="fa-solid fa-bolt"></i> {{ fac.proxyConductedCount }}
+                    </span>
+                  </td>
+
+                  <!-- Leaves / Proxy Received (Peer covered for them) -->
+                  <td style="text-align: center;">
+                    <span class="pill-metric" [ngClass]="fac.proxyReceivedCount > 0 ? 'pill-leave-received' : 'pill-zero'">
+                      <i class="fa-solid fa-handshake"></i> {{ fac.proxyReceivedCount }}
+                    </span>
+                  </td>
+
+                  <!-- Total Sessions Taught -->
+                  <td style="text-align: center;">
+                    <span class="total-taught-badge">
+                      {{ fac.totalLecturesTaught }}
+                    </span>
+                  </td>
+
+                  <!-- Expand Details Action -->
+                  <td style="text-align: right;" class="no-print">
+                    <button mat-stroked-button class="drilldown-btn" (click)="toggleDetails(fac.facultyId)">
+                      <i class="fa-solid" [ngClass]="expandedFacultyId === fac.facultyId ? 'fa-chevron-up' : 'fa-list-check'"></i>
+                      {{ expandedFacultyId === fac.facultyId ? 'Close' : 'Details' }}
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- Detailed Lecture Logs Drawer (Expandable) -->
+                @if (expandedFacultyId === fac.facultyId) {
+                  <tr class="drawer-row no-print">
+                    <td colspan="9" class="drawer-cell">
+                      <div class="drawer-container">
+                        <div class="drawer-header">
+                          <h4>
+                            <i class="fa-solid fa-timeline" style="color: var(--primary); margin-right: 6px;"></i>
+                            Teaching & Proxy Timeline for {{ fac.fullName }}
+                          </h4>
+                          <span class="drawer-courses">Assigned Subjects: {{ fac.subjects.join(', ') || 'General' }}</span>
+                        </div>
+
+                        @if (fac.detailedLogs.length === 0) {
+                          <p style="font-size: 13px; color: var(--text-muted); margin: 12px 0;">No lecture attendance sessions logged in this date range.</p>
+                        } @else {
+                          <div class="drawer-logs-grid">
+                            @for (log of fac.detailedLogs; track log.date) {
+                              <div class="log-item-card" [ngClass]="'log-type-' + log.type">
+                                <div class="log-top">
+                                  <span class="log-date">{{ log.date | date:'mediumDate' }}</span>
+                                  @if (log.type === 'REGULAR') {
+                                    <span class="badge badge-success">Regular Lecture</span>
+                                  } @else if (log.type === 'PROXY_CONDUCTED') {
+                                    <span class="badge badge-amber"><i class="fa-solid fa-bolt"></i> Conducted Proxy</span>
+                                  } @else if (log.type === 'LEAVE_COVERED_BY_PROXY') {
+                                    <span class="badge badge-warn"><i class="fa-solid fa-handshake"></i> Leave (Covered)</span>
+                                  }
+                                </div>
+                                <div class="log-subject">{{ log.subjectName }}</div>
+                                @if (log.coveredFor) {
+                                  <div class="log-peer-info"><i class="fa-solid fa-arrow-right"></i> Taught on behalf of: <strong>{{ log.coveredFor }}</strong></div>
+                                }
+                                @if (log.coveredBy) {
+                                  <div class="log-peer-info"><i class="fa-solid fa-user-clock"></i> Leave covered by: <strong>{{ log.coveredBy }}</strong></div>
+                                }
+                                @if (log.notes) {
+                                  <div class="log-notes"><i class="fa-solid fa-note-sticky"></i> {{ log.notes }}</div>
+                                }
+                                <div class="log-students-count">{{ log.studentCount }} student{{ log.studentCount === 1 ? '' : 's' }} marked present</div>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Printable Sign-off Footer (Only in Print / PDF Mode) -->
+      <div class="print-signoff-footer">
+        <div class="signoff-box">
+          <div class="sign-line"></div>
+          <p><strong>Prepared By: Academic Coordinator</strong></p>
+          <span>FacultyEase Ai Verified</span>
+        </div>
+        <div class="signoff-box">
+          <div class="sign-line"></div>
+          <p><strong>Dean of Academic Affairs</strong></p>
+          <span>University Management</span>
+        </div>
+        <div class="signoff-box">
+          <div class="sign-line"></div>
+          <p><strong>Principal / Director</strong></p>
+          <span>Authorized Signature & Seal</span>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

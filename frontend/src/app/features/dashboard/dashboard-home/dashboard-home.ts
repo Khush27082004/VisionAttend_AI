@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { DashboardService, DashboardStats } from '../../../services/dashboard';
 import { Attendance } from '../../../core/services/attendance';
@@ -7,7 +8,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-dashboard-home',
-  imports: [CommonModule, MatSnackBarModule],
+  imports: [CommonModule, RouterLink, MatSnackBarModule],
   templateUrl: './dashboard-home.html',
   styleUrl: './dashboard-home.scss',
   standalone: true

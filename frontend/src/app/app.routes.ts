@@ -19,6 +19,7 @@ import { AddSubjectComponent } from './features/admin/subjects/add-subject/add-s
 import { FacultySubjectsComponent } from './features/faculty/subjects/faculty-subjects';
 import { MasterRosterComponent } from './features/admin/roster/master-roster/master-roster';
 import { ReportList } from './features/reports/report-list/report-list';
+import { FacultyReportComponent } from './features/admin/faculty/faculty-report/faculty-report';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -39,6 +40,8 @@ export const routes: Routes = [
       { path: 'reports', component: ReportList },
       { path: 'admin/faculty', component: FacultyListComponent },
       { path: 'admin/faculty/add', component: AddFacultyComponent },
+      { path: 'admin/faculty-reports', component: FacultyReportComponent },
+      { path: 'admin/reports', component: FacultyReportComponent },
       { path: 'admin/roster', component: MasterRosterComponent },
       { path: 'subjects', component: SubjectListComponent },
       { path: 'subjects/add', component: AddSubjectComponent }

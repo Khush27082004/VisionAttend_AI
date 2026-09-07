@@ -450,16 +450,233 @@ router.get("/report/classwise", authenticate, authorize("FACULTY", "ADMIN"), asy
   }
 });
 
+router.get("/report/faculty-workload", authenticate, authorize("ADMIN", "FACULTY"), async (req: AuthRequest, res) => {
+  try {
+    const department = req.query.department ? String(req.query.department).trim() : null;
+    const startDateStr = req.query.startDate as string;
+    const endDateStr = req.query.endDate as string;
+
+    // 1. Build date range filter
+    let dateFilter: any = {};
+    if (startDateStr && endDateStr) {
+      const start = new Date(startDateStr);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDateStr);
+      end.setHours(23, 59, 59, 999);
+      dateFilter = { gte: start, lte: end };
+    } else if (startDateStr) {
+      const start = new Date(startDateStr);
+      start.setHours(0, 0, 0, 0);
+      dateFilter = { gte: start };
+    } else if (endDateStr) {
+      const end = new Date(endDateStr);
+      end.setHours(23, 59, 59, 999);
+      dateFilter = { lte: end };
+    }
+
+    // 2. Fetch all faculties
+    let facultyWhere: any = {};
+    if (department && department !== "ALL" && department !== "") {
+      facultyWhere.department = department;
+    }
+
+    const faculties = await prisma.faculty.findMany({
+      where: facultyWhere,
+      include: {
+        user: { select: { fullName: true, email: true, isActive: true } },
+        subjects: { select: { id: true, name: true, semester: true, department: true } }
+      },
+      orderBy: { employeeId: "asc" }
+    });
+
+    // 3. Fetch attendance records in timeframe
+    let attendanceWhere: any = {};
+    if (Object.keys(dateFilter).length > 0) {
+      attendanceWhere.date = dateFilter;
+    }
+
+    const allAttendance = await prisma.attendance.findMany({
+      where: attendanceWhere,
+      include: {
+        subject: { select: { id: true, name: true } },
+        student: {
+          include: {
+            user: { select: { fullName: true } }
+          }
+        },
+        faculty: { include: { user: { select: { fullName: true } } } },
+        proxyFaculty: { include: { user: { select: { fullName: true } } } }
+      },
+      orderBy: { date: "desc" }
+    });
+
+    // 4. Calculate metrics for each faculty
+    let overallRegularLectures = 0;
+    let overallProxyConducted = 0;
+    let overallLeaveInstances = 0;
+
+    const facultyReports = faculties.map(fac => {
+      const regularSessions = new Map<string, any>();
+      const proxyConductedSessions = new Map<string, any>();
+      const proxyReceivedSessions = new Map<string, any>();
+
+      allAttendance.forEach(a => {
+        const dStr = new Date(a.date).toISOString().split('T')[0];
+        const key = `${a.subjectId}_${dStr}`;
+
+        if (a.facultyId === fac.id && !a.isProxy) {
+          if (!regularSessions.has(key)) {
+            regularSessions.set(key, {
+              date: a.date,
+              subjectName: a.subject.name,
+              type: "REGULAR",
+              studentCount: 1,
+              notes: null
+            });
+          } else {
+            regularSessions.get(key).studentCount++;
+          }
+        }
+
+        if (a.proxyFacultyId === fac.id && a.isProxy) {
+          if (!proxyConductedSessions.has(key)) {
+            proxyConductedSessions.set(key, {
+              date: a.date,
+              subjectName: a.subject.name,
+              type: "PROXY_CONDUCTED",
+              coveredFor: a.faculty?.user?.fullName || "Colleague",
+              studentCount: 1,
+              notes: a.proxyNotes
+            });
+          } else {
+            proxyConductedSessions.get(key).studentCount++;
+          }
+        }
+
+        if (a.facultyId === fac.id && a.isProxy && a.proxyFacultyId !== fac.id) {
+          if (!proxyReceivedSessions.has(key)) {
+            proxyReceivedSessions.set(key, {
+              date: a.date,
+              subjectName: a.subject.name,
+              type: "LEAVE_COVERED_BY_PROXY",
+              coveredBy: a.proxyFaculty?.user?.fullName || "Proxy Colleague",
+              studentCount: 1,
+              notes: a.proxyNotes
+            });
+          } else {
+            proxyReceivedSessions.get(key).studentCount++;
+          }
+        }
+      });
+
+      const regularCount = regularSessions.size;
+      const proxyConductedCount = proxyConductedSessions.size;
+      const proxyReceivedCount = proxyReceivedSessions.size;
+      const totalLecturesTaught = regularCount + proxyConductedCount;
+
+      overallRegularLectures += regularCount;
+      overallProxyConducted += proxyConductedCount;
+      overallLeaveInstances += proxyReceivedCount;
+
+      let workloadStatus = "ACTIVE";
+      if (proxyReceivedCount >= 2) {
+        workloadStatus = "ON_LEAVE";
+      } else if (proxyConductedCount >= 2) {
+        workloadStatus = "HIGH_PROXY";
+      }
+
+      const detailedLogs = [
+        ...Array.from(regularSessions.values()),
+        ...Array.from(proxyConductedSessions.values()),
+        ...Array.from(proxyReceivedSessions.values())
+      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      return {
+        facultyId: fac.id,
+        fullName: fac.user.fullName,
+        email: fac.user.email,
+        employeeId: fac.employeeId,
+        department: fac.department,
+        designation: fac.designation || "Assistant Professor",
+        subjects: fac.subjects.map(s => s.name),
+        regularLecturesCount: regularCount,
+        proxyConductedCount,
+        proxyReceivedCount,
+        totalLecturesTaught,
+        workloadStatus,
+        detailedLogs
+      };
+    });
+
+    return res.json({
+      summary: {
+        department: department || "All Departments",
+        startDate: startDateStr || null,
+        endDate: endDateStr || null,
+        totalFaculty: faculties.length,
+        totalRegularLectures: overallRegularLectures,
+        totalProxyLectures: overallProxyConducted,
+        totalLeaveInstances: overallLeaveInstances
+      },
+      faculties: facultyReports
+    });
+  } catch (error) {
+    console.error("Error generating faculty workload report:", error);
+    return res.status(500).json({ message: "Internal server error generating faculty report" });
+  }
+});
+
 router.post("/seed-demo", authenticate, authorize("FACULTY", "ADMIN"), async (req: AuthRequest, res) => {
   try {
-    const faculty = await prisma.faculty.findFirst({
+    let faculty = await prisma.faculty.findFirst({
       include: { user: true }
     });
     if (!faculty) {
-      return res.status(404).json({ message: "No faculty found to assign demo data" });
+      const u = await prisma.user.create({
+        data: {
+          fullName: "Prof. Rajesh Sharma",
+          email: "rajesh.sharma@univ.edu",
+          password: "$2b$10$DEMO_HASHED_PASSWORD_SAMPLE",
+          role: "FACULTY"
+        }
+      });
+      faculty = await prisma.faculty.create({
+        data: {
+          userId: u.id,
+          employeeId: "EMP-CE-101",
+          department: "Computer Engineering",
+          designation: "Associate Professor"
+        },
+        include: { user: true }
+      });
     }
 
-    // 1. Ensure subject exists
+    // Ensure a second faculty for proxy demonstration
+    let secondFaculty = await prisma.faculty.findFirst({
+      where: { id: { not: faculty.id } },
+      include: { user: true }
+    });
+    if (!secondFaculty) {
+      const u2 = await prisma.user.create({
+        data: {
+          fullName: "Prof. Priya Verma",
+          email: "priya.verma@univ.edu",
+          password: "$2b$10$DEMO_HASHED_PASSWORD_SAMPLE",
+          role: "FACULTY"
+        }
+      });
+      secondFaculty = await prisma.faculty.create({
+        data: {
+          userId: u2.id,
+          employeeId: "EMP-CE-102",
+          department: "Computer Engineering",
+          designation: "Assistant Professor"
+        },
+        include: { user: true }
+      });
+    }
+
+    // 1. Ensure subjects exist
     let subject = await prisma.subject.findFirst({
       where: { facultyId: faculty.id }
     });
@@ -474,16 +691,30 @@ router.post("/seed-demo", authenticate, authorize("FACULTY", "ADMIN"), async (re
       });
     }
 
+    let secondSubject = await prisma.subject.findFirst({
+      where: { facultyId: secondFaculty.id }
+    });
+    if (!secondSubject) {
+      secondSubject = await prisma.subject.create({
+        data: {
+          name: "Operating Systems (CE-2)",
+          department: "Computer Engineering",
+          semester: 4,
+          facultyId: secondFaculty.id
+        }
+      });
+    }
+
     // 2. Demo student definitions with varying attendance rates
     const demoStudentsData = [
-      { name: "Aarav Patel", enrollment: "230410116001", email: "aarav.patel@univ.edu", rate: 0.9 }, // 90% (Eligible)
-      { name: "Diya Sharma", enrollment: "230410116002", email: "diya.sharma@univ.edu", rate: 1.0 }, // 100% (Eligible)
-      { name: "Rohan Mehta", enrollment: "230410116003", email: "rohan.mehta@univ.edu", rate: 0.8 }, // 80% (Eligible)
-      { name: "Ananya Joshi", enrollment: "230410116004", email: "ananya.joshi@univ.edu", rate: 0.85 }, // 85% (Eligible)
-      { name: "Kabir Verma", enrollment: "230410116005", email: "kabir.verma@univ.edu", rate: 0.5 }, // 50% (< 75% Defaulter)
-      { name: "Sneha Nair", enrollment: "230410116006", email: "sneha.nair@univ.edu", rate: 0.6 }, // 60% (< 75% Defaulter)
-      { name: "Vikas Shah", enrollment: "230410116007", email: "vikas.shah@univ.edu", rate: 0.4 }, // 40% (< 75% Defaulter)
-      { name: "Pooja Desai", enrollment: "230410116008", email: "pooja.desai@univ.edu", rate: 0.95 } // 95% (Eligible)
+      { name: "Aarav Patel", enrollment: "230410116001", email: "aarav.patel@univ.edu", rate: 0.9 },
+      { name: "Diya Sharma", enrollment: "230410116002", email: "diya.sharma@univ.edu", rate: 1.0 },
+      { name: "Rohan Mehta", enrollment: "230410116003", email: "rohan.mehta@univ.edu", rate: 0.8 },
+      { name: "Ananya Joshi", enrollment: "230410116004", email: "ananya.joshi@univ.edu", rate: 0.85 },
+      { name: "Kabir Verma", enrollment: "230410116005", email: "kabir.verma@univ.edu", rate: 0.5 },
+      { name: "Sneha Nair", enrollment: "230410116006", email: "sneha.nair@univ.edu", rate: 0.6 },
+      { name: "Vikas Shah", enrollment: "230410116007", email: "vikas.shah@univ.edu", rate: 0.4 },
+      { name: "Pooja Desai", enrollment: "230410116008", email: "pooja.desai@univ.edu", rate: 0.95 }
     ];
 
     const studentEntities: any[] = [];
@@ -526,12 +757,15 @@ router.post("/seed-demo", authenticate, authorize("FACULTY", "ADMIN"), async (re
       lectureDates.push(dt);
     }
 
-    // 4. Create attendance records for each date
+    // 4. Create attendance records for each date (including proxy lectures!)
     let createdCount = 0;
-    for (const lDate of lectureDates) {
+    for (let idx = 0; idx < lectureDates.length; idx++) {
+      const lDate = lectureDates[idx];
+      // 2 sessions as proxy lectures
+      const isProxySession = (idx === 3 || idx === 7);
+
       for (const item of studentEntities) {
-        const dateIndex = lectureDates.indexOf(lDate);
-        const shouldBePresent = (dateIndex / lectureDates.length) < item.rate;
+        const shouldBePresent = (idx / lectureDates.length) < item.rate;
 
         if (shouldBePresent) {
           const start = new Date(lDate);
@@ -553,6 +787,9 @@ router.post("/seed-demo", authenticate, authorize("FACULTY", "ADMIN"), async (re
                 studentId: item.student.id,
                 subjectId: subject.id,
                 facultyId: faculty.id,
+                proxyFacultyId: isProxySession ? secondFaculty.id : null,
+                isProxy: isProxySession,
+                proxyNotes: isProxySession ? "Covered Lecture 4 & Lab assignment on Decision Trees" : null,
                 status: "Present",
                 date: lDate
               }
@@ -565,7 +802,7 @@ router.post("/seed-demo", authenticate, authorize("FACULTY", "ADMIN"), async (re
 
     return res.json({
       success: true,
-      message: `Demo attendance dataset seeded with 8 students, 10 lecture dates, and ${createdCount} attendance records!`,
+      message: `Demo dataset seeded with faculty workload logs, regular lectures, and proxy records!`,
       subjectId: subject.id,
       subjectName: subject.name
     });

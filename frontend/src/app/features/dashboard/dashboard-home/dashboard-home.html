@@ -16,12 +16,12 @@
       </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" [routerLink]="userRole === 'ADMIN' ? '/dashboard/admin/faculty-reports' : null" [style.cursor]="userRole === 'ADMIN' ? 'pointer' : 'default'">
       <div class="stat-card-inner">
         <div>
           <p class="stat-label">Faculty Members</p>
           <h2 class="stat-value">{{ stats.totalFaculty }}</h2>
-          <p class="stat-trend neutral"><i class="fa-solid fa-chalkboard-user"></i> Active teachers</p>
+          <p class="stat-trend neutral"><i class="fa-solid fa-chalkboard-user"></i> Active teachers & workload &rarr;</p>
         </div>
         <div class="icon-circle icon-circle-accent">
           <i class="fa-solid fa-chalkboard-user"></i>
