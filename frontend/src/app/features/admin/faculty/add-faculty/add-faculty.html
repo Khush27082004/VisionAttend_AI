@@ -57,9 +57,13 @@
 
         <div class="form-group">
           <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
-            <mat-label>Department</mat-label>
+            <mat-label>Department *</mat-label>
             <mat-icon matPrefix>school</mat-icon>
-            <input matInput [(ngModel)]="facultyData.department" name="department" placeholder="e.g. Computer Engineering" required />
+            <mat-select [(ngModel)]="facultyData.department" name="department" required>
+              @for (dept of departments; track dept) {
+                <mat-option [value]="dept">{{ dept }}</mat-option>
+              }
+            </mat-select>
           </mat-form-field>
         </div>
 

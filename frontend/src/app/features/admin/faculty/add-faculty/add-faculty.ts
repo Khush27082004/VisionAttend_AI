@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Faculty } from '../../../../core/services/faculty';
@@ -21,6 +23,8 @@ import { Faculty } from '../../../../core/services/faculty';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
+    MatSelectModule,
     MatSnackBarModule,
     MatProgressSpinnerModule
   ],
@@ -32,13 +36,24 @@ export class AddFacultyComponent {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
 
+  departments: string[] = [
+    'Computer Science & Engineering',
+    'Computer Engineering',
+    'Information Technology',
+    'Artificial Intelligence & Data Science',
+    'Electronics & Communication Engineering',
+    'Electrical Engineering',
+    'Mechanical Engineering',
+    'Civil Engineering'
+  ];
+
   facultyData = {
     fullName: '',
     email: '',
     password: '',
     employeeId: '',
-    department: '',
-    designation: ''
+    department: 'Computer Engineering',
+    designation: 'Assistant Professor'
   };
 
   saving = false;
