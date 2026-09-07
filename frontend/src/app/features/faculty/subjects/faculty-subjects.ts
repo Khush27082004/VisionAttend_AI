@@ -227,133 +227,118 @@ export class FacultySubjectsComponent implements OnInit {
     const d = (dept || '').toLowerCase().trim();
     if (!d) {
       return [
-        'Div A', 'Div B', 'Div C', 'Div D',
-        'CE-1', 'CE-2', 'CE-3',
-        'IT-1', 'IT-2', 'IT-3',
-        'AI-1', 'AI-2', 'CSE-1', 'CSE-2'
+        'CE-1', 'CE-2', 'CE-3', 'CE-4',
+        'IT-1', 'IT-2', 'IT-3', 'IT-4',
+        'AI-1', 'AI-2', 'CSE-1', 'CSE-2',
+        'ME-1', 'ME-2', 'EE-1', 'EE-2',
+        'CL-1', 'CL-2', 'EC-1', 'EC-2',
+        'MCA-1', 'MCA-2', 'BCA-1', 'BCA-2'
       ];
     }
 
     // 1. Computer Engineering / Computer Science / CSE / CE
     if (d.includes('comp') || d.includes('cse') || d.includes('ce') || d.includes('software')) {
       return [
-        'CE-1', 'CE-2', 'CE-3', 'CE-4',
-        'CSE-1', 'CSE-2', 'CSE-3',
-        'Div A', 'Div B', 'Div C', 'Div D',
-        'Batch 1', 'Batch 2'
+        'CE-1', 'CE-2', 'CE-3', 'CE-4', 'CE-5', 'CE-6',
+        'CSE-1', 'CSE-2', 'CSE-3', 'CSE-4'
       ];
     }
 
     // 2. Information Technology / IT
     if (d.includes('information') || d.includes('it') || d.includes('infotech')) {
       return [
-        'IT-1', 'IT-2', 'IT-3', 'IT-4',
-        'Div A', 'Div B', 'Div C', 'Div D',
-        'Batch 1', 'Batch 2'
+        'IT-1', 'IT-2', 'IT-3', 'IT-4', 'IT-5', 'IT-6'
       ];
     }
 
     // 3. AI / Data Science / AIML / AIDS
     if (d.includes('artific') || d.includes('ai') || d.includes('data science') || d.includes('ml')) {
       return [
-        'AI-1', 'AI-2', 'AI-3',
-        'AIDS-1', 'AIDS-2',
+        'AI-1', 'AI-2', 'AI-3', 'AI-4',
+        'AIDS-1', 'AIDS-2', 'AIDS-3',
         'AIML-1', 'AIML-2',
-        'DS-1', 'DS-2',
-        'Div A', 'Div B', 'Div C'
+        'DS-1', 'DS-2'
       ];
     }
 
     // 4. Electronics / EC / ECE / Telecom
     if (d.includes('electron') || d.includes('ec') || d.includes('ece') || d.includes('telecom')) {
       return [
-        'EC-1', 'EC-2', 'EC-3',
-        'ECE-1', 'ECE-2',
-        'Div A', 'Div B', 'Div C'
+        'EC-1', 'EC-2', 'EC-3', 'EC-4',
+        'ECE-1', 'ECE-2', 'ECE-3'
       ];
     }
 
     // 5. Electrical / EE / EEE
     if (d.includes('electr') || d.includes('ee') || d.includes('eee')) {
       return [
-        'EE-1', 'EE-2', 'EE-3',
-        'EEE-1', 'EEE-2',
-        'Div A', 'Div B', 'Div C'
+        'EE-1', 'EE-2', 'EE-3', 'EE-4',
+        'EEE-1', 'EEE-2'
       ];
     }
 
     // 6. Mechanical / ME
     if (d.includes('mech') || d.includes('me')) {
       return [
-        'ME-1', 'ME-2', 'ME-3', 'ME-4',
-        'Div A', 'Div B', 'Div C', 'Div D'
+        'ME-1', 'ME-2', 'ME-3', 'ME-4', 'ME-5'
       ];
     }
 
     // 7. Civil / CL
     if (d.includes('civil') || d.includes('cl')) {
       return [
-        'CL-1', 'CL-2', 'CL-3',
-        'Civil-1', 'Civil-2',
-        'Div A', 'Div B', 'Div C'
+        'CL-1', 'CL-2', 'CL-3', 'CL-4',
+        'Civil-1', 'Civil-2'
       ];
     }
 
     // 8. Chemical / CH
     if (d.includes('chem') || d.includes('ch')) {
       return [
-        'CH-1', 'CH-2', 'CH-3',
-        'Div A', 'Div B', 'Div C'
+        'CH-1', 'CH-2', 'CH-3', 'CH-4'
       ];
     }
 
     // 9. MCA
     if (d.includes('mca') || d.includes('master of computer')) {
       return [
-        'MCA-1', 'MCA-2', 'MCA-3',
-        'MCA-A', 'MCA-B',
-        'Div A', 'Div B'
+        'MCA-1', 'MCA-2', 'MCA-3', 'MCA-4'
       ];
     }
 
     // 10. BCA
     if (d.includes('bca') || d.includes('bachelor of computer')) {
       return [
-        'BCA-1', 'BCA-2', 'BCA-3',
-        'BCA-A', 'BCA-B',
-        'Div A', 'Div B', 'Div C'
+        'BCA-1', 'BCA-2', 'BCA-3', 'BCA-4'
       ];
     }
 
     // 11. Cyber Security
     if (d.includes('cyber') || d.includes('forensic')) {
       return [
-        'CS-1', 'CS-2', 'CS-3',
-        'Cyber-1', 'Cyber-2',
-        'Div A', 'Div B', 'Div C'
+        'CS-1', 'CS-2', 'CS-3', 'CS-4',
+        'Cyber-1', 'Cyber-2'
       ];
     }
 
     // 12. Automobile / AE
     if (d.includes('auto') || d.includes('ae')) {
       return [
-        'AE-1', 'AE-2', 'AE-3',
-        'Div A', 'Div B'
+        'AE-1', 'AE-2', 'AE-3', 'AE-4'
       ];
     }
 
-    // Fallback: Generate smart abbreviation from department words + Div A, B, C
+    // Fallback: Generate smart abbreviation from department words (e.g. Robotics Engineering -> RE-1, RE-2)
     const words = dept.trim().split(/\s+/);
     let abbr = words.map(w => w[0]?.toUpperCase()).join('');
     if (abbr.length > 4) abbr = abbr.substring(0, 3);
     if (abbr) {
       return [
-        `${abbr}-1`, `${abbr}-2`, `${abbr}-3`,
-        'Div A', 'Div B', 'Div C', 'Div D'
+        `${abbr}-1`, `${abbr}-2`, `${abbr}-3`, `${abbr}-4`
       ];
     }
 
-    return ['Div A', 'Div B', 'Div C', 'Div D', 'Batch 1', 'Batch 2'];
+    return ['CE-1', 'CE-2', 'CE-3', 'IT-1', 'IT-2', 'AI-1'];
   }
 
   get filteredDepartments(): string[] {
