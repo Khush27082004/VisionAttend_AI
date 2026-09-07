@@ -9,6 +9,7 @@ const ROUTE_TITLES: Record<string, string> = {
   '/dashboard/faculty':            'Faculty Dashboard',
   '/dashboard/faculty/records':    'Attendance Records',
   '/dashboard/faculty/subjects':   'My Subjects',
+  '/dashboard/admin/roster':       'Master Student Roster',
   '/dashboard/student':            'Student Dashboard',
   '/dashboard/student/attendance': 'My Attendance',
 };

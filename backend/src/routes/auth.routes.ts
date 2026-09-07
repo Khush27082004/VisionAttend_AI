@@ -64,20 +64,52 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Student Registration
+// Student Registration with Master Roster Pre-Verification
 router.post("/register", async (req, res) => {
   try {
-    const fullName = (req.body.fullName || "").toString().trim();
+    const rawFullName = (req.body.fullName || "").toString().trim();
     const email = (req.body.email || "").toString().toLowerCase().trim();
     const password = (req.body.password || "").toString().trim();
     const enrollmentNo = (req.body.enrollmentNo || "").toString().toUpperCase().trim();
-    const department = (req.body.department || "").toString().trim();
-    const semester = Number(req.body.semester);
-    const division = (req.body.division || "").toString().toUpperCase().trim();
+    let department = (req.body.department || "").toString().trim();
+    let semester = Number(req.body.semester);
+    let division = (req.body.division || "").toString().toUpperCase().trim();
     const phone = req.body.phone ? req.body.phone.toString().trim() : null;
 
-    if (!fullName || !email || !password || !enrollmentNo || !department || !semester || !division) {
-      return res.status(400).json({ message: "All required fields must be filled." });
+    if (!email || !password || !enrollmentNo) {
+      return res.status(400).json({ message: "Enrollment number, email, and password are required." });
+    }
+
+    // 1. Check Master Roster (if records exist in master roster)
+    const rosterCount = await prisma.masterStudentRoster.count();
+    let finalFullName = rawFullName;
+
+    if (rosterCount > 0) {
+      const rosterEntry = await prisma.masterStudentRoster.findUnique({
+        where: { enrollmentNo }
+      });
+
+      if (!rosterEntry) {
+        return res.status(403).json({
+          message: `Unauthorized registration: Enrollment number "${enrollmentNo}" is not in the University Master Roster. Please contact your Department Admin.`
+        });
+      }
+
+      if (rosterEntry.isClaimed) {
+        return res.status(409).json({
+          message: `Enrollment number "${enrollmentNo}" is already registered. Please log in to your account.`
+        });
+      }
+
+      // Enforce university verified details
+      finalFullName = rosterEntry.fullName || rawFullName;
+      department = rosterEntry.department;
+      semester = rosterEntry.semester;
+      division = rosterEntry.division;
+    }
+
+    if (!finalFullName || !department || !semester || !division) {
+      return res.status(400).json({ message: "Student academic details (Department, Semester, Division) are required." });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -94,7 +126,7 @@ router.post("/register", async (req, res) => {
 
     const user = await prisma.user.create({
       data: {
-        fullName,
+        fullName: finalFullName,
         email,
         password: hashedPassword,
         role: "STUDENT"
@@ -112,11 +144,17 @@ router.post("/register", async (req, res) => {
       }
     });
 
+    // Mark master roster entry as claimed if it exists
+    await prisma.masterStudentRoster.updateMany({
+      where: { enrollmentNo },
+      data: { isClaimed: true }
+    });
+
     const jwtSecret = process.env.JWT_SECRET || "visionattend_secret_key_123!";
     const token = jwt.sign({ id: user.id, role: user.role }, jwtSecret, { expiresIn: "1d" });
 
     return res.status(201).json({
-      message: "Registration successful!",
+      message: "Registration successful! Welcome to FacultyEase Ai.",
       token,
       user: {
         id: user.id,

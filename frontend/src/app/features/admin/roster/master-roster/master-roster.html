@@ -1,0 +1,223 @@
+<div class="page-wrapper master-roster-page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-id-card"></i>
+      </div>
+      <div>
+        <h2>Master Student Roster & Verification</h2>
+        <p>Control authorized college students. Only pre-verified enrollment numbers can register and attend classes.</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center; z-index: 2;">
+      <button mat-flat-button class="sync-btn" (click)="syncExisting()" [disabled]="syncing" style="background: rgba(255,255,255,0.2) !important; color: #fff !important; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px;">
+        @if (syncing) {
+          <mat-spinner diameter="16" color="accent"></mat-spinner>
+          <span>Syncing…</span>
+        } @else {
+          <i class="fa-solid fa-arrows-rotate" style="margin-right: 6px;"></i>
+          <span>Sync DB Students</span>
+        }
+      </button>
+      <button mat-flat-button class="add-btn" (click)="showAddForm = !showAddForm">
+        <i class="fa-solid" [ngClass]="showAddForm ? 'fa-xmark' : 'fa-plus'"></i>
+        <span>{{ showAddForm ? 'Close Form' : 'Authorize Student' }}</span>
+      </button>
+    </div>
+    <div class="banner-orb"></div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    
+    <div class="va-card stat-card" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: #EEF2FF; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div>
+        <div style="font-size: 22px; font-weight: 800; color: var(--text-primary);">{{ stats.total }}</div>
+        <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Total Authorized Students</div>
+      </div>
+    </div>
+
+    <div class="va-card stat-card" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: #D1FAE5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+        <i class="fa-solid fa-user-check"></i>
+      </div>
+      <div>
+        <div style="font-size: 22px; font-weight: 800; color: #059669;">{{ stats.claimed }}</div>
+        <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Registered / Claimed</div>
+      </div>
+    </div>
+
+    <div class="va-card stat-card" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+        <i class="fa-solid fa-hourglass-half"></i>
+      </div>
+      <div>
+        <div style="font-size: 22px; font-weight: 800; color: #D97706;">{{ stats.pending }}</div>
+        <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Pending Onboarding</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Add Student Form Collapsible Card -->
+  @if (showAddForm) {
+    <div class="va-card form-card" style="margin-bottom: 24px; border: 1.5px solid var(--primary); animation: slideDown 0.3s ease-out;">
+      <div class="card-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #FAFAFA;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-user-plus" style="color: var(--primary);"></i>
+          <h3 style="font-size: 14px; font-weight: 700; margin: 0;">Add Authorized Student to Master Roster</h3>
+        </div>
+      </div>
+      <div class="card-body" style="padding: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Official Full Name</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput [(ngModel)]="newStudent.fullName" placeholder="e.g. John Doe" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Enrollment Number</mat-label>
+            <mat-icon matPrefix>badge</mat-icon>
+            <input matInput [(ngModel)]="newStudent.enrollmentNo" placeholder="e.g. 22BEIT3001" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Department</mat-label>
+            <mat-icon matPrefix>school</mat-icon>
+            <input matInput [(ngModel)]="newStudent.department" placeholder="e.g. Computer Engineering" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Semester</mat-label>
+            <mat-icon matPrefix>tag</mat-icon>
+            <input matInput type="number" min="1" max="8" [(ngModel)]="newStudent.semester" placeholder="e.g. 5" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Division / Class</mat-label>
+            <mat-icon matPrefix>group</mat-icon>
+            <input matInput [(ngModel)]="newStudent.division" placeholder="e.g. A" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Institutional Email (Optional)</mat-label>
+            <mat-icon matPrefix>email</mat-icon>
+            <input matInput [(ngModel)]="newStudent.email" placeholder="e.g. student@college.edu">
+          </mat-form-field>
+
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+          <button mat-button (click)="showAddForm = false">Cancel</button>
+          <button mat-flat-button color="primary" (click)="saveStudent()" [disabled]="addingStudent" style="background: var(--primary) !important; color: #fff !important; font-weight: 700; border-radius: 8px; padding: 0 20px; height: 44px;">
+            @if (addingStudent) {
+              <mat-spinner diameter="18" color="accent"></mat-spinner>
+              <span>Saving…</span>
+            } @else {
+              <i class="fa-solid fa-check" style="margin-right: 6px;"></i>
+              <span>Save to Master Roster</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Master Roster Table Card -->
+  <div class="va-card table-card" style="padding: 0 !important; border-radius: var(--radius-lg); overflow: hidden;">
+    
+    <!-- Table Toolbar / Filters -->
+    <div class="table-toolbar" style="padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: #FAFAFA;">
+      
+      <div style="display: flex; gap: 12px; align-items: center; flex: 1; min-width: 260px;">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1; max-width: 320px; margin-bottom: 0;">
+          <mat-label>Search Student or Enrollment</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="e.g. 22BEIT or Rahul">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 170px; margin-bottom: 0;">
+          <mat-label>Status Filter</mat-label>
+          <mat-select [(ngModel)]="filterStatus" (selectionChange)="applyFilters()">
+            <mat-option value="all">All Statuses</mat-option>
+            <mat-option value="claimed">Registered / Claimed</mat-option>
+            <mat-option value="pending">Pending Onboarding</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
+        Showing {{ filteredRoster.length }} authorized student{{ filteredRoster.length === 1 ? '' : 's' }}
+      </div>
+
+    </div>
+
+    <!-- Table -->
+    @if (loading) {
+      <div style="padding: 48px; text-align: center;">
+        <mat-spinner diameter="32" style="margin: 0 auto 12px;"></mat-spinner>
+        <p style="font-size: 13px; color: var(--text-muted);">Loading university master roster…</p>
+      </div>
+    } @else if (filteredRoster.length === 0) {
+      <div style="padding: 48px; text-align: center; color: var(--text-muted);">
+        <i class="fa-solid fa-address-book" style="font-size: 36px; opacity: 0.4; margin-bottom: 12px; display: block; color: var(--primary);"></i>
+        <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">No Master Roster Records Found</h3>
+        <p style="font-size: 13px; margin-bottom: 16px;">Click "Sync DB Students" to import current students, or click "Authorize Student" to add new enrollment entries.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="va-table">
+          <thead>
+            <tr>
+              <th>Enrollment No.</th>
+              <th>Official Full Name</th>
+              <th>Department</th>
+              <th>Semester & Div</th>
+              <th>Onboarding Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of filteredRoster; track student.id) {
+              <tr>
+                <td>
+                  <span class="badge-neutral" style="font-weight: 700; font-size: 12px;">#{{ student.enrollmentNo }}</span>
+                </td>
+                <td style="font-weight: 600;">{{ student.fullName }}</td>
+                <td>{{ student.department }}</td>
+                <td>
+                  <span class="badge-neutral">Sem {{ student.semester }} (Div {{ student.division }})</span>
+                </td>
+                <td>
+                  @if (student.isClaimed) {
+                    <span class="badge badge-success">
+                      <i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> Registered
+                    </span>
+                  } @else {
+                    <span class="badge badge-warn">
+                      <i class="fa-solid fa-clock" style="margin-right: 4px;"></i> Pending Onboarding
+                    </span>
+                  }
+                </td>
+                <td style="text-align: right;">
+                  <button mat-icon-button color="warn" (click)="deleteEntry(student.id)" title="Remove from Roster">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+  </div>
+
+</div>

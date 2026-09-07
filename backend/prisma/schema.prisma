@@ -72,3 +72,17 @@ model Attendance {
   proxyFaculty   Faculty?  @relation("ProxyFacultyAttendance", fields: [proxyFacultyId], references: [id])
 }
 
+model MasterStudentRoster {
+  id           Int      @id @default(autoincrement())
+  enrollmentNo String   @unique
+  fullName     String
+  email        String?
+  department   String
+  semester     Int
+  division     String
+  isClaimed    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+

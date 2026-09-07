@@ -8,6 +8,7 @@ import facultyRoutes from "./routes/faculty.routes";
 import subjectRoutes from "./routes/subject.routes";
 import attendanceRoutes from "./routes/attendance.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
+import rosterRoutes from "./routes/roster.routes";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/faculty", facultyRoutes);
 app.use("/subjects", subjectRoutes);
 app.use("/attendance", attendanceRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/roster", rosterRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "FacultyEase Ai API is running" });
