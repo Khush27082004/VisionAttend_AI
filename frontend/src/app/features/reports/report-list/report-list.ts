@@ -12,6 +12,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { Attendance } from '../../../core/services/attendance';
 import { SubjectService } from '../../../services/subject';
 import { Faculty } from '../../../core/services/faculty';
@@ -19,6 +21,7 @@ import { Faculty } from '../../../core/services/faculty';
 @Component({
   selector: 'app-report-list',
   standalone: true,
+  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     FormsModule,
@@ -32,7 +35,9 @@ import { Faculty } from '../../../core/services/faculty';
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './report-list.html',
   styleUrl: './report-list.scss'
@@ -51,6 +56,8 @@ export class ReportList implements OnInit {
   selectedDivision = 'ALL';
   startDate = '';
   endDate = '';
+  startDateObj: Date | null = null;
+  endDateObj: Date | null = null;
   onlyDefaulters = false;
   searchQuery = '';
 
@@ -88,10 +95,25 @@ export class ReportList implements OnInit {
 
   initDates() {
     const today = new Date();
-    // Default: Start of current month to today
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    this.startDateObj = firstDay;
+    this.endDateObj = today;
     this.startDate = this.formatDate(firstDay);
     this.endDate = this.formatDate(today);
+  }
+
+  onStartDateChange() {
+    if (this.startDateObj) {
+      this.startDate = this.formatDate(this.startDateObj);
+    }
+    this.generateReport();
+  }
+
+  onEndDateChange() {
+    if (this.endDateObj) {
+      this.endDate = this.formatDate(this.endDateObj);
+    }
+    this.generateReport();
   }
 
   formatDate(d: Date): string {
@@ -194,21 +216,25 @@ export class ReportList implements OnInit {
   // Preset Date Ranges
   setPresetRange(preset: 'thisMonth' | 'last30' | 'semester' | 'today') {
     const today = new Date();
+    this.endDateObj = today;
     this.endDate = this.formatDate(today);
 
     if (preset === 'today') {
+      this.startDateObj = today;
       this.startDate = this.formatDate(today);
     } else if (preset === 'thisMonth') {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      this.startDateObj = firstDay;
       this.startDate = this.formatDate(firstDay);
     } else if (preset === 'last30') {
       const past30 = new Date(today);
       past30.setDate(today.getDate() - 30);
+      this.startDateObj = past30;
       this.startDate = this.formatDate(past30);
     } else if (preset === 'semester') {
-      // Approximate 4 months semester
       const semStart = new Date(today);
       semStart.setMonth(today.getMonth() - 4);
+      this.startDateObj = semStart;
       this.startDate = this.formatDate(semStart);
     }
 
