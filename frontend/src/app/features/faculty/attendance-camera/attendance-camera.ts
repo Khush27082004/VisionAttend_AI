@@ -32,6 +32,7 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
   processing = false;
   status = 'Starting camera…';
   recognizedCount = 0;
+  isScanning = true;
 
   get triggerObservable() { return this.trigger.asObservable(); }
 
@@ -42,6 +43,7 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
       this.recognizedCount = 0;
       this.processing = false;
       this.status = 'Scanning for faces…';
+      this.isScanning = true;
     }
   }
 
@@ -49,12 +51,13 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
     this.status = 'Scanning for faces…';
     this.markedStudentIds.clear();
     this.recognizedCount = 0;
+    this.isScanning = true;
     // Fast scan: capture every 1.2 seconds for responsive recognition
     this.scanTimer = setInterval(() => this.captureFrame(), 1200);
   }
 
   handleImage(image: WebcamImage) {
-    if (!this.subjectId || this.processing) return;
+    if (!this.subjectId || this.processing || !this.isScanning) return;
     this.processing = true;
 
     // Compress image via canvas for much faster upload + AI processing
@@ -90,7 +93,21 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   captureFrame() {
-    if (!this.processing) this.trigger.next();
+    if (!this.processing && this.isScanning) this.trigger.next();
+  }
+
+  toggleScanning() {
+    if (this.isScanning) {
+      this.clearScanner();
+      this.isScanning = false;
+      this.status = 'Face scanning stopped. Click Resume to continue.';
+      this.snackBar.open('Face scanning stopped.', 'Close', { duration: 2000 });
+    } else {
+      this.isScanning = true;
+      this.status = 'Scanning for faces…';
+      this.scanTimer = setInterval(() => this.captureFrame(), 1200);
+      this.snackBar.open('Face scanning resumed.', 'Close', { duration: 2000 });
+    }
   }
 
   stopAttendance() {
