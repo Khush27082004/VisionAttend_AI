@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -35,6 +35,7 @@ export class RegisterComponent {
   private rosterService = inject(RosterService);
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   registerData = {
     fullName: '',
@@ -98,6 +99,7 @@ export class RegisterComponent {
             this.verificationMessage = 'Enrollment accepted.';
           }
         }
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.verifyingEnrollment = false;
@@ -110,6 +112,7 @@ export class RegisterComponent {
         } else {
           this.verificationError = err.error?.message || 'Could not verify enrollment number.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
@@ -130,6 +133,7 @@ export class RegisterComponent {
     }
 
     this.loading = true;
+    this.cdr.detectChanges();
 
     this.authService.register(this.registerData).subscribe({
       next: () => {
@@ -139,6 +143,7 @@ export class RegisterComponent {
       error: (err: any) => {
         this.loading = false;
         this.errorMessage = err.error?.message || 'Registration failed. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }
