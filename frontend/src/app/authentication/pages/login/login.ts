@@ -31,7 +31,7 @@ export class LoginComponent {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
-  loginData = { email: '', password: '' };
+  loginData = { identifier: '', password: '' };
   loading = false;
   showPassword = false;
   errorMessage = '';
@@ -40,17 +40,17 @@ export class LoginComponent {
   login() {
     this.errorMessage = '';
 
-    const cleanEmail = (this.loginData.email || '').trim().toLowerCase();
+    const cleanIdentifier = (this.loginData.identifier || '').trim();
     const cleanPassword = (this.loginData.password || '').trim();
 
-    if (!cleanEmail || !cleanPassword) {
-      this.errorMessage = 'Please enter your email and password.';
+    if (!cleanIdentifier || !cleanPassword) {
+      this.errorMessage = 'Please enter your email or enrollment number and password.';
       return;
     }
 
     this.loading = true;
 
-    this.authService.login({ email: cleanEmail, password: cleanPassword }).subscribe({
+    this.authService.login({ email: cleanIdentifier, identifier: cleanIdentifier, password: cleanPassword }).subscribe({
       next: (response: any) => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));

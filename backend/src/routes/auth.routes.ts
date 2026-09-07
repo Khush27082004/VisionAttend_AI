@@ -17,19 +17,31 @@ router.get("/profile", authenticate, authorize("ADMIN"), (req: AuthRequest, res)
 // Login
 router.post("/login", async (req, res) => {
   try {
-    const email = (req.body.email || "").toString().toLowerCase().trim();
+    const rawIdentifier = (req.body.email || req.body.identifier || "").toString().trim();
     const password = (req.body.password || "").toString().trim();
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Please provide both email and password." });
+    if (!rawIdentifier || !password) {
+      return res.status(400).json({ message: "Please provide your email or enrollment number and password." });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email }
+    // 1. Try finding user by email (case-insensitive)
+    let user = await prisma.user.findUnique({
+      where: { email: rawIdentifier.toLowerCase() }
     });
 
+    // 2. If not found by email, check if it's a student logging in with their enrollment number
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      const student = await prisma.student.findUnique({
+        where: { enrollmentNo: rawIdentifier.toUpperCase() },
+        include: { user: true }
+      });
+      if (student && student.user) {
+        user = student.user;
+      }
+    }
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email/enrollment number or password." });
     }
 
     if (!user.isActive) {
@@ -38,7 +50,7 @@ router.post("/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid email/enrollment number or password." });
     }
 
     const jwtSecret = process.env.JWT_SECRET || "visionattend_secret_key_123!";

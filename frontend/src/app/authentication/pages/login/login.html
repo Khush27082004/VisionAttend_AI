@@ -53,9 +53,9 @@
 
       <div class="form-group">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email address</mat-label>
-          <mat-icon matPrefix>alternate_email</mat-icon>
-          <input matInput type="email" [(ngModel)]="loginData.email" placeholder="you@example.com" autocomplete="email" />
+          <mat-label>Email or Enrollment No.</mat-label>
+          <mat-icon matPrefix>badge</mat-icon>
+          <input matInput type="text" [(ngModel)]="loginData.identifier" placeholder="you@example.com or 230410116001" autocomplete="username" />
         </mat-form-field>
       </div>
 
