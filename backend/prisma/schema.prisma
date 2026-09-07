@@ -35,14 +35,15 @@ model Student {
 }
 
 model Faculty {
-  id          Int          @id @default(autoincrement())
-  employeeId  String       @unique
-  department  String
-  designation String?
-  userId      Int          @unique
-  user        User         @relation(fields: [userId], references: [id])
-  attendance  Attendance[]
-  subjects    Subject[]
+  id               Int          @id @default(autoincrement())
+  employeeId       String       @unique
+  department       String
+  designation      String?
+  userId           Int          @unique
+  user             User         @relation(fields: [userId], references: [id])
+  attendance       Attendance[] @relation("FacultyAttendance")
+  proxyAttendances Attendance[] @relation("ProxyFacultyAttendance")
+  subjects         Subject[]
 }
 
 model Subject {
@@ -56,13 +57,18 @@ model Subject {
 }
 
 model Attendance {
-  id        Int      @id @default(autoincrement())
-  studentId Int
-  subjectId Int
-  facultyId Int
-  date      DateTime @default(now())
-  status    String
-  student   Student  @relation(fields: [studentId], references: [id])
-  subject   Subject  @relation(fields: [subjectId], references: [id])
-  faculty   Faculty  @relation(fields: [facultyId], references: [id])
+  id             Int       @id @default(autoincrement())
+  studentId      Int
+  subjectId      Int
+  facultyId      Int
+  proxyFacultyId Int?
+  isProxy        Boolean   @default(false)
+  proxyNotes     String?
+  date           DateTime  @default(now())
+  status         String
+  student        Student   @relation(fields: [studentId], references: [id])
+  subject        Subject   @relation(fields: [subjectId], references: [id])
+  faculty        Faculty   @relation("FacultyAttendance", fields: [facultyId], references: [id])
+  proxyFaculty   Faculty?  @relation("ProxyFacultyAttendance", fields: [proxyFacultyId], references: [id])
 }
+

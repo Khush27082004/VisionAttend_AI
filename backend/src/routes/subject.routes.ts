@@ -47,7 +47,12 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
     const userRole = req.user!.role;
     let whereClause = {};
 
-    if (userRole === "FACULTY") {
+    const targetFacultyId = req.query.facultyId ? Number(req.query.facultyId) : null;
+    const fetchAll = req.query.all === "true";
+
+    if (targetFacultyId) {
+      whereClause = { facultyId: targetFacultyId };
+    } else if (userRole === "FACULTY" && !fetchAll) {
       const faculty = await prisma.faculty.findUnique({
         where: { userId: req.user!.id }
       });

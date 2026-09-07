@@ -9,9 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SubjectService } from '../../../services/subject';
 import { Attendance } from '../../../core/services/attendance';
+import { Faculty } from '../../../core/services/faculty';
 import { AttendanceCameraComponent } from '../attendance-camera/attendance-camera';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-faculty-dashboard', standalone: true,
@@ -26,13 +28,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatIconModule,
     MatSnackBarModule,
     AttendanceCameraComponent,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSlideToggleModule
   ],
   templateUrl: './faculty-dashboard.html', styleUrl: './faculty-dashboard.scss'
 })
 export class FacultyDashboard implements OnInit {
   private subjectService = inject(SubjectService);
   private attendanceService = inject(Attendance);
+  private facultyService = inject(Faculty);
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
 
@@ -42,6 +46,13 @@ export class FacultyDashboard implements OnInit {
   attendanceRecords: any[] = [];
   enrolledStudents: any[] = [];
   filterByDay = false;
+
+  // Proxy Attendance Mode
+  isProxyMode = false;
+  faculties: any[] = [];
+  selectedAbsentFacultyId: number | null = null;
+  proxyNotes = '';
+  currentUserId: number | null = null;
 
   // Custom Date selection
   selectedDate: string = (() => {
@@ -72,11 +83,82 @@ export class FacultyDashboard implements OnInit {
     );
   }
 
-  ngOnInit() { 
-    this.subjectService.getSubjects().subscribe(subjects => {
-      this.subjects = subjects;
-      this.cdr.detectChanges();
-    }); 
+  ngOnInit() {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') ?? '{}');
+      this.currentUserId = user.id ?? null;
+    } catch { /* ignore */ }
+
+    this.loadOwnSubjects();
+    this.loadFaculties();
+  }
+
+  loadOwnSubjects() {
+    this.subjectService.getSubjects().subscribe({
+      next: (subjects) => {
+        this.subjects = subjects || [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Could not load subjects', err)
+    });
+  }
+
+  loadFaculties() {
+    this.facultyService.getFaculty().subscribe({
+      next: (data) => {
+        this.faculties = (data || []).filter(f => f.userId !== this.currentUserId);
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Could not load faculties', err)
+    });
+  }
+
+  toggleProxyMode() {
+    this.selectedSubjectId = null;
+    this.attendanceRecords = [];
+    this.enrolledStudents = [];
+    this.attendanceActive = false;
+
+    if (this.isProxyMode) {
+      if (this.selectedAbsentFacultyId) {
+        this.loadAbsentFacultySubjects(this.selectedAbsentFacultyId);
+      } else {
+        this.subjects = [];
+      }
+      this.snackBar.open("⚡ Proxy Mode Activated — Select the absent faculty & their subject", "Close", { duration: 3500 });
+    } else {
+      this.selectedAbsentFacultyId = null;
+      this.proxyNotes = '';
+      this.loadOwnSubjects();
+      this.snackBar.open("Switched back to Regular Lecture Mode", "Close", { duration: 2500 });
+    }
+    this.cdr.detectChanges();
+  }
+
+  onAbsentFacultyChange() {
+    this.selectedSubjectId = null;
+    this.attendanceRecords = [];
+    this.enrolledStudents = [];
+    if (this.selectedAbsentFacultyId) {
+      this.loadAbsentFacultySubjects(this.selectedAbsentFacultyId);
+    } else {
+      this.subjects = [];
+    }
+  }
+
+  loadAbsentFacultySubjects(facultyId: number) {
+    this.subjectService.getSubjects(facultyId).subscribe({
+      next: (subjects) => {
+        this.subjects = subjects || [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Could not load absent faculty subjects', err)
+    });
+  }
+
+  getSelectedAbsentFacultyName(): string {
+    const f = this.faculties.find(fac => fac.id === this.selectedAbsentFacultyId);
+    return f ? f.user?.fullName : 'Absent Faculty';
   }
 
   onSubjectChange() {
@@ -123,8 +205,21 @@ export class FacultyDashboard implements OnInit {
 
   markPresentManually(studentId: number) {
     if (this.selectedSubjectId) {
-      this.attendanceService.markPresent(studentId, this.selectedSubjectId, this.selectedDate).subscribe({
+      this.attendanceService.markPresent(
+        studentId, 
+        this.selectedSubjectId, 
+        this.selectedDate,
+        this.isProxyMode,
+        this.proxyNotes
+      ).subscribe({
         next: (result) => {
+          if (result.success) {
+            this.snackBar.open(
+              this.isProxyMode ? "⚡ Proxy attendance marked manually" : "Attendance marked manually", 
+              "Close", 
+              { duration: 2500 }
+            );
+          }
           this.loadAttendance();
         },
         error: (err) => console.error(err)

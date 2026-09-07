@@ -12,8 +12,12 @@ export class SubjectService {
 
   constructor(private http: HttpClient) {}
 
-  getSubjects(): Observable<any> {
-    return this.http.get(this.api);
+  getSubjects(facultyId?: number, all?: boolean): Observable<any> {
+    let params: string[] = [];
+    if (facultyId) params.push(`facultyId=${facultyId}`);
+    if (all) params.push(`all=true`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get(`${this.api}${query}`);
   }
 
   createSubject(data: any): Observable<any> {

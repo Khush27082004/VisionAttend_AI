@@ -19,8 +19,11 @@ router.get("/my", authenticate, authorize("STUDENT"), async (req: AuthRequest, r
         id: true,
         date: true,
         status: true,
+        isProxy: true,
+        proxyNotes: true,
         subject: { select: { name: true } },
-        faculty: { select: { user: { select: { fullName: true } } } }
+        faculty: { select: { user: { select: { fullName: true } } } },
+        proxyFaculty: { select: { user: { select: { fullName: true } } } }
       }
     });
 
@@ -29,7 +32,10 @@ router.get("/my", authenticate, authorize("STUDENT"), async (req: AuthRequest, r
       subjectName: record.subject.name,
       date: record.date,
       status: record.status,
-      facultyName: record.faculty.user.fullName
+      facultyName: record.faculty.user.fullName,
+      isProxy: record.isProxy,
+      proxyNotes: record.proxyNotes,
+      proxyFacultyName: record.proxyFaculty?.user?.fullName || null
     })));
   } catch (error) {
     console.error(error);
@@ -42,19 +48,29 @@ router.post("/", authenticate, authorize("FACULTY"), async (req: AuthRequest, re
     const studentId = Number(req.body.studentId);
     const subjectId = Number(req.body.subjectId);
     const customDateStr = req.body.date;
+    const isProxy = Boolean(req.body.isProxy);
+    const proxyNotes = req.body.proxyNotes ? String(req.body.proxyNotes).trim() : null;
 
     if (!Number.isInteger(studentId) || !Number.isInteger(subjectId)) {
       return res.status(400).json({ success: false, message: "studentId and subjectId are required" });
     }
 
-    const faculty = await prisma.faculty.findUnique({ where: { userId: req.user!.id } });
-    if (!faculty) {
+    const currentFaculty = await prisma.faculty.findUnique({ where: { userId: req.user!.id } });
+    if (!currentFaculty) {
       return res.status(403).json({ success: false, message: "Faculty profile not found" });
     }
 
-    const subject = await prisma.subject.findFirst({ where: { id: subjectId, facultyId: faculty.id } });
+    const subject = await prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: { faculty: { include: { user: true } } }
+    });
     if (!subject) {
-      return res.status(403).json({ success: false, message: "You cannot mark attendance for this subject" });
+      return res.status(404).json({ success: false, message: "Subject not found" });
+    }
+
+    // If not proxy mode, verify faculty owns the subject
+    if (!isProxy && subject.facultyId !== currentFaculty.id) {
+      return res.status(403).json({ success: false, message: "You cannot mark attendance for this subject without proxy mode enabled" });
     }
 
     const student = await prisma.student.findUnique({ where: { id: studentId } });
@@ -67,12 +83,10 @@ router.post("/", authenticate, authorize("FACULTY"), async (req: AuthRequest, re
     if (customDateStr) {
       const dateParts = customDateStr.split('-');
       if (dateParts.length === 3) {
-        // Construct in local server time rather than UTC zero-hour
         classDate = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
       } else {
         classDate = new Date(customDateStr);
       }
-      // Apply current server hour, minute, second to custom date to log marking time
       classDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
     }
 
@@ -96,7 +110,10 @@ router.post("/", authenticate, authorize("FACULTY"), async (req: AuthRequest, re
       data: {
         studentId,
         subjectId,
-        facultyId: faculty.id,
+        facultyId: subject.facultyId, // Assigned to the subject owner so it directly appears in absent faculty's records!
+        proxyFacultyId: isProxy ? currentFaculty.id : null,
+        isProxy: isProxy,
+        proxyNotes: isProxy ? proxyNotes : null,
         status: "Present",
         date: classDate
       }
@@ -115,8 +132,24 @@ router.get("/faculty/all", authenticate, authorize("FACULTY"), async (req: AuthR
       return res.status(404).json({ message: "Faculty profile not found" });
     }
 
+    const view = req.query.view as string; // 'all' | 'mine' | 'proxy_conducted' | 'proxy_received'
+    let whereClause: any = {
+      OR: [
+        { facultyId: faculty.id },
+        { proxyFacultyId: faculty.id }
+      ]
+    };
+
+    if (view === "mine") {
+      whereClause = { facultyId: faculty.id, isProxy: false };
+    } else if (view === "proxy_conducted") {
+      whereClause = { proxyFacultyId: faculty.id, isProxy: true };
+    } else if (view === "proxy_received") {
+      whereClause = { facultyId: faculty.id, isProxy: true };
+    }
+
     const attendance = await prisma.attendance.findMany({
-      where: { facultyId: faculty.id },
+      where: whereClause,
       orderBy: { date: "desc" },
       include: {
         student: {
@@ -133,6 +166,24 @@ router.get("/faculty/all", authenticate, authorize("FACULTY"), async (req: AuthR
           select: {
             name: true
           }
+        },
+        faculty: {
+          select: {
+            user: {
+              select: {
+                fullName: true
+              }
+            }
+          }
+        },
+        proxyFaculty: {
+          select: {
+            user: {
+              select: {
+                fullName: true
+              }
+            }
+          }
         }
       }
     });
@@ -146,7 +197,13 @@ router.get("/faculty/all", authenticate, authorize("FACULTY"), async (req: AuthR
       enrollmentNo: a.student.enrollmentNo,
       department: a.student.department,
       semester: a.student.semester,
-      division: a.student.division
+      division: a.student.division,
+      isProxy: a.isProxy,
+      proxyNotes: a.proxyNotes,
+      primaryFacultyName: a.faculty?.user?.fullName,
+      proxyFacultyName: a.proxyFaculty?.user?.fullName,
+      isProxyConductedByMe: a.proxyFacultyId === faculty.id,
+      isProxyReceivedForMe: a.facultyId === faculty.id && a.isProxy
     })));
   } catch (error) {
     console.error(error);
@@ -154,21 +211,19 @@ router.get("/faculty/all", authenticate, authorize("FACULTY"), async (req: AuthR
   }
 });
 
-router.get("/subject/:subjectId", authenticate, authorize("FACULTY"), async (req: AuthRequest, res) => {
+router.get("/subject/:subjectId", authenticate, authorize("FACULTY", "ADMIN"), async (req: AuthRequest, res) => {
   try {
     const subjectId = Number(req.params.subjectId);
     if (!Number.isInteger(subjectId)) {
       return res.status(400).json({ message: "Invalid subject ID" });
     }
 
-    const faculty = await prisma.faculty.findUnique({ where: { userId: req.user!.id } });
-    if (!faculty) {
-      return res.status(403).json({ message: "Faculty profile not found" });
-    }
-
-    const subject = await prisma.subject.findFirst({ where: { id: subjectId, facultyId: faculty.id } });
+    const subject = await prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: { faculty: { include: { user: true } } }
+    });
     if (!subject) {
-      return res.status(403).json({ message: "You do not teach this subject" });
+      return res.status(404).json({ message: "Subject not found" });
     }
 
     const queryDateStr = req.query.date as string;
@@ -202,6 +257,16 @@ router.get("/subject/:subjectId", authenticate, authorize("FACULTY"), async (req
               }
             }
           }
+        },
+        faculty: {
+          select: {
+            user: { select: { fullName: true } }
+          }
+        },
+        proxyFaculty: {
+          select: {
+            user: { select: { fullName: true } }
+          }
         }
       }
     });
@@ -214,7 +279,11 @@ router.get("/subject/:subjectId", authenticate, authorize("FACULTY"), async (req
       enrollmentNo: a.student.enrollmentNo,
       department: a.student.department,
       semester: a.student.semester,
-      division: a.student.division
+      division: a.student.division,
+      isProxy: a.isProxy,
+      proxyNotes: a.proxyNotes,
+      primaryFacultyName: a.faculty?.user?.fullName,
+      proxyFacultyName: a.proxyFaculty?.user?.fullName
     })));
   } catch (error) {
     console.error(error);
@@ -232,21 +301,11 @@ router.delete("/all", authenticate, authorize("ADMIN"), async (req: AuthRequest,
   }
 });
 
-router.delete("/subject/:subjectId/today", authenticate, authorize("FACULTY"), async (req: AuthRequest, res) => {
+router.delete("/subject/:subjectId/today", authenticate, authorize("FACULTY", "ADMIN"), async (req: AuthRequest, res) => {
   try {
     const subjectId = Number(req.params.subjectId);
     if (!Number.isInteger(subjectId)) {
       return res.status(400).json({ success: false, message: "Invalid subject ID" });
-    }
-
-    const faculty = await prisma.faculty.findUnique({ where: { userId: req.user!.id } });
-    if (!faculty) {
-      return res.status(403).json({ success: false, message: "Faculty profile not found" });
-    }
-
-    const subject = await prisma.subject.findFirst({ where: { id: subjectId, facultyId: faculty.id } });
-    if (!subject) {
-      return res.status(403).json({ success: false, message: "You do not teach this subject" });
     }
 
     const today = new Date();

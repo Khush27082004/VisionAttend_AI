@@ -7,12 +7,23 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { SubjectService } from '../../../services/subject';
 import { Attendance } from '../../../core/services/attendance';
 
 @Component({
   selector: 'app-attendance-records', standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatCardModule, MatFormFieldModule, MatSelectModule, MatIconModule, MatInputModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatIconModule,
+    MatInputModule,
+    MatButtonToggleModule
+  ],
   templateUrl: './attendance-records.html', styleUrl: './attendance-records.scss'
 })
 export class AttendanceRecordsComponent implements OnInit {
@@ -30,6 +41,7 @@ export class AttendanceRecordsComponent implements OnInit {
   filterDiv = '';
   filterDate = '';
   searchQuery = '';
+  proxyFilter: 'all' | 'regular' | 'proxy_conducted' | 'proxy_received' = 'all';
 
   // Sorting state
   sortColumn = '';
@@ -38,6 +50,14 @@ export class AttendanceRecordsComponent implements OnInit {
   uniqueDepts: string[] = [];
   uniqueSems: number[] = [];
   uniqueDivs: string[] = [];
+
+  get proxyReceivedCount(): number {
+    return this.allAttendanceRecords.filter(r => r.isProxyReceivedForMe).length;
+  }
+
+  get proxyConductedCount(): number {
+    return this.allAttendanceRecords.filter(r => r.isProxyConductedByMe).length;
+  }
 
   ngOnInit() {
     this.subjectService.getSubjects().subscribe(subjects => {
@@ -75,6 +95,11 @@ export class AttendanceRecordsComponent implements OnInit {
     this.uniqueDivs = Array.from(divs).sort();
   }
 
+  setProxyFilter(type: 'all' | 'regular' | 'proxy_conducted' | 'proxy_received') {
+    this.proxyFilter = type;
+    this.applyFilters();
+  }
+
   toggleSort(column: string) {
     if (this.sortColumn === column) {
       if (this.sortDirection === 'asc') {
@@ -108,7 +133,17 @@ export class AttendanceRecordsComponent implements OnInit {
         r.studentName.toLowerCase().includes(q) || 
         r.enrollmentNo.toLowerCase().includes(q);
 
-      return matchSubject && matchDept && matchSem && matchDiv && matchDate && matchSearch;
+      // Proxy filter matching
+      let matchProxy = true;
+      if (this.proxyFilter === 'regular') {
+        matchProxy = !r.isProxy;
+      } else if (this.proxyFilter === 'proxy_conducted') {
+        matchProxy = r.isProxyConductedByMe;
+      } else if (this.proxyFilter === 'proxy_received') {
+        matchProxy = r.isProxyReceivedForMe;
+      }
+
+      return matchSubject && matchDept && matchSem && matchDiv && matchDate && matchSearch && matchProxy;
     });
 
     // Apply natural sorting if active
@@ -131,6 +166,7 @@ export class AttendanceRecordsComponent implements OnInit {
     this.filterDiv = '';
     this.filterDate = '';
     this.searchQuery = '';
+    this.proxyFilter = 'all';
     this.sortColumn = '';
     this.sortDirection = '';
     this.applyFilters();
@@ -140,11 +176,16 @@ export class AttendanceRecordsComponent implements OnInit {
     if (this.filteredRecords.length === 0) return;
 
     // Define CSV headers
-    const headers = ['Student Name', 'Enrollment No', 'Subject', 'Department', 'Semester & Division', 'Date & Time', 'Status'];
+    const headers = ['Student Name', 'Enrollment No', 'Subject', 'Department', 'Semester & Division', 'Date & Time', 'Status', 'Session Type', 'Conducted By', 'Primary Faculty', 'Proxy Notes'];
     
     // Map records to CSV rows with double quotes escaping
     const rows = this.filteredRecords.map(r => {
       const formattedDate = new Date(r.date).toLocaleString('en-IN');
+      const sessionType = r.isProxy ? 'Proxy' : 'Regular';
+      const conductedBy = r.isProxy ? (r.proxyFacultyName || 'Proxy Faculty') : (r.primaryFacultyName || 'Self');
+      const primaryFac = r.primaryFacultyName || 'Self';
+      const notes = r.proxyNotes || '';
+
       return [
         `"${r.studentName.replace(/"/g, '""')}"`,
         `"${r.enrollmentNo.replace(/"/g, '""')}"`,
@@ -152,7 +193,11 @@ export class AttendanceRecordsComponent implements OnInit {
         `"${r.department.replace(/"/g, '""')}"`,
         `"Sem ${r.semester} (Div ${r.division})"`,
         `"${formattedDate}"`,
-        `"${r.status}"`
+        `"${r.status}"`,
+        `"${sessionType}"`,
+        `"${conductedBy.replace(/"/g, '""')}"`,
+        `"${primaryFac.replace(/"/g, '""')}"`,
+        `"${notes.replace(/"/g, '""')}"`
       ];
     });
 
@@ -165,8 +210,10 @@ export class AttendanceRecordsComponent implements OnInit {
     const link = document.createElement('a');
     link.setAttribute('href', url);
     
-    // Dynamic filename based on filters
     let filename = 'Attendance_Report';
+    if (this.proxyFilter !== 'all') {
+      filename += `_${this.proxyFilter}`;
+    }
     if (this.filterSubject) {
       filename += `_${this.filterSubject.replace(/\s+/g, '_')}`;
     }

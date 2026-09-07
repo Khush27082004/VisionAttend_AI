@@ -17,6 +17,8 @@ import { Attendance } from '../../../core/services/attendance';
 export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
   @Input({ required: true }) subjectId = 0;
   @Input() date = '';
+  @Input() isProxy = false;
+  @Input() proxyNotes = '';
   @Output() stop = new EventEmitter<void>();
   @Output() studentMarked = new EventEmitter<number>();
 
@@ -133,7 +135,7 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
     let successCount = 0;
 
     newIds.forEach(studentId => {
-      this.attendance.markPresent(studentId, this.subjectId, this.date).subscribe({
+      this.attendance.markPresent(studentId, this.subjectId, this.date, this.isProxy, this.proxyNotes).subscribe({
         next: result => {
           if (result.success) {
             this.markedStudentIds.add(studentId);
@@ -158,7 +160,10 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
 
   private showSummaryAndFinish(successCount: number) {
     if (successCount > 0) {
-      this.snackBar.open(`✅ Attendance marked for ${successCount} student(s)`, 'Close', { duration: 3000 });
+      const msg = this.isProxy 
+        ? `⚡ Proxy attendance marked for ${successCount} student(s)`
+        : `✅ Attendance marked for ${successCount} student(s)`;
+      this.snackBar.open(msg, 'Close', { duration: 3000 });
       this.finishFrame(`✅ ${this.recognizedCount} student(s) marked total. Scanning…`);
     } else {
       this.finishFrame('No new attendance marked. Continuing scan…');

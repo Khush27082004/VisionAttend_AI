@@ -7,12 +7,28 @@
         <i class="fa-solid fa-clipboard-list"></i>
       </div>
       <div>
-        <h2>Attendance Records</h2>
-        <p>Search, filter and analyze student attendance logs across all your subjects</p>
+        <h2>Attendance Records & Proxy History</h2>
+        <p>Search, filter and analyze student attendance logs across regular and proxy lectures</p>
       </div>
     </div>
     <div class="banner-orb"></div>
   </div>
+
+  <!-- Proxy Shared Notification (if other faculty took proxy for me) -->
+  @if (proxyReceivedCount > 0) {
+    <div class="proxy-alert-banner">
+      <div class="alert-icon">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div class="alert-content">
+        <h4>Proxy Lectures Received</h4>
+        <p>Colleagues have conducted <strong>{{ proxyReceivedCount }}</strong> proxy attendance record(s) on your behalf. These are automatically merged into your subject reports.</p>
+      </div>
+      <button mat-flat-button class="view-proxy-btn" (click)="setProxyFilter('proxy_received')">
+        <i class="fa-solid fa-eye"></i> View Covered Classes
+      </button>
+    </div>
+  }
 
   <!-- Comprehensive Attendance History -->
   <div class="va-card history-card">
@@ -21,10 +37,10 @@
         <i class="fa-solid fa-database table-icon"></i>
         <div>
           <h3>All Attendance Logs</h3>
-          <p>Filtered list of class attendance history</p>
+          <p>Filtered list of class attendance history ({{ filteredRecords.length }} record{{ filteredRecords.length === 1 ? '' : 's' }})</p>
         </div>
       </div>
-      <div style="display: flex; gap: 10px; align-items: center;">
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <button mat-flat-button class="export-btn" (click)="exportToCSV()" [disabled]="filteredRecords.length === 0" style="font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(16,185,129,.25) !important;">
           <i class="fa-solid fa-file-excel"></i> Export to Excel
         </button>
@@ -32,6 +48,28 @@
           <i class="fa-solid fa-rotate-left"></i> Reset Filters
         </button>
       </div>
+    </div>
+
+    <!-- Proxy Tabs Filter -->
+    <div class="proxy-tab-row">
+      <button class="proxy-tab" [class.active]="proxyFilter === 'all'" (click)="setProxyFilter('all')">
+        <i class="fa-solid fa-layer-group"></i> All Records
+      </button>
+      <button class="proxy-tab" [class.active]="proxyFilter === 'regular'" (click)="setProxyFilter('regular')">
+        <i class="fa-solid fa-book"></i> Regular Lectures
+      </button>
+      <button class="proxy-tab" [class.active]="proxyFilter === 'proxy_received'" (click)="setProxyFilter('proxy_received')">
+        <i class="fa-solid fa-handshake"></i> Covered for Me
+        @if (proxyReceivedCount > 0) {
+          <span class="tab-badge">{{ proxyReceivedCount }}</span>
+        }
+      </button>
+      <button class="proxy-tab" [class.active]="proxyFilter === 'proxy_conducted'" (click)="setProxyFilter('proxy_conducted')">
+        <i class="fa-solid fa-bolt"></i> Conducted as Proxy
+        @if (proxyConductedCount > 0) {
+          <span class="tab-badge tab-badge-amber">{{ proxyConductedCount }}</span>
+        }
+      </button>
     </div>
 
     <!-- Filters Section -->
@@ -123,6 +161,7 @@
               <th>Semester & Div</th>
               <th>Date & Time</th>
               <th>Status</th>
+              <th>Session Type / Proxy Info</th>
             </tr>
           </thead>
           <tbody>
@@ -135,6 +174,23 @@
                 <td>Sem {{ record.semester }} (Div {{ record.division }})</td>
                 <td>{{ record.date | date:'medium' }}</td>
                 <td><span class="badge badge-success">Present</span></td>
+                <td>
+                  @if (record.isProxyReceivedForMe) {
+                    <span class="badge badge-warn" [title]="record.proxyNotes ? 'Notes: ' + record.proxyNotes : 'Covered by ' + record.proxyFacultyName">
+                      <i class="fa-solid fa-handshake" style="margin-right: 4px;"></i> By Prof. {{ record.proxyFacultyName }}
+                    </span>
+                  } @else if (record.isProxyConductedByMe) {
+                    <span class="badge badge-proxy-conducted" [title]="record.proxyNotes ? 'Notes: ' + record.proxyNotes : 'Covered for ' + record.primaryFacultyName">
+                      <i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> For Prof. {{ record.primaryFacultyName }}
+                    </span>
+                  } @else if (record.isProxy) {
+                    <span class="badge badge-warn">
+                      <i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> Proxy ({{ record.proxyFacultyName }})
+                    </span>
+                  } @else {
+                    <span class="badge badge-primary">Regular</span>
+                  }
+                </td>
               </tr>
             }
           </tbody>

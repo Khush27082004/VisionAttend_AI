@@ -10,9 +10,13 @@ export class Attendance {
   private http = inject(HttpClient);
   private api = 'http://localhost:5000/attendance';
 
-  markPresent(studentId: number, subjectId: number, date?: string) {
+  markPresent(studentId: number, subjectId: number, date?: string, isProxy?: boolean, proxyNotes?: string) {
     const body: any = { studentId, subjectId };
     if (date) body.date = date;
+    if (isProxy) {
+      body.isProxy = true;
+      if (proxyNotes) body.proxyNotes = proxyNotes;
+    }
     return this.http.post<AttendanceResponse>(this.api, body);
   }
 
@@ -28,8 +32,9 @@ export class Attendance {
     return this.http.get<any[]>(url);
   }
 
-  getAllFacultyAttendance(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/faculty/all`);
+  getAllFacultyAttendance(view?: string): Observable<any[]> {
+    const query = view ? `?view=${encodeURIComponent(view)}` : '';
+    return this.http.get<any[]>(`${this.api}/faculty/all${query}`);
   }
 
   clearAllAttendance(): Observable<any> {

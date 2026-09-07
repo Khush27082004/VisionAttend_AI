@@ -53,7 +53,7 @@ router.post("/", authenticate, authorize("ADMIN"), async (req, res) => {
   }
 });
 
-router.get("/", authenticate, authorize("ADMIN"), async (req, res) => {
+router.get("/", authenticate, authorize("ADMIN", "FACULTY"), async (req, res) => {
   try {
     const faculty = await prisma.faculty.findMany({
       include: {
