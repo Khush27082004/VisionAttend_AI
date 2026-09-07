@@ -2,8 +2,8 @@
 
   <div class="page-header">
     <div>
-      <h1 class="page-title">Face Registration</h1>
-      <p class="page-subtitle">Capture a clear face image to enable AI-powered attendance</p>
+      <h1 class="page-title">{{ isEditMode ? 'Update Face Biometrics' : 'Face Registration' }}</h1>
+      <p class="page-subtitle">{{ isEditMode ? 'Capture a new clear face photo to update your AI biometric recognition profile' : 'Capture a clear face image to enable AI-powered attendance' }}</p>
     </div>
   </div>
 
@@ -14,9 +14,9 @@
       <!-- Instructions Panel -->
       <div class="reg-instructions">
         <div class="reg-icon">
-          <i class="fa-solid fa-face-smile"></i>
+          <i class="fa-solid" [ngClass]="isEditMode ? 'fa-user-pen' : 'fa-face-smile'"></i>
         </div>
-        <h3>How it works</h3>
+        <h3>{{ isEditMode ? 'Updating Face Data' : 'How it works' }}</h3>
         <div class="instruction-steps">
           <div class="step">
             <div class="step-num">1</div>
@@ -32,7 +32,7 @@
           </div>
           <div class="step">
             <div class="step-num">4</div>
-            <p>Review the preview, then click <strong>Register Face</strong></p>
+            <p>Review the preview, then click <strong>{{ isEditMode ? 'Save & Update Face' : 'Register Face' }}</strong></p>
           </div>
         </div>
         <div class="tips-box">
@@ -73,10 +73,10 @@
           <button mat-flat-button type="button" (click)="register()" [disabled]="!webcamImage || saving" class="register-btn" id="face-register-btn">
             @if (saving) {
               <mat-spinner diameter="18" color="accent"></mat-spinner>
-              <span>Registering…</span>
+              <span>{{ isEditMode ? 'Updating…' : 'Registering…' }}</span>
             } @else {
-              <i class="fa-solid fa-fingerprint"></i>
-              <span>Register Face</span>
+              <i class="fa-solid" [ngClass]="isEditMode ? 'fa-floppy-disk' : 'fa-fingerprint'"></i>
+              <span>{{ isEditMode ? 'Update Face Profile' : 'Register Face' }}</span>
             }
           </button>
         </div>

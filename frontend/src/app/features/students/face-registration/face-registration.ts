@@ -28,6 +28,7 @@ export class FaceRegistrationComponent implements OnInit {
   webcamImage: WebcamImage | null = null;
   saving = false;
   cameraError: string | null = null;
+  isEditMode = false;
 
   ngOnInit() {
     const user = JSON.parse(localStorage.getItem('user') ?? '{}');
@@ -36,7 +37,9 @@ export class FaceRegistrationComponent implements OnInit {
         next: (profile) => {
           if (profile.id !== this.studentId) {
             this.router.navigate([`/dashboard/students/${profile.id}/register-face`]);
+            return;
           }
+          this.isEditMode = !!profile.faceRegistered;
           this.cdr.detectChanges();
         },
         error: () => this.router.navigate(['/dashboard/student'])
@@ -84,7 +87,7 @@ export class FaceRegistrationComponent implements OnInit {
             }
             this.students.markFaceRegistered(this.studentId).subscribe({
               next: () => {
-                this.snackBar.open('✅ Face registered successfully!', 'Close', { duration: 4000 });
+                this.snackBar.open(this.isEditMode ? '✅ Face biometrics updated successfully!' : '✅ Face registered successfully!', 'Close', { duration: 4000 });
                 this.saving = false;
                 this.cdr.detectChanges();
                 const user = JSON.parse(localStorage.getItem('user') ?? '{}');

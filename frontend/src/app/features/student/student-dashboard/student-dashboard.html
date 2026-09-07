@@ -1,70 +1,326 @@
 <div class="page-wrapper student-dash">
 
-  <!-- Welcome Card -->
-  <div class="welcome-card va-card">
-    <div class="welcome-content">
-      <div class="stu-avatar">{{ userInitials }}</div>
-      <div>
-        <h2>Welcome back, {{ userName }}!</h2>
-        <p>Track your attendance and keep your face profile up to date.</p>
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading your academic records & attendance data…</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h3>Unable to load records</h3>
+      <p>{{ error }}</p>
+      <button mat-flat-button color="primary" (click)="loadData()">
+        <i class="fa-solid fa-rotate-right"></i>
+        <span>Retry</span>
+      </button>
+    </div>
+  } @else {
+
+    <!-- 1. Student Profile Header Banner -->
+    <div class="welcome-card va-card">
+      <div class="welcome-main">
+        <div class="stu-avatar">{{ userInitials }}</div>
+        <div class="stu-info">
+          <div class="name-badge-row">
+            <h2>{{ userName }}</h2>
+            <span class="welcome-badge">
+              <i class="fa-solid fa-user-graduate"></i>
+              Student Portal
+            </span>
+          </div>
+          <p class="stu-subtext">VisionAttend AI • Official Student Academic & Biometric Record</p>
+        </div>
+      </div>
+
+      <!-- Student Record Details Chips -->
+      <div class="student-meta-grid">
+        <div class="meta-chip">
+          <i class="fa-solid fa-id-card"></i>
+          <div class="meta-data">
+            <span class="meta-label">Enrollment No.</span>
+            <span class="meta-value">{{ student?.enrollmentNo || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="meta-chip">
+          <i class="fa-solid fa-building-columns"></i>
+          <div class="meta-data">
+            <span class="meta-label">Department</span>
+            <span class="meta-value">{{ student?.department || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="meta-chip">
+          <i class="fa-solid fa-layer-group"></i>
+          <div class="meta-data">
+            <span class="meta-label">Semester & Div</span>
+            <span class="meta-value">Sem {{ student?.semester || '1' }} (Div {{ student?.division || 'A' }})</span>
+          </div>
+        </div>
+
+        <div class="meta-chip">
+          <i class="fa-solid fa-envelope"></i>
+          <div class="meta-data">
+            <span class="meta-label">Official Email</span>
+            <span class="meta-value" [title]="student?.email">{{ student?.email || 'N/A' }}</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="welcome-badge">
-      <i class="fa-solid fa-user-graduate"></i>
-      Student
-    </div>
-  </div>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-
-    <a class="action-card va-card" routerLink="attendance" id="student-view-attendance">
-      <div class="action-icon icon-circle-primary">
-        <i class="fa-solid fa-calendar-check"></i>
+    <!-- 2. AI Face Biometrics Status & Edit Face Card -->
+    <div class="biometric-card va-card" [ngClass]="faceRegistered ? 'bio-active' : 'bio-pending'">
+      <div class="bio-left">
+        <div class="bio-icon">
+          <i class="fa-solid" [ngClass]="faceRegistered ? 'fa-face-smile-beam' : 'fa-triangle-exclamation'"></i>
+        </div>
+        <div class="bio-info">
+          <div class="bio-status-row">
+            <h3>{{ faceRegistered ? 'AI Face Biometrics Active' : 'Face Biometrics Pending' }}</h3>
+            <span class="bio-pill" [ngClass]="faceRegistered ? 'pill-success' : 'pill-warning'">
+              <i class="fa-solid" [ngClass]="faceRegistered ? 'fa-check-double' : 'fa-clock'"></i>
+              {{ faceRegistered ? 'Enrolled & Verified' : 'Action Required' }}
+            </span>
+          </div>
+          <p>
+            {{ faceRegistered 
+              ? 'Your facial embedding is registered in the AI model for automated classroom recognition. You can update or re-capture your face anytime if you change your appearance or lighting.' 
+              : 'You have not registered your face yet. You must enroll your face to allow the AI camera to recognize you and mark your attendance automatically.' 
+            }}
+          </p>
+        </div>
       </div>
-      <div class="action-body">
-        <h3>My Attendance</h3>
-        <p>View all your attendance records, subject-wise breakdown and status</p>
+      <div class="bio-actions">
+        <a 
+          mat-flat-button 
+          [routerLink]="['/dashboard/students', studentId, 'register-face']" 
+          class="bio-btn" 
+          [ngClass]="faceRegistered ? 'edit-face-btn' : 'register-face-btn'"
+          id="student-edit-face-btn"
+        >
+          <i class="fa-solid" [ngClass]="faceRegistered ? 'fa-user-pen' : 'fa-camera'"></i>
+          <span>{{ faceRegistered ? 'Edit / Update Face' : 'Register Face Now' }}</span>
+        </a>
       </div>
-      <i class="fa-solid fa-arrow-right action-arrow"></i>
-    </a>
+    </div>
 
-    @if (faceRegistered) {
-      <div class="action-card va-card">
-        <div class="action-icon icon-circle-accent" style="background: linear-gradient(135deg, #10B981 0%, #34D399 100%);">
-          <i class="fa-solid fa-circle-check"></i>
+    <!-- 3. Key Attendance Metrics & Statistics -->
+    <div class="kpi-grid">
+      
+      <!-- Overall Attendance Card -->
+      <div class="kpi-card va-card overall-kpi" [ngClass]="stats.isEligible ? 'kpi-good' : 'kpi-bad'">
+        <div class="kpi-top">
+          <span class="kpi-title">Overall Attendance</span>
+          <div class="kpi-icon">
+            <i class="fa-solid" [ngClass]="stats.isEligible ? 'fa-chart-pie' : 'fa-triangle-exclamation'"></i>
+          </div>
         </div>
-        <div class="action-body">
-          <h3>Face Registered</h3>
-          <p>Your face profile is registered. You are ready for AI-powered attendance.</p>
+        <div class="kpi-metric-row">
+          <div class="kpi-value">{{ stats.overallPercentage }}%</div>
+          <span class="eligibility-tag" [ngClass]="stats.isEligible ? 'tag-eligible' : 'tag-defaulter'">
+            {{ stats.isEligible ? 'Eligible (≥ 75%)' : 'Defaulter (< 75%)' }}
+          </span>
         </div>
-        <span class="badge badge-success" style="background: #E0F2FE; color: #0369A1; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 700;">Active</span>
+        <!-- Progress Bar -->
+        <div class="kpi-progress-bar">
+          <div class="kpi-progress-fill" [style.width.%]="stats.overallPercentage > 100 ? 100 : stats.overallPercentage" [ngClass]="stats.isEligible ? 'fill-good' : 'fill-bad'"></div>
+        </div>
+        <span class="kpi-foot">{{ stats.attendedLectures }} of {{ stats.totalLectures }} total lectures attended</span>
       </div>
-    } @else {
-      <a class="action-card va-card" [routerLink]="['/dashboard/students', studentId, 'register-face']" id="student-register-face">
-        <div class="action-icon icon-circle-accent" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);">
-          <i class="fa-solid fa-camera"></i>
-        </div>
-        <div class="action-body">
-          <h3>Register Face Now</h3>
-          <p>Click here to register your face using the webcam to enable AI attendance.</p>
-        </div>
-        <i class="fa-solid fa-arrow-right action-arrow"></i>
-      </a>
-    }
 
-  </div>
+      <!-- Attended Classes -->
+      <div class="kpi-card va-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Present / Attended</span>
+          <div class="kpi-icon icon-emerald">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <div class="kpi-value value-emerald">{{ stats.attendedLectures }}</div>
+        <span class="kpi-foot text-emerald">Marked via Face Recognition</span>
+      </div>
 
-  <!-- Info Boxes -->
-  <div class="info-row">
-    <div class="info-box">
-      <i class="fa-solid fa-circle-info"></i>
-      <p>Attendance is marked automatically via face recognition during class sessions</p>
+      <!-- Missed / Absent Classes -->
+      <div class="kpi-card va-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Absent / Missed</span>
+          <div class="kpi-icon icon-rose">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+        </div>
+        <div class="kpi-value value-rose">{{ stats.absentLectures }}</div>
+        <span class="kpi-foot text-rose">Missed lecture sessions</span>
+      </div>
+
+      <!-- Total Subjects -->
+      <div class="kpi-card va-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Enrolled Subjects</span>
+          <div class="kpi-icon icon-indigo">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+        </div>
+        <div class="kpi-value value-indigo">{{ stats.totalSubjects }}</div>
+        <span class="kpi-foot text-indigo">Semester {{ student?.semester || 1 }} curriculum</span>
+      </div>
+
     </div>
-    <div class="info-box">
-      <i class="fa-solid fa-shield-halved"></i>
-      <p>Your face data is stored securely and used only for attendance purposes</p>
+
+    <!-- 4. Subject-wise Attendance Breakdown -->
+    <div class="section-container va-card">
+      <div class="section-header">
+        <div class="section-title-group">
+          <div class="section-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div>
+            <h3>Subject-Wise Attendance Breakdown</h3>
+            <p>Individual attendance track records and instructor details for Semester {{ student?.semester || 1 }}</p>
+          </div>
+        </div>
+        <a mat-stroked-button routerLink="/dashboard/student/attendance" class="view-all-btn">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Full History</span>
+        </a>
+      </div>
+
+      @if (subjects.length === 0) {
+        <div class="empty-placeholder">
+          <i class="fa-solid fa-folder-open"></i>
+          <p>No subjects found for Semester {{ student?.semester || 1 }} in {{ student?.department }}.</p>
+        </div>
+      } @else {
+        <div class="subject-grid">
+          @for (subj of subjects; track subj.id) {
+            <div class="subject-card" [ngClass]="subj.isDefaulter ? 'subj-deficient' : 'subj-normal'">
+              <div class="subj-head">
+                <div class="subj-info">
+                  <h4 class="subj-name">{{ subj.name }}</h4>
+                  <p class="subj-faculty">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    {{ subj.facultyName }}
+                  </p>
+                </div>
+                <div class="subj-badge" [ngClass]="subj.isDefaulter ? 'badge-low' : 'badge-good'">
+                  {{ subj.percentage }}%
+                </div>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="subj-progress-container">
+                <div class="subj-progress-bar">
+                  <div class="subj-progress-fill" [style.width.%]="subj.percentage > 100 ? 100 : subj.percentage" [ngClass]="subj.isDefaulter ? 'fill-low' : 'fill-good'"></div>
+                </div>
+              </div>
+
+              <div class="subj-footer">
+                <span class="subj-counts">
+                  <strong>{{ subj.attended }}</strong> / {{ subj.totalConducted }} attended
+                </span>
+                <span class="subj-status-tag" [ngClass]="subj.isDefaulter ? 'status-defaulter' : 'status-ontrack'">
+                  <i class="fa-solid" [ngClass]="subj.isDefaulter ? 'fa-circle-exclamation' : 'fa-circle-check'"></i>
+                  {{ subj.isDefaulter ? '< 75% Defaulter' : 'On Track' }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
-  </div>
+
+    <!-- 5. Recent Attendance Activity & University Guidelines Grid -->
+    <div class="bottom-grid">
+
+      <!-- Recent Attendance Activity -->
+      <div class="section-container va-card">
+        <div class="section-header">
+          <div class="section-title-group">
+            <div class="section-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div>
+              <h3>Recent Class Activity</h3>
+              <p>Your latest marked attendance sessions</p>
+            </div>
+          </div>
+        </div>
+
+        @if (recentActivity.length === 0) {
+          <div class="empty-placeholder">
+            <i class="fa-solid fa-calendar-xmark"></i>
+            <p>No recent attendance records found. Classes attended will appear here in real-time.</p>
+          </div>
+        } @else {
+          <div class="recent-list">
+            @for (rec of recentActivity; track rec.id) {
+              <div class="recent-item">
+                <div class="recent-icon-wrapper">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="recent-details">
+                  <span class="recent-subject">{{ rec.subjectName }}</span>
+                  <span class="recent-meta">
+                    <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i>
+                    {{ rec.date | date:'mediumDate' }} • {{ rec.date | date:'shortTime' }}
+                    @if (rec.isProxy) {
+                      <span class="proxy-mini-tag" title="Proxy class conducted by {{ rec.proxyFacultyName }}">
+                        Proxy: {{ rec.proxyFacultyName }}
+                      </span>
+                    } @else {
+                      <span class="faculty-mini-tag">{{ rec.facultyName }}</span>
+                    }
+                  </span>
+                </div>
+                <div class="recent-badge">
+                  <span class="present-pill">
+                    <i class="fa-solid fa-robot" style="margin-right: 4px;"></i>
+                    AI Verified
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- University Regulations & Guidelines -->
+      <div class="section-container va-card guidelines-card">
+        <div class="section-header">
+          <div class="section-title-group">
+            <div class="section-icon" style="background: rgba(79, 70, 229, 0.1); color: #4F46E5;"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+              <h3>Attendance Regulations</h3>
+              <p>University & AI Attendance Guidelines</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="guidelines-list">
+          <div class="guideline-item">
+            <div class="g-bullet"><i class="fa-solid fa-percent"></i></div>
+            <div class="g-text">
+              <strong>75% Mandatory Attendance Rule</strong>
+              <p>A minimum of 75% attendance across all registered semester subjects is required for examination eligibility.</p>
+            </div>
+          </div>
+
+          <div class="guideline-item">
+            <div class="g-bullet"><i class="fa-solid fa-camera"></i></div>
+            <div class="g-text">
+              <strong>Keep Face Biometrics Updated</strong>
+              <p>If you experience recognition issues during class or change your appearance, use the <strong>Edit / Update Face</strong> button above to re-capture your face.</p>
+            </div>
+          </div>
+
+          <div class="guideline-item">
+            <div class="g-bullet"><i class="fa-solid fa-bolt"></i></div>
+            <div class="g-text">
+              <strong>Automated Real-Time Sync</strong>
+              <p>Attendance is verified via classroom cameras and reflected in this dashboard immediately upon session conclusion.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  }
 
 </div>
