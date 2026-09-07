@@ -14,34 +14,87 @@
     
     <div class="card-body">
       <div class="form-grid">
+        <!-- Subject Name with Autocomplete Suggestions -->
         <mat-form-field appearance="outline">
           <mat-label>Subject Name</mat-label>
           <mat-icon matPrefix>book</mat-icon>
-          <input matInput placeholder="e.g. Data Structures" [(ngModel)]="name" required>
+          <input
+            matInput
+            placeholder="Select or type subject (e.g. Machine Learning)"
+            [(ngModel)]="name"
+            [matAutocomplete]="autoSubject"
+            required
+          >
+          <mat-autocomplete #autoSubject="matAutocomplete">
+            @for (subj of filteredSubjectSuggestions; track subj) {
+              <mat-option [value]="subj">
+                <i class="fa-solid fa-graduation-cap" style="color: var(--primary); margin-right: 8px; font-size: 13px;"></i>
+                {{ subj }}
+              </mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
 
+        <!-- Department with Autocomplete & Pre-fill -->
         <mat-form-field appearance="outline">
           <mat-label>Department</mat-label>
           <mat-icon matPrefix>business</mat-icon>
-          <input matInput placeholder="e.g. Computer Engineering" [(ngModel)]="department" required>
+          <input
+            matInput
+            placeholder="Select or type department"
+            [(ngModel)]="department"
+            [matAutocomplete]="autoDept"
+            required
+          >
+          <mat-autocomplete #autoDept="matAutocomplete">
+            @for (dept of filteredDepartments; track dept) {
+              <mat-option [value]="dept">
+                <i class="fa-solid fa-building-columns" style="color: #6366F1; margin-right: 8px; font-size: 13px;"></i>
+                {{ dept }}
+              </mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
 
       <div class="form-grid">
+        <!-- Semester Dropdown (Select) -->
         <mat-form-field appearance="outline">
           <mat-label>Semester</mat-label>
           <mat-icon matPrefix>school</mat-icon>
-          <input matInput type="number" min="1" max="8" placeholder="e.g. 6" [(ngModel)]="semester" required>
+          <mat-select [(ngModel)]="semester" required>
+            <mat-option [value]="null">-- Select Semester --</mat-option>
+            @for (sem of semesterOptions; track sem.value) {
+              <mat-option [value]="sem.value">
+                {{ sem.label }}
+              </mat-option>
+            }
+          </mat-select>
         </mat-form-field>
 
+        <!-- Division with Autocomplete -->
         <mat-form-field appearance="outline">
           <mat-label>Division (Class)</mat-label>
           <mat-icon matPrefix>groups</mat-icon>
-          <input matInput placeholder="e.g. IT-1" [(ngModel)]="division">
+          <input
+            matInput
+            placeholder="Select or type division (e.g. IT-1, Div A)"
+            [(ngModel)]="division"
+            [matAutocomplete]="autoDiv"
+          >
+          <mat-autocomplete #autoDiv="matAutocomplete">
+            @for (div of filteredDivisions; track div) {
+              <mat-option [value]="div">
+                <i class="fa-solid fa-users" style="color: #06B6D4; margin-right: 8px; font-size: 13px;"></i>
+                {{ div }}
+              </mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
 
       <div class="form-grid">
+        <!-- Lecture Day Dropdown -->
         <mat-form-field appearance="outline">
           <mat-label>Lecture Day</mat-label>
           <mat-icon matPrefix>calendar_today</mat-icon>
@@ -57,10 +110,24 @@
           </mat-select>
         </mat-form-field>
 
+        <!-- Lecture Time Slot with Autocomplete Suggestions -->
         <mat-form-field appearance="outline">
-          <mat-label>Lecture Start Time</mat-label>
+          <mat-label>Lecture Start Time / Slot</mat-label>
           <mat-icon matPrefix>access_time</mat-icon>
-          <input matInput placeholder="e.g. 10:30 AM" [(ngModel)]="lectureTime">
+          <input
+            matInput
+            placeholder="Select slot (e.g. 10:30 AM - 11:30 AM)"
+            [(ngModel)]="lectureTime"
+            [matAutocomplete]="autoTime"
+          >
+          <mat-autocomplete #autoTime="matAutocomplete">
+            @for (slot of filteredTimeSlots; track slot) {
+              <mat-option [value]="slot">
+                <i class="fa-regular fa-clock" style="color: #10B981; margin-right: 8px; font-size: 13px;"></i>
+                {{ slot }}
+              </mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
 

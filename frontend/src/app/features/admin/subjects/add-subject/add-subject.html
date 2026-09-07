@@ -27,23 +27,60 @@
           <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
             <mat-label>Subject Name</mat-label>
             <mat-icon matPrefix>book</mat-icon>
-            <input matInput [(ngModel)]="subjectData.name" name="name" placeholder="e.g. Distributed Systems" required />
+            <input
+              matInput
+              [(ngModel)]="subjectData.name"
+              name="name"
+              placeholder="Select or type subject (e.g. Machine Learning)"
+              [matAutocomplete]="autoSubject"
+              required
+            />
+            <mat-autocomplete #autoSubject="matAutocomplete">
+              @for (subj of filteredSubjectSuggestions; track subj) {
+                <mat-option [value]="subj">
+                  <i class="fa-solid fa-graduation-cap" style="color: var(--primary); margin-right: 8px; font-size: 13px;"></i>
+                  {{ subj }}
+                </mat-option>
+              }
+            </mat-autocomplete>
           </mat-form-field>
         </div>
 
         <div class="form-group">
           <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
             <mat-label>Department</mat-label>
-            <mat-icon matPrefix>school</mat-icon>
-            <input matInput [(ngModel)]="subjectData.department" name="department" placeholder="e.g. Computer Engineering" required />
+            <mat-icon matPrefix>business</mat-icon>
+            <input
+              matInput
+              [(ngModel)]="subjectData.department"
+              name="department"
+              placeholder="Select or type department"
+              [matAutocomplete]="autoDept"
+              required
+            />
+            <mat-autocomplete #autoDept="matAutocomplete">
+              @for (dept of filteredDepartments; track dept) {
+                <mat-option [value]="dept">
+                  <i class="fa-solid fa-building-columns" style="color: #6366F1; margin-right: 8px; font-size: 13px;"></i>
+                  {{ dept }}
+                </mat-option>
+              }
+            </mat-autocomplete>
           </mat-form-field>
         </div>
 
         <div class="form-group">
           <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
             <mat-label>Semester</mat-label>
-            <mat-icon matPrefix>tag</mat-icon>
-            <input matInput type="number" min="1" max="8" [(ngModel)]="subjectData.semester" name="semester" placeholder="e.g. 5" required />
+            <mat-icon matPrefix>school</mat-icon>
+            <mat-select [(ngModel)]="subjectData.semester" name="semester" required>
+              <mat-option value="">-- Select Semester --</mat-option>
+              @for (sem of semesterOptions; track sem.value) {
+                <mat-option [value]="sem.value">
+                  {{ sem.label }}
+                </mat-option>
+              }
+            </mat-select>
           </mat-form-field>
         </div>
 
