@@ -310,7 +310,7 @@
                   <td style="text-align: right;" class="no-print">
                     <button mat-stroked-button class="drilldown-btn" (click)="toggleDetails(fac.facultyId)">
                       <i class="fa-solid" [ngClass]="expandedFacultyId === fac.facultyId ? 'fa-chevron-up' : 'fa-list-check'"></i>
-                      {{ expandedFacultyId === fac.facultyId ? 'Close' : 'Details' }}
+                      <span>{{ expandedFacultyId === fac.facultyId ? 'Close' : 'Details' }}</span>
                     </button>
                   </td>
                 </tr>

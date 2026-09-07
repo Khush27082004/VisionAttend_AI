@@ -389,17 +389,42 @@
 }
 
 .drilldown-btn {
-  font-size: 11.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   color: var(--primary) !important;
-  border-color: #C7D2FE !important;
+  border: 1px solid #C7D2FE !important;
   border-radius: 8px !important;
   height: 32px !important;
-  line-height: 30px !important;
+  min-height: 32px !important;
   padding: 0 12px !important;
+  white-space: nowrap !important;
+  background: transparent !important;
+  transition: all 0.2s ease !important;
+
+  ::ng-deep .mdc-button__label {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  i {
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+
+  span {
+    line-height: 1 !important;
+  }
 
   &:hover {
     background: #EEF2FF !important;
+    border-color: #818CF8 !important;
   }
 }
 
