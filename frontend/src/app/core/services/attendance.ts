@@ -64,4 +64,8 @@ export class Attendance {
     const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
     return this.http.get<{ summary: any; students: any[] }>(`${this.api}/report/classwise${queryString}`);
   }
+
+  seedDemoReportData(): Observable<any> {
+    return this.http.post<any>(`${this.api}/seed-demo`, {});
+  }
 }

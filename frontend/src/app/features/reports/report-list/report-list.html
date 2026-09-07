@@ -34,6 +34,15 @@
     </div>
     
     <div class="banner-actions">
+      <button mat-flat-button class="demo-seed-btn" (click)="loadDemoData()" [disabled]="seeding" title="Instantly populate sample students and attendance logs with both eligible and < 75% defaulter students">
+        @if (seeding) {
+          <mat-spinner diameter="16" color="accent"></mat-spinner>
+          <span>Loading…</span>
+        } @else {
+          <i class="fa-solid fa-wand-magic-sparkles icon-left"></i>
+          <span>Load Test Data</span>
+        }
+      </button>
       <button mat-flat-button class="export-excel-btn" (click)="exportToCSV()" [disabled]="students.length === 0">
         <i class="fa-solid fa-file-excel icon-left"></i> Export Excel (CSV)
       </button>

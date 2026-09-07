@@ -355,4 +355,21 @@ export class ReportList implements OnInit {
   printReport() {
     window.print();
   }
+
+  seeding = false;
+  loadDemoData() {
+    this.seeding = true;
+    this.attendanceService.seedDemoReportData().subscribe({
+      next: (res) => {
+        this.seeding = false;
+        this.snackBar.open("Sample class attendance dataset loaded! (Defaulters & Regular students ready to test)", "Close", { duration: 4000 });
+        this.loadSubjects();
+        this.setPresetRange('last30');
+      },
+      error: (err) => {
+        this.seeding = false;
+        this.snackBar.open(err.error?.message || "Failed to load test data", "Close", { duration: 3000 });
+      }
+    });
+  }
 }

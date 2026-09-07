@@ -450,6 +450,131 @@ router.get("/report/classwise", authenticate, authorize("FACULTY", "ADMIN"), asy
   }
 });
 
+router.post("/seed-demo", authenticate, authorize("FACULTY", "ADMIN"), async (req: AuthRequest, res) => {
+  try {
+    const faculty = await prisma.faculty.findFirst({
+      include: { user: true }
+    });
+    if (!faculty) {
+      return res.status(404).json({ message: "No faculty found to assign demo data" });
+    }
+
+    // 1. Ensure subject exists
+    let subject = await prisma.subject.findFirst({
+      where: { facultyId: faculty.id }
+    });
+    if (!subject) {
+      subject = await prisma.subject.create({
+        data: {
+          name: "Machine Learning (CE-1)",
+          department: faculty.department || "Computer Engineering",
+          semester: 6,
+          facultyId: faculty.id
+        }
+      });
+    }
+
+    // 2. Demo student definitions with varying attendance rates
+    const demoStudentsData = [
+      { name: "Aarav Patel", enrollment: "230410116001", email: "aarav.patel@univ.edu", rate: 0.9 }, // 90% (Eligible)
+      { name: "Diya Sharma", enrollment: "230410116002", email: "diya.sharma@univ.edu", rate: 1.0 }, // 100% (Eligible)
+      { name: "Rohan Mehta", enrollment: "230410116003", email: "rohan.mehta@univ.edu", rate: 0.8 }, // 80% (Eligible)
+      { name: "Ananya Joshi", enrollment: "230410116004", email: "ananya.joshi@univ.edu", rate: 0.85 }, // 85% (Eligible)
+      { name: "Kabir Verma", enrollment: "230410116005", email: "kabir.verma@univ.edu", rate: 0.5 }, // 50% (< 75% Defaulter)
+      { name: "Sneha Nair", enrollment: "230410116006", email: "sneha.nair@univ.edu", rate: 0.6 }, // 60% (< 75% Defaulter)
+      { name: "Vikas Shah", enrollment: "230410116007", email: "vikas.shah@univ.edu", rate: 0.4 }, // 40% (< 75% Defaulter)
+      { name: "Pooja Desai", enrollment: "230410116008", email: "pooja.desai@univ.edu", rate: 0.95 } // 95% (Eligible)
+    ];
+
+    const studentEntities: any[] = [];
+    for (const d of demoStudentsData) {
+      let stu = await prisma.student.findUnique({
+        where: { enrollmentNo: d.enrollment }
+      });
+      if (!stu) {
+        let u = await prisma.user.findUnique({ where: { email: d.email } });
+        if (!u) {
+          u = await prisma.user.create({
+            data: {
+              fullName: d.name,
+              email: d.email,
+              password: "$2b$10$DEMO_HASHED_PASSWORD_SAMPLE",
+              role: "STUDENT"
+            }
+          });
+        }
+        stu = await prisma.student.create({
+          data: {
+            userId: u.id,
+            enrollmentNo: d.enrollment,
+            department: subject.department,
+            semester: subject.semester,
+            division: "CE-1"
+          }
+        });
+      }
+      studentEntities.push({ student: stu, rate: d.rate });
+    }
+
+    // 3. Generate 10 lecture dates over the past 3 weeks
+    const today = new Date();
+    const lectureDates: Date[] = [];
+    for (let i = 1; i <= 10; i++) {
+      const dt = new Date(today);
+      dt.setDate(today.getDate() - (11 - i) * 2);
+      dt.setHours(10, 30, 0, 0);
+      lectureDates.push(dt);
+    }
+
+    // 4. Create attendance records for each date
+    let createdCount = 0;
+    for (const lDate of lectureDates) {
+      for (const item of studentEntities) {
+        const dateIndex = lectureDates.indexOf(lDate);
+        const shouldBePresent = (dateIndex / lectureDates.length) < item.rate;
+
+        if (shouldBePresent) {
+          const start = new Date(lDate);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(start);
+          end.setDate(start.getDate() + 1);
+
+          const exists = await prisma.attendance.findFirst({
+            where: {
+              studentId: item.student.id,
+              subjectId: subject.id,
+              date: { gte: start, lt: end }
+            }
+          });
+
+          if (!exists) {
+            await prisma.attendance.create({
+              data: {
+                studentId: item.student.id,
+                subjectId: subject.id,
+                facultyId: faculty.id,
+                status: "Present",
+                date: lDate
+              }
+            });
+            createdCount++;
+          }
+        }
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: `Demo attendance dataset seeded with 8 students, 10 lecture dates, and ${createdCount} attendance records!`,
+      subjectId: subject.id,
+      subjectName: subject.name
+    });
+  } catch (error) {
+    console.error("Error seeding demo report data:", error);
+    return res.status(500).json({ success: false, message: "Could not seed demo report data" });
+  }
+});
+
 router.delete("/all", authenticate, authorize("ADMIN"), async (req: AuthRequest, res) => {
   try {
     await prisma.attendance.deleteMany();

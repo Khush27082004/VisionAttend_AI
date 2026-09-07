@@ -12,6 +12,22 @@
   flex-wrap: wrap;
 }
 
+.demo-seed-btn {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  height: 44px !important;
+  padding: 0 18px !important;
+  box-shadow: 0 3px 12px rgba(245, 158, 11, 0.28) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4) !important;
+  }
+}
+
 .export-excel-btn {
   background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
   color: #fff !important;
