@@ -21,8 +21,7 @@ export class Sidebar implements OnInit {
   primaryItems: NavItem[] = [];
 
   systemItems: NavItem[] = [
-    { icon: 'fa-chart-column', label: 'Reports' },
-    { icon: 'fa-gear',         label: 'Settings' }
+    { icon: 'fa-gear', label: 'Settings' }
   ];
 
   userName    = '';
@@ -52,7 +51,6 @@ export class Sidebar implements OnInit {
         { icon: 'fa-id-card',         label: 'Master Roster', route: '/dashboard/admin/roster', exact: false },
         { icon: 'fa-chalkboard-user', label: 'Faculty List', route: '/dashboard/admin/faculty',  exact: false },
         { icon: 'fa-user-tie',        label: 'Faculty Reports', route: '/dashboard/admin/faculty-reports', exact: false },
-        { icon: 'fa-book',            label: 'Subjects',   route: '/dashboard/subjects', exact: false },
         { icon: 'fa-chart-pie',       label: 'Student Reports', route: '/dashboard/reports', exact: false }
       ];
     } else if (this.userRole === 'FACULTY') {
