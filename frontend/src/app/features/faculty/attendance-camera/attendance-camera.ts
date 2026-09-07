@@ -26,6 +26,7 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
   private attendance = inject(Attendance);
   private snackBar = inject(MatSnackBar);
   private scanTimer: ReturnType<typeof setInterval> | undefined;
+  private scanTimeout: ReturnType<typeof setTimeout> | undefined;
   private markedStudentIds = new Set<number>();
 
   trigger = new Subject<void>();
@@ -52,44 +53,46 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
     this.markedStudentIds.clear();
     this.recognizedCount = 0;
     this.isScanning = true;
-    // Fast scan: capture every 1.2 seconds for responsive recognition
-    this.scanTimer = setInterval(() => this.captureFrame(), 1200);
+    
+    // Trigger first frame right away
+    setTimeout(() => this.captureFrame(), 300);
+
+    // Safety fallback interval for continuous scanning
+    this.scanTimer = setInterval(() => {
+      if (!this.processing && this.isScanning) {
+        this.captureFrame();
+      }
+    }, 500);
   }
 
   handleImage(image: WebcamImage) {
     if (!this.subjectId || this.processing || !this.isScanning) return;
     this.processing = true;
 
-    // Compress image via canvas for much faster upload + AI processing
-    this.compressAndSend(image.imageAsDataUrl);
+    try {
+      // Instant direct conversion from base64 to Blob (<1ms)
+      const blob = this.dataUrlToBlob(image.imageAsDataUrl);
+      const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
+      this.ai.recognize(file).subscribe({
+        next: recognition => this.handleRecognition(recognition),
+        error: () => this.finishFrame('Recognition service temporarily unavailable. Retrying…')
+      });
+    } catch {
+      this.finishFrame('Unable to process camera frame. Retrying…');
+    }
   }
 
-  private compressAndSend(dataUrl: string) {
-    const img = new Image();
-    img.onload = () => {
-      const MAX = 320; // small image = fast upload + fast AI processing
-      let w = img.width, h = img.height;
-      if (Math.max(w, h) > MAX) {
-        const scale = MAX / Math.max(w, h);
-        w = Math.round(w * scale);
-        h = Math.round(h * scale);
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0, w, h);
-      canvas.toBlob(blob => {
-        if (!blob) { this.finishFrame('Unable to capture camera frame. Retrying…'); return; }
-        const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
-        this.ai.recognize(file).subscribe({
-          next: recognition => this.handleRecognition(recognition),
-          error: () => this.finishFrame('Recognition service unavailable. Retrying…')
-        });
-      }, 'image/jpeg', 0.65); // 65% quality — sufficient for face recognition, faster transfer
-    };
-    img.onerror = () => this.finishFrame('Unable to capture camera frame. Retrying…');
-    img.src = dataUrl;
+  private dataUrlToBlob(dataUrl: string): Blob {
+    const parts = dataUrl.split(',');
+    const mimeMatch = parts[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const binaryStr = atob(parts[1]);
+    const len = binaryStr.length;
+    const u8arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      u8arr[i] = binaryStr.charCodeAt(i);
+    }
+    return new Blob([u8arr], { type: mime });
   }
 
   captureFrame() {
@@ -105,7 +108,12 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.isScanning = true;
       this.status = 'Scanning for faces…';
-      this.scanTimer = setInterval(() => this.captureFrame(), 1200);
+      this.captureFrame();
+      this.scanTimer = setInterval(() => {
+        if (!this.processing && this.isScanning) {
+          this.captureFrame();
+        }
+      }, 500);
       this.snackBar.open('Face scanning resumed.', 'Close', { duration: 2000 });
     }
   }
@@ -147,6 +155,9 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    // Immediately register in marked IDs to prevent duplicate triggers
+    newIds.forEach(id => this.markedStudentIds.add(id));
+
     this.status = `Recognized ${newIds.length} student(s). Marking attendance…`;
     let completedCount = 0;
     let successCount = 0;
@@ -155,7 +166,6 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
       this.attendance.markPresent(studentId, this.subjectId, this.date, this.isProxy, this.proxyNotes).subscribe({
         next: result => {
           if (result.success) {
-            this.markedStudentIds.add(studentId);
             this.recognizedCount++;
             this.studentMarked.emit(studentId);
             successCount++;
@@ -180,7 +190,7 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
       const msg = this.isProxy 
         ? `⚡ Proxy attendance marked for ${successCount} student(s)`
         : `✅ Attendance marked for ${successCount} student(s)`;
-      this.snackBar.open(msg, 'Close', { duration: 3000 });
+      this.snackBar.open(msg, 'Close', { duration: 2500 });
       this.finishFrame(`✅ ${this.recognizedCount} student(s) marked total. Scanning…`);
     } else {
       this.finishFrame('No new attendance marked. Continuing scan…');
@@ -190,12 +200,23 @@ export class AttendanceCameraComponent implements OnInit, OnChanges, OnDestroy {
   private finishFrame(status: string) {
     this.status = status;
     this.processing = false;
+    // Schedule next frame rapidly after only 150ms if scanning is active
+    if (this.isScanning && !this.scanTimeout) {
+      this.scanTimeout = setTimeout(() => {
+        this.scanTimeout = undefined;
+        this.captureFrame();
+      }, 150);
+    }
   }
 
   private clearScanner() {
     if (this.scanTimer) {
       clearInterval(this.scanTimer);
       this.scanTimer = undefined;
+    }
+    if (this.scanTimeout) {
+      clearTimeout(this.scanTimeout);
+      this.scanTimeout = undefined;
     }
   }
 }

@@ -8,13 +8,15 @@
       </div>
       <div>
         <h2>{{ isProxyMode ? 'Proxy Attendance Portal' : 'Welcome, Faculty' }}</h2>
-        <p>{{ isProxyMode ? 'Conduct attendance for absent faculty and share real-time class logs directly to their account' : 'Start today\'s attendance session by selecting a subject below' }}</p>
+        <p>{{ isProxyMode ? 'Conduct attendance for absent faculty and share real-time class logs directly to their
+          account' : 'Start today\'s attendance session by selecting a subject below' }}</p>
       </div>
     </div>
-    
+
     <!-- Header Actions (Reports & Proxy Toggle) -->
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <a mat-flat-button routerLink="/dashboard/faculty/reports" style="background: #ffffff !important; color: var(--primary) !important; font-weight: 700; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+      <a mat-flat-button routerLink="/dashboard/faculty/reports"
+        style="background: #ffffff !important; color: var(--primary) !important; font-weight: 700; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); height: 42px; display: inline-flex; align-items: center; gap: 6px;">
         <i class="fa-solid fa-chart-pie"></i>
         <span>Attendance Reports</span>
       </a>
@@ -33,15 +35,16 @@
 
   <!-- Proxy Info Notice Banner -->
   @if (isProxyMode) {
-    <div class="proxy-notice-card">
-      <div class="proxy-notice-icon">
-        <i class="fa-solid fa-bolt"></i>
-      </div>
-      <div class="proxy-notice-text">
-        <h4>Proxy Lecture Tracking Activated</h4>
-        <p>You are logged in with your own credentials. Select the absent faculty and their scheduled course. The attendance records will be permanently stamped with your proxy sign-off and shared with the absent faculty.</p>
-      </div>
+  <div class="proxy-notice-card">
+    <div class="proxy-notice-icon">
+      <i class="fa-solid fa-bolt"></i>
     </div>
+    <div class="proxy-notice-text">
+      <h4>Proxy Lecture Tracking Activated</h4>
+      <p>You are logged in with your own credentials. Select the absent faculty and their scheduled course. The
+        attendance records will be permanently stamped with your proxy sign-off and shared with the absent faculty.</p>
+    </div>
+  </div>
   }
 
   <!-- Subject / Proxy Selection Card -->
@@ -52,74 +55,73 @@
       </div>
       <div>
         <h3>{{ isProxyMode ? 'Select Absent Faculty & Course' : 'Take Attendance' }}</h3>
-        <p>{{ isProxyMode ? 'Specify which faculty member you are covering for' : 'Choose a subject and start face-recognition attendance' }}</p>
+        <p>{{ isProxyMode ? 'Specify which faculty member you are covering for' : 'Choose a subject and start
+          face-recognition attendance' }}</p>
       </div>
     </div>
 
     <div class="subject-card-body" style="display: flex; flex-direction: column; gap: 14px; padding: 24px 28px;">
-      
+
       <!-- Proxy Fields (When Proxy Mode is ON) -->
       @if (isProxyMode) {
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; width: 100%;">
-          
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>Absent Faculty Member</mat-label>
-            <mat-icon matPrefix>person_off</mat-icon>
-            <mat-select [(ngModel)]="selectedAbsentFacultyId" (selectionChange)="onAbsentFacultyChange()" [disabled]="attendanceActive" required>
-              @if (faculties.length === 0) {
-                <mat-option disabled>No other faculty profiles found</mat-option>
-              }
-              @for (faculty of faculties; track faculty.id) {
-                <mat-option [value]="faculty.id">
-                  {{ faculty.user?.fullName }} ({{ faculty.department }})
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; width: 100%;">
 
-          <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>Proxy Notes / Lecture Topic (Optional)</mat-label>
-            <mat-icon matPrefix>edit_note</mat-icon>
-            <input matInput placeholder="e.g. Covered Chapter 4 Binary Trees" [(ngModel)]="proxyNotes" [disabled]="attendanceActive">
-          </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Absent Faculty Member</mat-label>
+          <mat-icon matPrefix>person_off</mat-icon>
+          <mat-select [(ngModel)]="selectedAbsentFacultyId" (selectionChange)="onAbsentFacultyChange()"
+            [disabled]="attendanceActive" required>
+            @if (faculties.length === 0) {
+            <mat-option disabled>No other faculty profiles found</mat-option>
+            }
+            @for (faculty of faculties; track faculty.id) {
+            <mat-option [value]="faculty.id">
+              {{ faculty.user?.fullName }} ({{ faculty.department }})
+            </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-        </div>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Proxy Notes / Lecture Topic (Optional)</mat-label>
+          <mat-icon matPrefix>edit_note</mat-icon>
+          <input matInput placeholder="e.g. Covered Chapter 4 Binary Trees" [(ngModel)]="proxyNotes"
+            [disabled]="attendanceActive">
+        </mat-form-field>
+
+      </div>
       }
 
       <!-- Main Controls Row -->
       <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; width: 100%;">
-        
-        <mat-form-field appearance="outline" class="subject-field" subscriptSizing="dynamic" style="flex: 1.5; min-width: 250px; margin-bottom: 0;">
+
+        <mat-form-field appearance="outline" class="subject-field" subscriptSizing="dynamic"
+          style="flex: 1.5; min-width: 250px; margin-bottom: 0;">
           <mat-label>{{ isProxyMode ? 'Select Absent Faculty Subject' : 'Select Subject' }}</mat-label>
           <mat-icon matPrefix>book</mat-icon>
-          <mat-select [(ngModel)]="selectedSubjectId" (selectionChange)="onSubjectChange()" [disabled]="attendanceActive || (isProxyMode && !selectedAbsentFacultyId)">
+          <mat-select [(ngModel)]="selectedSubjectId" (selectionChange)="onSubjectChange()"
+            [disabled]="attendanceActive || (isProxyMode && !selectedAbsentFacultyId)">
             @if (isProxyMode && !selectedAbsentFacultyId) {
-              <mat-option disabled>Please choose an absent faculty above first</mat-option>
+            <mat-option disabled>Please choose an absent faculty above first</mat-option>
             } @else if (getFilteredSubjects().length === 0) {
-              <mat-option disabled>No subjects found for this faculty</mat-option>
+            <mat-option disabled>No subjects found for this faculty</mat-option>
             }
             @for (subject of getFilteredSubjects(); track subject.id) {
-              <mat-option [value]="subject.id">
-                {{ subject.name }} — Semester {{ subject.semester }}
-              </mat-option>
+            <mat-option [value]="subject.id">
+              {{ subject.name }} — Semester {{ subject.semester }}
+            </mat-option>
             }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 180px; margin-bottom: 0;">
           <mat-label>Class Date</mat-label>
-          <input matInput type="date" [(ngModel)]="selectedDate" (change)="onDateChange()" [disabled]="attendanceActive">
+          <input matInput type="date" [(ngModel)]="selectedDate" (change)="onDateChange()"
+            [disabled]="attendanceActive">
         </mat-form-field>
 
-        <button
-          mat-flat-button
-          class="start-btn"
-          [class.proxy-start-btn]="isProxyMode"
-          (click)="startAttendance()"
-          [disabled]="!selectedSubjectId || attendanceActive"
-          id="start-attendance-btn"
-          style="height: 56px;"
-        >
+        <button mat-flat-button class="start-btn" [class.proxy-start-btn]="isProxyMode" (click)="startAttendance()"
+          [disabled]="!selectedSubjectId || attendanceActive" id="start-attendance-btn" style="height: 56px;">
           <i class="fa-solid" [ngClass]="isProxyMode ? 'fa-bolt' : 'fa-play'"></i>
           <span>{{ isProxyMode ? 'Start Proxy Attendance' : 'Start Attendance' }}</span>
         </button>
@@ -127,14 +129,8 @@
 
       <!-- Single End Lecture Button below Start Attendance -->
       <div class="end-action-row" style="display: flex; justify-content: flex-end; width: 100%; margin-top: 4px;">
-        <button
-          mat-flat-button
-          class="end-lec-btn"
-          (click)="endLecture()"
-          [disabled]="!attendanceActive"
-          id="end-lecture-btn"
-          style="height: 48px;"
-        >
+        <button mat-flat-button class="end-lec-btn" (click)="endLecture()" [disabled]="!attendanceActive"
+          id="end-lecture-btn" style="height: 48px;">
           <i class="fa-solid fa-flag-checkered"></i>
           <span>End Lecture & Finalize Attendance</span>
         </button>
@@ -143,7 +139,8 @@
       <!-- Schedule filter toggle -->
       <div style="display: flex; align-items: center; margin-top: 4px;">
         <mat-checkbox [(ngModel)]="filterByDay" color="primary" [disabled]="attendanceActive">
-          <span style="font-size: 12px; color: var(--text-secondary); font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+          <span
+            style="font-size: 12px; color: var(--text-secondary); font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
             <i class="fa-solid fa-calendar-day" style="color: var(--primary);"></i>
             Filter by schedule (shows only <strong>{{ getDayName(selectedDate) }}</strong> classes)
           </span>
@@ -155,154 +152,160 @@
 
   <!-- Live Camera & Attendance List -->
   @if (selectedSubjectId) {
-    <div class="dashboard-grid" [class.active-session]="attendanceActive">
-      
-      <!-- Camera -->
-      @if (attendanceActive) {
-        <div class="camera-section" [class.proxy-camera-border]="isProxyMode">
-          <div class="live-header" [class.proxy-live-header]="isProxyMode">
-            <div class="live-dot" [class.proxy-live-dot]="isProxyMode"></div>
-            <span>{{ isProxyMode ? 'Proxy Session Active (Covering for ' + getSelectedAbsentFacultyName() + ')' : 'Live Attendance Session Running' }}</span>
-          </div>
-          <app-attendance-camera 
-            [subjectId]="selectedSubjectId" 
-            [date]="selectedDate" 
-            [isProxy]="isProxyMode"
-            [proxyNotes]="proxyNotes"
-            (studentMarked)="onStudentMarked()">
-          </app-attendance-camera>
-        </div>
-      }
-      
-      <!-- Attendance Records Table -->
-      <div class="va-card attendance-list-card">
-        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
-          <div class="header-icon-title">
-            <i class="fa-solid table-icon" [ngClass]="isProxyMode ? 'fa-handshake fa-table-proxy' : 'fa-clipboard-user'"></i>
-            <div>
-              <h3>Attendance Records</h3>
-              <p>{{ isProxyMode ? 'Proxy session records shared with ' + getSelectedAbsentFacultyName() : 'Recent attendance logs for this subject' }}</p>
-            </div>
-          </div>
-          @if (attendanceRecords.length > 0) {
-            <button mat-stroked-button color="warn" (click)="resetTodaySession()" style="font-size: 11px; font-weight: 600; padding: 4px 10px; border-color: var(--warn) !important; color: var(--warn) !important; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
-              <i class="fa-solid fa-trash-can"></i> Reset Session
-            </button>
-          }
-        </div>
-        
-        @if (attendanceRecords.length === 0) {
-          <div class="empty-list">
-            <i class="fa-solid fa-users-slash"></i>
-            <p>No attendance records recorded yet.</p>
-          </div>
-        } @else {
-          <div class="table-responsive">
-            <table class="va-table">
-              <thead>
-                <tr>
-                  <th>Student Name</th>
-                  <th>Enrollment No.</th>
-                  <th class="hide-active">Department</th>
-                  <th>Date/Time</th>
-                  <th>Status</th>
-                  <th>Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (record of attendanceRecords; track record.id) {
-                  <tr>
-                    <td>{{ record.studentName }}</td>
-                    <td><span class="badge-neutral">{{ record.enrollmentNo }}</span></td>
-                    <td class="hide-active">{{ record.department }} (Sem {{ record.semester }}, Div {{ record.division }})</td>
-                    <td>
-                      <span class="hide-active">{{ record.date | date:'medium' }}</span>
-                      <span class="show-active">{{ record.date | date:'shortTime' }}</span>
-                    </td>
-                    <td><span class="badge badge-success">Present</span></td>
-                    <td>
-                      @if (record.isProxy) {
-                        <span class="badge badge-warn" title="Proxy by {{ record.proxyFacultyName || 'Proxy Faculty' }}">
-                          <i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> Proxy
-                        </span>
-                      } @else {
-                        <span class="badge badge-primary">Regular</span>
-                      }
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        }
+  <div class="dashboard-grid" [class.active-session]="attendanceActive">
+
+    <!-- Camera -->
+    @if (attendanceActive) {
+    <div class="camera-section" [class.proxy-camera-border]="isProxyMode">
+      <div class="live-header" [class.proxy-live-header]="isProxyMode">
+        <div class="live-dot" [class.proxy-live-dot]="isProxyMode"></div>
+        <span>{{ isProxyMode ? 'Proxy Session Active (Covering for ' + getSelectedAbsentFacultyName() + ')' : 'Live
+          Attendance Session Running' }}</span>
       </div>
-
+      <app-attendance-camera [subjectId]="selectedSubjectId" [date]="selectedDate" [isProxy]="isProxyMode"
+        [proxyNotes]="proxyNotes" (studentMarked)="onStudentMarked()">
+      </app-attendance-camera>
     </div>
+    }
 
-    <!-- Student Roster (Manual Override) -->
-    <div class="va-card roster-card" style="margin-top: 24px;">
-      <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #FAFAFA;">
-        <div class="header-icon-title" style="display: flex; align-items: center; gap: 12px;">
-          <i class="fa-solid fa-users table-icon" style="font-size: 20px; color: var(--primary); background: #EEF2FF; padding: 10px; border-radius: 10px;"></i>
+    <!-- Attendance Records Table -->
+    <div class="va-card attendance-list-card">
+      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="header-icon-title">
+          <i class="fa-solid table-icon"
+            [ngClass]="isProxyMode ? 'fa-handshake fa-table-proxy' : 'fa-clipboard-user'"></i>
           <div>
-            <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px 0;">Class Roster</h3>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Enrolled students for this class. You can manually mark attendance if needed.</p>
+            <h3>Attendance Records</h3>
+            <p>{{ isProxyMode ? 'Proxy session records shared with ' + getSelectedAbsentFacultyName() : 'Recent
+              attendance logs for this subject' }}</p>
           </div>
         </div>
-        @if (isProxyMode) {
-          <span class="badge badge-warn" style="font-size: 11px; padding: 4px 10px;">
-            <i class="fa-solid fa-user-shield" style="margin-right: 4px;"></i> Proxy Marking Enabled
-          </span>
+        @if (attendanceRecords.length > 0) {
+        <button mat-stroked-button color="warn" (click)="resetTodaySession()"
+          style="font-size: 11px; font-weight: 600; padding: 4px 10px; border-color: var(--warn) !important; color: var(--warn) !important; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+          <i class="fa-solid fa-trash-can"></i> Reset Session
+        </button>
         }
       </div>
 
-      @if (enrolledStudents.length === 0) {
-        <div class="empty-list">
-          <i class="fa-solid fa-users-slash"></i>
-          <p>No students enrolled in this subject's class yet.</p>
-        </div>
+      @if (attendanceRecords.length === 0) {
+      <div class="empty-list">
+        <i class="fa-solid fa-users-slash"></i>
+        <p>No attendance records recorded yet.</p>
+      </div>
       } @else {
-        <div class="table-responsive">
-          <table class="va-table">
-            <thead>
-              <tr>
-                <th>Student Name</th>
-                <th>Enrollment No.</th>
-                <th>Sem / Div</th>
-                <th>Status Today</th>
-                <th style="text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (student of enrolledStudents; track student.id) {
-                <tr>
-                  <td>{{ student.fullName }}</td>
-                  <td><span class="badge-neutral">{{ student.enrollmentNo }}</span></td>
-                  <td>Division {{ student.division }}</td>
-                  <td>
-                    @if (isStudentPresent(student.enrollmentNo)) {
-                      <span class="badge badge-success">Present</span>
-                    } @else {
-                      <span class="badge badge-warn">Absent</span>
-                    }
-                  </td>
-                  <td style="text-align: right;">
-                    @if (!isStudentPresent(student.enrollmentNo)) {
-                      <button mat-stroked-button color="primary" (click)="markPresentManually(student.id)" style="font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 8px;">
-                        <i class="fa-solid fa-check icon-left" style="margin-right: 4px;"></i>
-                        {{ isProxyMode ? 'Mark Proxy Present' : 'Mark Present' }}
-                      </button>
-                    } @else {
-                      <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Confirmed</span>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+      <div class="table-responsive">
+        <table class="va-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Enrollment No.</th>
+              <th class="hide-active">Department</th>
+              <th>Date/Time</th>
+              <th>Status</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (record of attendanceRecords; track record.id) {
+            <tr>
+              <td>{{ record.studentName }}</td>
+              <td><span class="badge-neutral">{{ record.enrollmentNo }}</span></td>
+              <td class="hide-active">{{ record.department }} (Sem {{ record.semester }}, Div {{ record.division }})
+              </td>
+              <td>
+                <span class="hide-active">{{ record.date | date:'medium' }}</span>
+                <span class="show-active">{{ record.date | date:'shortTime' }}</span>
+              </td>
+              <td><span class="badge badge-success">Present</span></td>
+              <td>
+                @if (record.isProxy) {
+                <span class="badge badge-warn" title="Proxy by {{ record.proxyFacultyName || 'Proxy Faculty' }}">
+                  <i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> Proxy
+                </span>
+                } @else {
+                <span class="badge badge-primary">Regular</span>
+                }
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       }
     </div>
+
+  </div>
+
+  <!-- Student Roster (Manual Override) -->
+  <div class="va-card roster-card" style="margin-top: 24px;">
+    <div class="card-header"
+      style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: #FAFAFA;">
+      <div class="header-icon-title" style="display: flex; align-items: center; gap: 12px;">
+        <i class="fa-solid fa-users table-icon"
+          style="font-size: 20px; color: var(--primary); background: #EEF2FF; padding: 10px; border-radius: 10px;"></i>
+        <div>
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 2px 0;">Class Roster
+          </h3>
+          <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Enrolled students for this class. You can
+            manually mark attendance if needed.</p>
+        </div>
+      </div>
+      @if (isProxyMode) {
+      <span class="badge badge-warn" style="font-size: 11px; padding: 4px 10px;">
+        <i class="fa-solid fa-user-shield" style="margin-right: 4px;"></i> Proxy Marking Enabled
+      </span>
+      }
+    </div>
+
+    @if (enrolledStudents.length === 0) {
+    <div class="empty-list">
+      <i class="fa-solid fa-users-slash"></i>
+      <p>No students enrolled in this subject's class yet.</p>
+    </div>
+    } @else {
+    <div class="table-responsive">
+      <table class="va-table">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Enrollment No.</th>
+            <th>Sem / Div</th>
+            <th>Status Today</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of enrolledStudents; track student.id) {
+          <tr>
+            <td>{{ student.fullName }}</td>
+            <td><span class="badge-neutral">{{ student.enrollmentNo }}</span></td>
+            <td>Division {{ student.division }}</td>
+            <td>
+              @if (isStudentPresent(student.enrollmentNo)) {
+              <span class="badge badge-success">Present</span>
+              } @else {
+              <span class="badge badge-warn">Absent</span>
+              }
+            </td>
+            <td style="text-align: right;">
+              @if (!isStudentPresent(student.enrollmentNo)) {
+              <button mat-stroked-button color="primary" (click)="markPresentManually(student.id)"
+                style="font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 8px;">
+                <i class="fa-solid fa-check icon-left" style="margin-right: 4px;"></i>
+                {{ isProxyMode ? 'Mark Proxy Present' : 'Mark Present' }}
+              </button>
+              } @else {
+              <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Confirmed</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
   }
 
 </div>

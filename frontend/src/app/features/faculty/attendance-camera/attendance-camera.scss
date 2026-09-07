@@ -34,8 +34,15 @@
 }
 
 @keyframes cameraPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
-  50%       { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, .4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
 }
 
 .paused-dot {
@@ -94,7 +101,7 @@
   height: 100% !important;
 }
 
-::ng-deep webcam > div {
+::ng-deep webcam>div {
   width: 100% !important;
   height: 100% !important;
   position: relative !important;
@@ -117,15 +124,22 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(79,70,229,.7), transparent);
+  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, .7), transparent);
   animation: scan 2s linear infinite;
 }
 
-.scan-line.scanning { animation-play-state: running; }
+.scan-line.scanning {
+  animation-play-state: running;
+}
 
 @keyframes scan {
-  0%   { top: 10%; }
-  100% { top: 90%; }
+  0% {
+    top: 10%;
+  }
+
+  100% {
+    top: 90%;
+  }
 }
 
 .processing-badge {
@@ -133,7 +147,7 @@
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,.7);
+  background: rgba(0, 0, 0, .7);
   backdrop-filter: blur(8px);
   color: #fff;
   border-radius: 20px;
@@ -157,4 +171,6 @@
   background: var(--bg);
 }
 
-.camera-hint i { color: var(--accent); }
+.camera-hint i {
+  color: var(--accent);
+}

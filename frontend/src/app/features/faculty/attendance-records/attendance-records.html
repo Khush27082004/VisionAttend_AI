@@ -133,9 +133,19 @@
       </mat-form-field>
 
       <!-- Date Filter -->
-      <mat-form-field appearance="outline" class="filter-field">
+      <mat-form-field appearance="outline" class="filter-field datepicker-field">
         <mat-label>Filter Date</mat-label>
-        <input matInput type="date" [(ngModel)]="filterDate" (change)="applyFilters()" style="padding-top: 2px;" />
+        <mat-icon matPrefix>calendar_today</mat-icon>
+        <input
+          matInput
+          [matDatepicker]="datePicker"
+          [(ngModel)]="filterDateObj"
+          (dateChange)="onFilterDateChange()"
+          placeholder="Select date"
+          (click)="datePicker.open()"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker #datePicker></mat-datepicker>
       </mat-form-field>
     </div>
 

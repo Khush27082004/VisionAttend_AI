@@ -8,6 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { SubjectService } from '../../../services/subject';
 import { Attendance } from '../../../core/services/attendance';
 
@@ -15,6 +17,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-attendance-records', standalone: true,
+  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     FormsModule,
@@ -25,7 +28,9 @@ import { RouterLink } from '@angular/router';
     MatSelectModule,
     MatIconModule,
     MatInputModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './attendance-records.html', styleUrl: './attendance-records.scss'
 })
@@ -43,6 +48,7 @@ export class AttendanceRecordsComponent implements OnInit {
   filterSem = '';
   filterDiv = '';
   filterDate = '';
+  filterDateObj: Date | null = null;
   searchQuery = '';
   proxyFilter: 'all' | 'regular' | 'proxy_conducted' | 'proxy_received' = 'all';
 
@@ -103,6 +109,19 @@ export class AttendanceRecordsComponent implements OnInit {
     this.applyFilters();
   }
 
+  onFilterDateChange() {
+    if (this.filterDateObj) {
+      const d = this.filterDateObj;
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      this.filterDate = `${year}-${month}-${day}`;
+    } else {
+      this.filterDate = '';
+    }
+    this.applyFilters();
+  }
+
   toggleSort(column: string) {
     if (this.sortColumn === column) {
       if (this.sortDirection === 'asc') {
@@ -127,7 +146,11 @@ export class AttendanceRecordsComponent implements OnInit {
       
       let matchDate = true;
       if (this.filterDate) {
-        const recordDateStr = new Date(r.date).toISOString().split('T')[0];
+        const d = new Date(r.date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const recordDateStr = `${year}-${month}-${day}`;
         matchDate = recordDateStr === this.filterDate;
       }
 
@@ -168,6 +191,7 @@ export class AttendanceRecordsComponent implements OnInit {
     this.filterSem = '';
     this.filterDiv = '';
     this.filterDate = '';
+    this.filterDateObj = null;
     this.searchQuery = '';
     this.proxyFilter = 'all';
     this.sortColumn = '';

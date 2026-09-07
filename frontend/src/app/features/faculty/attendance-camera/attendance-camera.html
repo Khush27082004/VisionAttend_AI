@@ -6,7 +6,8 @@
       <div class="pulse-dot" [class.paused-dot]="!isScanning"></div>
       <span class="status-text">{{ status }}</span>
     </div>
-    <button mat-stroked-button class="scan-toggle-btn" [class.resuming-btn]="!isScanning" type="button" (click)="toggleScanning()" id="toggle-scan-btn">
+    <button mat-stroked-button class="scan-toggle-btn" [class.resuming-btn]="!isScanning" type="button"
+      (click)="toggleScanning()" id="toggle-scan-btn">
       <i class="fa-solid" [ngClass]="isScanning ? 'fa-pause' : 'fa-play'"></i>
       <span>{{ isScanning ? 'Stop Face Scanning' : 'Resume Face Scanning' }}</span>
     </button>
@@ -14,7 +15,8 @@
 
   <!-- Webcam -->
   <div class="camera-wrapper">
-    <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" (initError)="handleCameraError($event)" class="webcam-view"></webcam>
+    <webcam [trigger]="triggerObservable" [imageQuality]="0.75" [width]="480" [height]="360"
+      (imageCapture)="handleImage($event)" (initError)="handleCameraError($event)" class="webcam-view"></webcam>
 
     <!-- Scanning overlay -->
     <div class="scan-overlay">
@@ -23,16 +25,16 @@
 
     <!-- Processing indicator -->
     @if (processing) {
-      <div class="processing-badge">
-        <mat-spinner diameter="14"></mat-spinner>
-        <span>Analyzing…</span>
-      </div>
+    <div class="processing-badge">
+      <mat-spinner diameter="14"></mat-spinner>
+      <span>Analyzing…</span>
+    </div>
     }
   </div>
 
   <p class="camera-hint">
-    <i class="fa-solid fa-circle-info"></i>
-    A frame is automatically captured and analyzed every ~1.2 seconds when scanning is active
+    <i class="fa-solid fa-bolt" style="color: #F59E0B; margin-right: 4px;"></i>
+    Instant real-time face detection & auto-attendance active
   </p>
 
 </div>

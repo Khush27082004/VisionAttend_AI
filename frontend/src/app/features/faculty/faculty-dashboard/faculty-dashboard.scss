@@ -2,7 +2,9 @@
    Faculty Dashboard Styles
    ======================================== */
 
-.faculty-page { max-width: 1400px; }
+.faculty-page {
+  max-width: 1400px;
+}
 
 /* ── Welcome Banner ───────────────────── */
 .welcome-banner {
@@ -88,8 +90,15 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .proxy-card-border {
@@ -145,8 +154,8 @@
   width: 60px;
   height: 60px;
   border-radius: 16px;
-  background: rgba(255,255,255,.15);
-  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,7 +171,7 @@
 
 .welcome-content p {
   font-size: 13px;
-  color: rgba(255,255,255,.8);
+  color: rgba(255, 255, 255, .8);
 }
 
 .banner-orb {
@@ -172,7 +181,7 @@
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  background: rgba(255,255,255,.08);
+  background: rgba(255, 255, 255, .08);
   pointer-events: none;
 }
 
@@ -224,16 +233,18 @@
   padding: 14px 28px !important;
   font-size: 14px !important;
   border-radius: var(--radius-sm) !important;
-  box-shadow: 0 4px 16px rgba(79,70,229,.35) !important;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, .35) !important;
   height: 56px !important;
   flex-shrink: 0 !important;
 }
 
-.start-btn[disabled] { opacity: .5; }
+.start-btn[disabled] {
+  opacity: .5;
+}
 
 .start-btn:hover:not([disabled]) {
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(79,70,229,.45) !important;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, .45) !important;
 }
 
 .end-action-row {
@@ -270,31 +281,89 @@
   }
 }
 
-/* ── Live Session ─────────────────────── */
-.camera-section { margin-top: 8px; }
-
-.live-header {
+/* ── Live Session Banner ─────────────────────── */
+.session-active-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--success);
+  justify-content: space-between;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  border-left: 4px solid var(--success);
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+
+  .live-indicator-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .live-text {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #065F46;
+  }
+
+  .live-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, .25);
+    animation: pulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .badge-count {
+    background: #D1FAE5;
+    color: #065F46;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border: 1px solid #A7F3D0;
+  }
+
+  &.proxy-banner {
+    background: #FFFBEB;
+    border-color: #FDE68A;
+    border-left-color: #F59E0B;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+
+    .live-text {
+      color: #92400E;
+    }
+
+    .live-dot {
+      background: #F59E0B;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    }
+
+    .badge-count {
+      background: #FEF3C7;
+      color: #92400E;
+      border-color: #FDE68A;
+    }
+  }
 }
 
-.live-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--success);
-  box-shadow: 0 0 0 3px rgba(16,185,129,.25);
-  animation: pulse 1.5s ease-in-out infinite;
+.camera-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(16,185,129,.25); }
-  50%       { box-shadow: 0 0 0 8px rgba(16,185,129,.1); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, .25);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, .1);
+  }
 }
 
 .show-active {
@@ -306,11 +375,17 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  
+
   &.active-session {
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    
+    grid-template-columns: 1.35fr 1fr;
+    align-items: stretch;
+    gap: 24px;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: 1.2fr 1fr;
+    }
+
     @media (max-width: 992px) {
       grid-template-columns: 1fr;
     }
@@ -322,22 +397,6 @@
     .show-active {
       display: inline !important;
     }
-
-    .va-table thead th {
-      padding: 12px 10px;
-      font-size: 10px;
-      white-space: nowrap;
-    }
-
-    .va-table tbody td {
-      padding: 12px 10px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .badge, .badge-neutral {
-      white-space: nowrap;
-    }
   }
 }
 
@@ -347,22 +406,23 @@
   flex-direction: column;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  
+  height: 100%;
+
   .card-header {
-    padding: 20px 24px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #FAFAFA;
   }
-  
+
   .header-icon-title {
     display: flex;
     align-items: center;
     gap: 12px;
   }
-  
+
   .table-icon {
     font-size: 20px;
     color: var(--primary);
@@ -370,17 +430,104 @@
     padding: 10px;
     border-radius: 10px;
   }
-  
+
   h3 {
     font-size: 15px;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 2px;
   }
-  
+
   p {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--text-muted);
+  }
+
+  .table-responsive {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 560px;
+  }
+}
+
+/* ── Attendance Live Table Typography ─────────────── */
+.attendance-live-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    background: #F8FAFC;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px 14px;
+    border-bottom: 1.5px solid #E2E8F0;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #F1F5F9;
+
+    &:hover {
+      background: #F8FAFC;
+    }
+  }
+
+  tbody td {
+    padding: 13px 14px;
+    vertical-align: middle;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .student-name-text {
+    font-weight: 800;
+    font-size: 13.5px;
+    color: #0F172A;
+    letter-spacing: -0.1px;
+    display: inline-block;
+  }
+
+  .bold-enrollment {
+    font-weight: 800;
+    font-size: 12.5px;
+    color: #1E293B;
+    background: #F1F5F9;
+    border: 1px solid #CBD5E1;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    display: inline-block;
+  }
+
+  .bold-time {
+    font-weight: 700;
+    font-size: 12.5px;
+    color: #334155;
+  }
+
+  .bold-status {
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #DCFCE7 !important;
+    color: #15803D !important;
+    border: 1px solid #BBF7D0;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .bold-type {
+    font-weight: 700;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
   }
 }
 
@@ -388,16 +535,15 @@
   padding: 48px;
   text-align: center;
   color: var(--text-muted);
-  
+
   i {
     font-size: 32px;
     color: var(--text-muted);
     opacity: 0.5;
     margin-bottom: 12px;
   }
-  
+
   p {
     font-size: 13px;
   }
 }
-
