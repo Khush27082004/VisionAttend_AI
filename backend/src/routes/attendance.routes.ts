@@ -291,6 +291,165 @@ router.get("/subject/:subjectId", authenticate, authorize("FACULTY", "ADMIN"), a
   }
 });
 
+router.get("/report/classwise", authenticate, authorize("FACULTY", "ADMIN"), async (req: AuthRequest, res) => {
+  try {
+    const subjectId = req.query.subjectId ? Number(req.query.subjectId) : null;
+    const department = req.query.department ? String(req.query.department).trim() : null;
+    const semester = req.query.semester ? Number(req.query.semester) : null;
+    const division = req.query.division ? String(req.query.division).trim() : null;
+    const startDateStr = req.query.startDate as string;
+    const endDateStr = req.query.endDate as string;
+
+    let targetSubject: any = null;
+    if (subjectId) {
+      targetSubject = await prisma.subject.findUnique({
+        where: { id: subjectId },
+        include: { faculty: { include: { user: true } } }
+      });
+    }
+
+    const effDept = targetSubject ? targetSubject.department : department;
+    const effSem = targetSubject ? targetSubject.semester : semester;
+
+    // 1. Build date range filter
+    let dateFilter: any = {};
+    if (startDateStr && endDateStr) {
+      const start = new Date(startDateStr);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(endDateStr);
+      end.setHours(23, 59, 59, 999);
+      dateFilter = { gte: start, lte: end };
+    } else if (startDateStr) {
+      const start = new Date(startDateStr);
+      start.setHours(0, 0, 0, 0);
+      dateFilter = { gte: start };
+    } else if (endDateStr) {
+      const end = new Date(endDateStr);
+      end.setHours(23, 59, 59, 999);
+      dateFilter = { lte: end };
+    }
+
+    // 2. Fetch enrolled students matching department, semester, and division
+    let studentWhere: any = {};
+    if (effDept) studentWhere.department = effDept;
+    if (effSem) studentWhere.semester = effSem;
+    if (division && division !== "ALL" && division !== "") studentWhere.division = division;
+
+    const students = await prisma.student.findMany({
+      where: studentWhere,
+      include: {
+        user: {
+          select: {
+            fullName: true,
+            email: true
+          }
+        }
+      },
+      orderBy: { enrollmentNo: "asc" }
+    });
+
+    // 3. Find all attendance logs matching subjectId/dept/sem and date range
+    let attendanceWhere: any = {};
+    if (subjectId) {
+      attendanceWhere.subjectId = subjectId;
+    } else {
+      if (effDept || effSem || (division && division !== "ALL" && division !== "")) {
+        attendanceWhere.student = {};
+        if (effDept) attendanceWhere.student.department = effDept;
+        if (effSem) attendanceWhere.student.semester = effSem;
+        if (division && division !== "ALL" && division !== "") attendanceWhere.student.division = division;
+      }
+    }
+    if (Object.keys(dateFilter).length > 0) {
+      attendanceWhere.date = dateFilter;
+    }
+
+    const attendanceRecords = await prisma.attendance.findMany({
+      where: attendanceWhere,
+      select: {
+        id: true,
+        date: true,
+        studentId: true,
+        subjectId: true,
+        status: true,
+        isProxy: true
+      }
+    });
+
+    // 4. Calculate distinct lecture sessions/dates conducted
+    const lectureSessions = new Set<string>();
+    attendanceRecords.forEach(a => {
+      const dStr = new Date(a.date).toISOString().split('T')[0];
+      lectureSessions.add(`${a.subjectId}_${dStr}`);
+    });
+    const totalLecturesConducted = lectureSessions.size;
+
+    // 5. Count records per student
+    const studentAttendanceMap = new Map<number, number>();
+    attendanceRecords.forEach(a => {
+      studentAttendanceMap.set(a.studentId, (studentAttendanceMap.get(a.studentId) || 0) + 1);
+    });
+
+    let defaulterCount = 0;
+    let eligibleCount = 0;
+    let totalPercentageSum = 0;
+
+    const studentReports = students.map(s => {
+      const attended = studentAttendanceMap.get(s.id) || 0;
+      const total = totalLecturesConducted;
+      const absent = Math.max(0, total - attended);
+      const percentage = total > 0 ? Number(((attended / total) * 100).toFixed(1)) : 0;
+      const isDefaulter = percentage < 75.0 && total > 0;
+      
+      if (isDefaulter) {
+        defaulterCount++;
+      } else {
+        eligibleCount++;
+      }
+      totalPercentageSum += percentage;
+
+      return {
+        studentId: s.id,
+        fullName: s.user.fullName,
+        email: s.user.email,
+        enrollmentNo: s.enrollmentNo,
+        department: s.department,
+        semester: s.semester,
+        division: s.division,
+        attendedLectures: attended,
+        absentLectures: absent,
+        totalLectures: total,
+        percentage,
+        isDefaulter,
+        status: isDefaulter ? "DEFICIENT (< 75%)" : "ELIGIBLE (>= 75%)"
+      };
+    });
+
+    const avgPercentage = students.length > 0 ? Number((totalPercentageSum / students.length).toFixed(1)) : 0;
+
+    return res.json({
+      summary: {
+        subjectName: targetSubject ? targetSubject.name : "All Classes",
+        facultyName: targetSubject?.faculty?.user?.fullName || null,
+        department: effDept || "All Departments",
+        semester: effSem || "All Semesters",
+        division: division || "All Divisions",
+        startDate: startDateStr || null,
+        endDate: endDateStr || null,
+        totalStudents: students.length,
+        totalLecturesConducted,
+        defaulterCount,
+        eligibleCount,
+        averagePercentage: avgPercentage
+      },
+      students: studentReports
+    });
+  } catch (error) {
+    console.error("Error generating report:", error);
+    return res.status(500).json({ message: "Internal server error while generating attendance report" });
+  }
+});
+
 router.delete("/all", authenticate, authorize("ADMIN"), async (req: AuthRequest, res) => {
   try {
     await prisma.attendance.deleteMany();

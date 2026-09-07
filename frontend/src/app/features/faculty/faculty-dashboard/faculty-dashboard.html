@@ -12,14 +12,22 @@
       </div>
     </div>
     
-    <!-- Proxy Mode Quick Toggle Pill -->
-    <div class="proxy-toggle-container">
-      <mat-slide-toggle [(ngModel)]="isProxyMode" (change)="toggleProxyMode()" color="warn">
-        <span class="proxy-toggle-label">
-          <i class="fa-solid fa-handshake-angle"></i>
-          <strong>Proxy Mode</strong>
-        </span>
-      </mat-slide-toggle>
+    <!-- Header Actions (Reports & Proxy Toggle) -->
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <a mat-flat-button routerLink="/dashboard/faculty/reports" style="background: #ffffff !important; color: var(--primary) !important; font-weight: 700; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); height: 42px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Attendance Reports</span>
+      </a>
+
+      <!-- Proxy Mode Quick Toggle Pill -->
+      <div class="proxy-toggle-container">
+        <mat-slide-toggle [(ngModel)]="isProxyMode" (change)="toggleProxyMode()" color="warn">
+          <span class="proxy-toggle-label">
+            <i class="fa-solid fa-handshake-angle"></i>
+            <strong>Proxy Mode</strong>
+          </span>
+        </mat-slide-toggle>
+      </div>
     </div>
   </div>
 

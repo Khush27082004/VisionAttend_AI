@@ -11,11 +11,14 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { SubjectService } from '../../../services/subject';
 import { Attendance } from '../../../core/services/attendance';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-attendance-records', standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,

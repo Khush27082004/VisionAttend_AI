@@ -51,12 +51,14 @@ export class Sidebar implements OnInit {
         { icon: 'fa-user-graduate',   label: 'Students',   route: '/dashboard/students', exact: false },
         { icon: 'fa-id-card',         label: 'Master Roster', route: '/dashboard/admin/roster', exact: false },
         { icon: 'fa-chalkboard-user', label: 'Faculty',    route: '/dashboard/admin/faculty',  exact: false },
-        { icon: 'fa-book',            label: 'Subjects',   route: '/dashboard/subjects', exact: false }
+        { icon: 'fa-book',            label: 'Subjects',   route: '/dashboard/subjects', exact: false },
+        { icon: 'fa-chart-pie',       label: 'Attendance Reports', route: '/dashboard/reports', exact: false }
       ];
     } else if (this.userRole === 'FACULTY') {
       this.primaryItems = [
         { icon: 'fa-house',           label: 'Faculty Panel', route: '/dashboard/faculty',  exact: true },
         { icon: 'fa-clipboard-list',  label: 'Attendance Records', route: '/dashboard/faculty/records', exact: false },
+        { icon: 'fa-chart-pie',       label: 'Attendance Reports', route: '/dashboard/faculty/reports', exact: false },
         { icon: 'fa-book-open',       label: 'Add Subject', route: '/dashboard/faculty/subjects', exact: false }
       ];
     } else if (this.userRole === 'STUDENT') {

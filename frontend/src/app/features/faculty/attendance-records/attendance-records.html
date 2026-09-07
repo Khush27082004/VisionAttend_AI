@@ -41,6 +41,9 @@
         </div>
       </div>
       <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <a mat-flat-button routerLink="/dashboard/faculty/reports" style="font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; background: #4F46E5 !important; color: #fff !important; box-shadow: 0 2px 8px rgba(79,70,229,.25) !important;">
+          <i class="fa-solid fa-chart-pie"></i> Class Reports & Defaulters
+        </a>
         <button mat-flat-button class="export-btn" (click)="exportToCSV()" [disabled]="filteredRecords.length === 0" style="font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(16,185,129,.25) !important;">
           <i class="fa-solid fa-file-excel"></i> Export to Excel
         </button>

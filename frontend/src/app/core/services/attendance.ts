@@ -44,4 +44,24 @@ export class Attendance {
   clearTodaySubjectAttendance(subjectId: number): Observable<any> {
     return this.http.delete<any>(`${this.api}/subject/${subjectId}/today`);
   }
+
+  getClasswiseReport(params: {
+    subjectId?: number | null;
+    department?: string;
+    semester?: number | null;
+    division?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Observable<{ summary: any; students: any[] }> {
+    const queryParts: string[] = [];
+    if (params.subjectId) queryParts.push(`subjectId=${encodeURIComponent(params.subjectId)}`);
+    if (params.department) queryParts.push(`department=${encodeURIComponent(params.department)}`);
+    if (params.semester) queryParts.push(`semester=${encodeURIComponent(params.semester)}`);
+    if (params.division && params.division !== 'ALL') queryParts.push(`division=${encodeURIComponent(params.division)}`);
+    if (params.startDate) queryParts.push(`startDate=${encodeURIComponent(params.startDate)}`);
+    if (params.endDate) queryParts.push(`endDate=${encodeURIComponent(params.endDate)}`);
+
+    const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
+    return this.http.get<{ summary: any; students: any[] }>(`${this.api}/report/classwise${queryString}`);
+  }
 }
