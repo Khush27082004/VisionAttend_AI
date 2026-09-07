@@ -223,6 +223,139 @@ export class FacultySubjectsComponent implements OnInit {
     }
   }
 
+  getDivisionSuggestionsForDepartment(dept: string): string[] {
+    const d = (dept || '').toLowerCase().trim();
+    if (!d) {
+      return [
+        'Div A', 'Div B', 'Div C', 'Div D',
+        'CE-1', 'CE-2', 'CE-3',
+        'IT-1', 'IT-2', 'IT-3',
+        'AI-1', 'AI-2', 'CSE-1', 'CSE-2'
+      ];
+    }
+
+    // 1. Computer Engineering / Computer Science / CSE / CE
+    if (d.includes('comp') || d.includes('cse') || d.includes('ce') || d.includes('software')) {
+      return [
+        'CE-1', 'CE-2', 'CE-3', 'CE-4',
+        'CSE-1', 'CSE-2', 'CSE-3',
+        'Div A', 'Div B', 'Div C', 'Div D',
+        'Batch 1', 'Batch 2'
+      ];
+    }
+
+    // 2. Information Technology / IT
+    if (d.includes('information') || d.includes('it') || d.includes('infotech')) {
+      return [
+        'IT-1', 'IT-2', 'IT-3', 'IT-4',
+        'Div A', 'Div B', 'Div C', 'Div D',
+        'Batch 1', 'Batch 2'
+      ];
+    }
+
+    // 3. AI / Data Science / AIML / AIDS
+    if (d.includes('artific') || d.includes('ai') || d.includes('data science') || d.includes('ml')) {
+      return [
+        'AI-1', 'AI-2', 'AI-3',
+        'AIDS-1', 'AIDS-2',
+        'AIML-1', 'AIML-2',
+        'DS-1', 'DS-2',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 4. Electronics / EC / ECE / Telecom
+    if (d.includes('electron') || d.includes('ec') || d.includes('ece') || d.includes('telecom')) {
+      return [
+        'EC-1', 'EC-2', 'EC-3',
+        'ECE-1', 'ECE-2',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 5. Electrical / EE / EEE
+    if (d.includes('electr') || d.includes('ee') || d.includes('eee')) {
+      return [
+        'EE-1', 'EE-2', 'EE-3',
+        'EEE-1', 'EEE-2',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 6. Mechanical / ME
+    if (d.includes('mech') || d.includes('me')) {
+      return [
+        'ME-1', 'ME-2', 'ME-3', 'ME-4',
+        'Div A', 'Div B', 'Div C', 'Div D'
+      ];
+    }
+
+    // 7. Civil / CL
+    if (d.includes('civil') || d.includes('cl')) {
+      return [
+        'CL-1', 'CL-2', 'CL-3',
+        'Civil-1', 'Civil-2',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 8. Chemical / CH
+    if (d.includes('chem') || d.includes('ch')) {
+      return [
+        'CH-1', 'CH-2', 'CH-3',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 9. MCA
+    if (d.includes('mca') || d.includes('master of computer')) {
+      return [
+        'MCA-1', 'MCA-2', 'MCA-3',
+        'MCA-A', 'MCA-B',
+        'Div A', 'Div B'
+      ];
+    }
+
+    // 10. BCA
+    if (d.includes('bca') || d.includes('bachelor of computer')) {
+      return [
+        'BCA-1', 'BCA-2', 'BCA-3',
+        'BCA-A', 'BCA-B',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 11. Cyber Security
+    if (d.includes('cyber') || d.includes('forensic')) {
+      return [
+        'CS-1', 'CS-2', 'CS-3',
+        'Cyber-1', 'Cyber-2',
+        'Div A', 'Div B', 'Div C'
+      ];
+    }
+
+    // 12. Automobile / AE
+    if (d.includes('auto') || d.includes('ae')) {
+      return [
+        'AE-1', 'AE-2', 'AE-3',
+        'Div A', 'Div B'
+      ];
+    }
+
+    // Fallback: Generate smart abbreviation from department words + Div A, B, C
+    const words = dept.trim().split(/\s+/);
+    let abbr = words.map(w => w[0]?.toUpperCase()).join('');
+    if (abbr.length > 4) abbr = abbr.substring(0, 3);
+    if (abbr) {
+      return [
+        `${abbr}-1`, `${abbr}-2`, `${abbr}-3`,
+        'Div A', 'Div B', 'Div C', 'Div D'
+      ];
+    }
+
+    return ['Div A', 'Div B', 'Div C', 'Div D', 'Batch 1', 'Batch 2'];
+  }
+
   get filteredDepartments(): string[] {
     const query = (this.department || '').toLowerCase().trim();
     if (!query) return this.departmentOptions;
@@ -231,8 +364,9 @@ export class FacultySubjectsComponent implements OnInit {
 
   get filteredDivisions(): string[] {
     const query = (this.division || '').toLowerCase().trim();
-    if (!query) return this.divisionOptions;
-    return this.divisionOptions.filter(d => d.toLowerCase().includes(query));
+    const options = this.getDivisionSuggestionsForDepartment(this.department);
+    if (!query) return options;
+    return options.filter(d => d.toLowerCase().includes(query));
   }
 
   get filteredTimeSlots(): string[] {
