@@ -15,6 +15,7 @@ import { AttendanceRecordsComponent } from './features/faculty/attendance-record
 import { FacultyListComponent } from './features/admin/faculty/faculty-list/faculty-list';
 import { AddFacultyComponent } from './features/admin/faculty/add-faculty/add-faculty';
 import { SubjectListComponent } from './features/admin/subjects/subject-list/subject-list';
+import { AddSubjectComponent } from './features/admin/subjects/add-subject/add-subject';
 import { FacultySubjectsComponent } from './features/faculty/subjects/faculty-subjects';
 import { MasterRosterComponent } from './features/admin/roster/master-roster/master-roster';
 
