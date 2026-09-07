@@ -36,6 +36,7 @@ export class AddStudent {
   private snackBar = inject(MatSnackBar);
 
   saving = false;
+  showPassword = false;
 
   studentForm = this.fb.group({
     fullName:     ['', Validators.required],

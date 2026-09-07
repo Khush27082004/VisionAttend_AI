@@ -59,6 +59,7 @@ export class AddFacultyComponent {
   };
 
   saving = false;
+  showPassword = false;
 
   save() {
     const { fullName, email, password, employeeId, department } = this.facultyData;

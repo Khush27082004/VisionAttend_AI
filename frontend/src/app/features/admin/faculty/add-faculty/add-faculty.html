@@ -41,9 +41,12 @@
 
         <div class="form-group">
           <mat-form-field appearance="outline" class="full-width" style="width: 100%;">
-            <mat-label>Password</mat-label>
+            <mat-label>Password *</mat-label>
             <mat-icon matPrefix>lock_outline</mat-icon>
-            <input matInput type="password" [(ngModel)]="facultyData.password" name="password" placeholder="Secure Password" required />
+            <input matInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="facultyData.password" name="password" placeholder="Secure Password" required />
+            <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
           </mat-form-field>
         </div>
 
