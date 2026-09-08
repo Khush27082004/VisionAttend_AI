@@ -90,10 +90,7 @@
               @for (log of stats.recentLogs; track log.id) {
                 <tr>
                   <td>
-                    <div class="name-cell" style="display: flex; align-items: center; gap: 10px;">
-                      <div class="avatar" [style.background]="getAvatarColor(log.studentName)">{{ getInitials(log.studentName) }}</div>
-                      <span>{{ log.studentName }}</span>
-                    </div>
+                    <span style="font-weight: 700; color: var(--text-primary);">{{ log.studentName }}</span>
                   </td>
                   <td>{{ log.subjectName }}</td>
                   <td>{{ log.time | date:'shortTime' }}</td>
@@ -115,14 +112,14 @@
         </div>
       </div>
 
-      @if (stats.classes.length === 0) {
+      @if (getTodayClasses().length === 0) {
         <div class="state-placeholder" style="min-height: 160px; padding: 24px;">
           <i class="fa-solid fa-book-bookmark" style="font-size: 24px; opacity: 0.5;"></i>
-          <p style="font-size: 13px; margin: 0;">No subjects registered in the system.</p>
+          <p style="font-size: 13px; margin: 0;">No lectures scheduled for today.</p>
         </div>
       } @else {
         <div class="class-list" style="padding: 16px 24px; display: flex; flex-direction: column; gap: 14px;">
-          @for (cls of stats.classes; track cls.id) {
+          @for (cls of getTodayClasses(); track cls.id) {
             <div class="class-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="class-dot" [style.background]="getAvatarColor(cls.name)" style="width: 8px; height: 8px; border-radius: 50%;"></div>
@@ -141,32 +138,5 @@
     </div>
 
   </div>
-
-  <!-- Admin Control Area -->
-  @if (userRole === 'ADMIN') {
-    <div class="va-card admin-alert-card" style="margin-top: 24px; border: 1px solid var(--warn); background: #FFF1F2; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; border-radius: 12px; box-shadow: 0 4px 12px rgba(244,63,94,.08);">
-      <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
-        <i class="fa-solid fa-triangle-exclamation" style="font-size: 24px; color: var(--warn); flex-shrink: 0;"></i>
-        <div>
-          <h3 style="font-size: 14px; font-weight: 700; color: #9F1239; margin: 0 0 2px 0;">System Administrator Control</h3>
-          <p style="font-size: 12px; color: #B91C1C; margin: 0;">Perform administrative database actions. <strong>Warning:</strong> All actions are destructive and cannot be undone.</p>
-        </div>
-      </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button mat-stroked-button color="warn" (click)="clearAllRecords()" style="border-color: var(--warn) !important; color: var(--warn) !important; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; background: transparent; cursor: pointer; height: 32px;">
-          <i class="fa-solid fa-calendar-minus" style="font-size: 11px;"></i> Clear Logs Only
-        </button>
-        <button mat-stroked-button color="warn" (click)="clearStudents()" style="border-color: var(--warn) !important; color: var(--warn) !important; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; background: transparent; cursor: pointer; height: 32px;">
-          <i class="fa-solid fa-user-xmark" style="font-size: 11px;"></i> Wipe Students
-        </button>
-        <button mat-stroked-button color="warn" (click)="clearFaculty()" style="border-color: var(--warn) !important; color: var(--warn) !important; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; background: transparent; cursor: pointer; height: 32px;">
-          <i class="fa-solid fa-user-lock" style="font-size: 11px;"></i> Wipe Faculty
-        </button>
-        <button mat-flat-button color="warn" (click)="resetAllData()" style="background: var(--warn) !important; color: #fff !important; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(244,63,94,.2) !important; border: none; cursor: pointer; height: 32px;">
-          <i class="fa-solid fa-dumpster-fire" style="font-size: 11px;"></i> Complete Factory Reset
-        </button>
-      </div>
-    </div>
-  }
 
 </div>

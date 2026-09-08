@@ -1,76 +1,101 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../core/services/auth';
-import { DashboardService, DashboardStats } from '../../../services/dashboard';
-import { Attendance } from '../../../core/services/attendance';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ThemeService } from '../../../core/services/theme.service';
+import { DashboardService } from '../../../services/dashboard';
+import { Attendance } from '../../../core/services/attendance';
+import { AuthService } from '../../../core/services/auth';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-dashboard-home',
-  imports: [CommonModule, RouterLink, MatSnackBarModule],
-  templateUrl: './dashboard-home.html',
-  styleUrl: './dashboard-home.scss',
-  standalone: true
+  selector: 'app-settings',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    MatButtonModule,
+    MatCardModule,
+    MatIconModule,
+    MatSlideToggleModule,
+    MatSnackBarModule
+  ],
+  templateUrl: './app-settings.html',
+  styleUrl: './app-settings.scss'
 })
-export class DashboardHome implements OnInit {
-  private authService = inject(AuthService);
+export class AppSettingsComponent implements OnInit {
+  private themeService = inject(ThemeService);
   private dashboardService = inject(DashboardService);
   private attendanceService = inject(Attendance);
+  private authService = inject(AuthService);
   private snackBar = inject(MatSnackBar);
+  private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
 
-  todayDate = new Date().toLocaleDateString('en-IN', {
-    weekday: 'long', day: 'numeric', month: 'long'
-  });
-
+  isDarkMode = false;
   userRole = '';
+  userName = '';
+  userEmail = '';
 
-  stats: DashboardStats = {
-    totalStudents: 0,
-    totalFaculty: 0,
-    todaysAttendance: 0,
-    attendanceRate: 0,
-    recentLogs: [],
-    classes: []
-  };
+  aiServiceOnline = false;
+  aiStatusChecking = true;
 
   ngOnInit() {
+    this.isDarkMode = this.themeService.isDarkMode();
+
     try {
       const user = JSON.parse(localStorage.getItem('user') ?? '{}');
       this.userRole = user.role ?? '';
+      this.userName = user.fullName ?? user.email ?? 'User';
+      this.userEmail = user.email ?? '';
     } catch { /* ignore */ }
 
-    this.authService.getProfile().subscribe({
-      next: (res) => {
-        console.log('Profile:', res);
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
-
-    this.loadStats();
+    this.checkAiService();
   }
 
-  loadStats() {
-    this.dashboardService.getStats().subscribe({
-      next: (data) => {
-        this.stats = data;
+  toggleTheme() {
+    this.isDarkMode = this.themeService.toggleTheme();
+    const modeName = this.isDarkMode ? 'Dark Mode' : 'Light Mode';
+    this.snackBar.open(`🌗 Switched to ${modeName}`, 'Close', { duration: 2500 });
+  }
+
+  setTheme(dark: boolean) {
+    if (this.isDarkMode !== dark) {
+      this.isDarkMode = dark;
+      this.themeService.setDark(dark);
+      const modeName = dark ? 'Dark Mode' : 'Light Mode';
+      this.snackBar.open(`🌗 Switched to ${modeName}`, 'Close', { duration: 2500 });
+    }
+  }
+
+  checkAiService() {
+    this.aiStatusChecking = true;
+    this.http.get('http://127.0.0.1:8000/').subscribe({
+      next: () => {
+        this.aiServiceOnline = true;
+        this.aiStatusChecking = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Could not load stats:', err);
+      error: () => {
+        this.aiServiceOnline = false;
+        this.aiStatusChecking = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
+  // Admin Control Methods
   clearAllRecords() {
     if (confirm('Are you absolutely sure you want to delete ALL attendance records from the database? This action is destructive and cannot be undone.')) {
       this.attendanceService.clearAllAttendance().subscribe({
         next: (res) => {
           this.snackBar.open(res.message || 'All attendance records successfully cleared.', 'Close', { duration: 3000 });
-          this.loadStats();
         },
         error: (err) => {
           this.snackBar.open(err.error?.message || 'Failed to clear attendance records.', 'Close', { duration: 3000 });
@@ -84,7 +109,6 @@ export class DashboardHome implements OnInit {
       this.dashboardService.clearStudents().subscribe({
         next: (res) => {
           this.snackBar.open(res.message || 'All student records deleted successfully.', 'Close', { duration: 3000 });
-          this.loadStats();
         },
         error: (err) => {
           this.snackBar.open(err.error?.message || 'Failed to delete student records.', 'Close', { duration: 3000 });
@@ -98,7 +122,6 @@ export class DashboardHome implements OnInit {
       this.dashboardService.clearFaculty().subscribe({
         next: (res) => {
           this.snackBar.open(res.message || 'All faculty records and subjects deleted.', 'Close', { duration: 3000 });
-          this.loadStats();
         },
         error: (err) => {
           this.snackBar.open(err.error?.message || 'Failed to delete faculty records.', 'Close', { duration: 3000 });
@@ -112,44 +135,11 @@ export class DashboardHome implements OnInit {
       this.dashboardService.resetDatabase().subscribe({
         next: (res) => {
           this.snackBar.open(res.message || 'Entire database successfully reset.', 'Close', { duration: 3000 });
-          this.loadStats();
         },
         error: (err) => {
           this.snackBar.open(err.error?.message || 'Failed to reset database.', 'Close', { duration: 3000 });
         }
       });
     }
-  }
-
-  getTodayClasses(): any[] {
-    if (!this.stats.classes || this.stats.classes.length === 0) return [];
-    const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    
-    // Filter classes that belong to today (e.g. contains 'tuesday')
-    const matching = this.stats.classes.filter(cls => 
-      cls.name && cls.name.toLowerCase().includes(dayName)
-    );
-
-    return matching.length > 0 ? matching : this.stats.classes;
-  }
-
-  getInitials(name: string): string {
-    if (!name) return 'U';
-    return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
-  }
-
-  getAvatarColor(name: string): string {
-    const colors = [
-      'linear-gradient(135deg, #4F46E5, #818CF8)', // Indigo
-      'linear-gradient(135deg, #06B6D4, #22D3EE)', // Cyan
-      'linear-gradient(135deg, #10B981, #34D399)', // Emerald
-      'linear-gradient(135deg, #F59E0B, #FCD34D)', // Amber
-      'linear-gradient(135deg, #EC4899, #F472B6)'  // Pink
-    ];
-    let sum = 0;
-    for (let i = 0; i < (name || '').length; i++) {
-      sum += name.charCodeAt(i);
-    }
-    return colors[sum % colors.length];
   }
 }

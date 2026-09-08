@@ -35,11 +35,19 @@
     <span class="nav-section-label" style="margin-top: 12px;">SYSTEM</span>
 
     @for (item of systemItems; track item.label) {
-    <div class="nav-item nav-item-disabled" title="Coming soon">
-      <i class="fa-solid {{ item.icon }} nav-icon"></i>
-      <span>{{ item.label }}</span>
-      <span class="nav-soon">Soon</span>
-    </div>
+      @if (item.route) {
+        <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }">
+          <i class="fa-solid {{ item.icon }} nav-icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      } @else {
+        <div class="nav-item nav-item-disabled" title="Coming soon">
+          <i class="fa-solid {{ item.icon }} nav-icon"></i>
+          <span>{{ item.label }}</span>
+          <span class="nav-soon">Soon</span>
+        </div>
+      }
     }
 
   </nav>

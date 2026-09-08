@@ -42,9 +42,11 @@ router.get("/stats", authenticate, async (req, res) => {
       }
     });
 
-    // Get subjects (classes) list to show real courses
-    const subjectsList = await prisma.subject.findMany({
-      take: 4,
+    // Get subjects (classes) list to show real courses for today
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const currentDayName = daysOfWeek[new Date().getDay()];
+
+    const allSubjects = await prisma.subject.findMany({
       include: {
         faculty: {
           include: {
@@ -53,6 +55,12 @@ router.get("/stats", authenticate, async (req, res) => {
         }
       }
     });
+
+    const daySubjects = allSubjects.filter(sub =>
+      sub.name.toLowerCase().includes(currentDayName.toLowerCase())
+    );
+
+    const displaySubjects = daySubjects.length > 0 ? daySubjects : allSubjects;
 
     return res.json({
       totalStudents,
@@ -66,9 +74,9 @@ router.get("/stats", authenticate, async (req, res) => {
         time: log.date,
         status: log.status
       })),
-      classes: subjectsList.map((sub, index) => {
-        const rooms = ["Room 301", "Room 205", "Lab 01", "Seminar Hall"];
-        const times = ["09:00 - 10:00", "10:30 - 11:30", "12:00 - 01:00", "02:00 - 03:30"];
+      classes: displaySubjects.map((sub, index) => {
+        const rooms = ["Room 301", "Room 205", "Lab 01", "Seminar Hall", "Room 102", "Room 404"];
+        const times = ["09:00 - 10:00", "10:30 - 11:30", "12:00 - 01:00", "02:00 - 03:30", "03:45 - 04:45"];
         return {
           id: sub.id,
           name: sub.name,

@@ -1,0 +1,230 @@
+<div class="page-wrapper settings-page">
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <div class="welcome-avatar">
+        <i class="fa-solid fa-gear"></i>
+      </div>
+      <div>
+        <h2>System Settings & Preferences</h2>
+        <p>Manage application theme, AI engine connections, and administrative database operations</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- 1. Appearance & Theme Settings -->
+    <div class="va-card settings-card">
+      <div class="card-section-header">
+        <div class="section-icon icon-primary">
+          <i class="fa-solid fa-palette"></i>
+        </div>
+        <div>
+          <h3>Appearance & Theme</h3>
+          <p>Customize the visual interface between Light and Dark mode</p>
+        </div>
+      </div>
+
+      <div class="theme-options-grid">
+        
+        <!-- Light Mode Card -->
+        <div class="theme-option-card" [class.theme-active]="!isDarkMode" (click)="setTheme(false)">
+          <div class="theme-preview light-preview">
+            <div class="preview-sidebar"></div>
+            <div class="preview-body">
+              <div class="preview-bar"></div>
+              <div class="preview-box"></div>
+            </div>
+          </div>
+          <div class="theme-card-footer">
+            <div class="theme-info">
+              <i class="fa-solid fa-sun text-warning"></i>
+              <strong>Light Mode</strong>
+            </div>
+            <span class="theme-check" *ngIf="!isDarkMode">
+              <i class="fa-solid fa-circle-check"></i> Active
+            </span>
+          </div>
+        </div>
+
+        <!-- Dark Mode Card -->
+        <div class="theme-option-card" [class.theme-active]="isDarkMode" (click)="setTheme(true)">
+          <div class="theme-preview dark-preview">
+            <div class="preview-sidebar"></div>
+            <div class="preview-body">
+              <div class="preview-bar"></div>
+              <div class="preview-box"></div>
+            </div>
+          </div>
+          <div class="theme-card-footer">
+            <div class="theme-info">
+              <i class="fa-solid fa-moon text-indigo"></i>
+              <strong>Dark Mode</strong>
+            </div>
+            <span class="theme-check" *ngIf="isDarkMode">
+              <i class="fa-solid fa-circle-check"></i> Active
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="quick-toggle-row">
+        <div class="toggle-text">
+          <strong>Dark Mode Toggle</strong>
+          <span>Toggle dark theme for night usage</span>
+        </div>
+        <mat-slide-toggle [checked]="isDarkMode" (change)="toggleTheme()" color="primary">
+        </mat-slide-toggle>
+      </div>
+    </div>
+
+    <!-- 2. AI Engine Status & Diagnostics -->
+    <div class="va-card settings-card">
+      <div class="card-section-header">
+        <div class="section-icon icon-cyan">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div>
+          <h3>AI Recognition Engine</h3>
+          <p>Real-time health and connection status of Python AI service</p>
+        </div>
+      </div>
+
+      <div class="ai-status-box">
+        <div class="ai-status-row">
+          <div class="ai-info-left">
+            <div class="status-indicator" [class.online]="aiServiceOnline" [class.offline]="!aiServiceOnline"></div>
+            <div>
+              <h4>InsightFace buffalo_sc Model</h4>
+              <p class="ai-sub">Local Endpoint: <code>http://127.0.0.1:8000</code></p>
+            </div>
+          </div>
+          <div>
+            @if (aiStatusChecking) {
+              <span class="badge badge-neutral"><i class="fa-solid fa-spinner fa-spin"></i> Checking...</span>
+            } @else if (aiServiceOnline) {
+              <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Online & Ready</span>
+            } @else {
+              <span class="badge badge-warn"><i class="fa-solid fa-circle-exclamation"></i> Offline</span>
+            }
+          </div>
+        </div>
+
+        <div class="ai-meta-grid">
+          <div class="ai-meta-item">
+            <span class="meta-title">Detection Threshold</span>
+            <span class="meta-val">0.45 Cosine Sim</span>
+          </div>
+          <div class="ai-meta-item">
+            <span class="meta-title">Feature Vector</span>
+            <span class="meta-val">512-dim ArcFace</span>
+          </div>
+          <div class="ai-meta-item">
+            <span class="meta-title">Avg Latency</span>
+            <span class="meta-val">~280ms / Frame</span>
+          </div>
+        </div>
+
+        <button mat-stroked-button (click)="checkAiService()" class="recheck-btn">
+          <i class="fa-solid fa-rotate"></i> Refresh AI Connection Status
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 3. Account Profile Card -->
+  <div class="va-card account-card" style="margin-top: 24px;">
+    <div class="card-section-header">
+      <div class="section-icon icon-accent">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <div>
+        <h3>Logged In Account</h3>
+        <p>Active session credentials and permissions</p>
+      </div>
+    </div>
+
+    <div class="account-details-grid">
+      <div class="account-item">
+        <span class="acc-label">Full Name</span>
+        <span class="acc-val">{{ userName }}</span>
+      </div>
+      <div class="account-item">
+        <span class="acc-label">Email Address</span>
+        <span class="acc-val">{{ userEmail }}</span>
+      </div>
+      <div class="account-item">
+        <span class="acc-label">System Role</span>
+        <span class="acc-val"><span class="badge badge-primary">{{ userRole }}</span></span>
+      </div>
+      <div class="account-item">
+        <span class="acc-label">Platform Version</span>
+        <span class="acc-val">v2.4.0 (InsightFace Ultra)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. System Administrator Control (Danger Zone) - ONLY FOR ADMIN -->
+  @if (userRole === 'ADMIN') {
+    <div class="va-card danger-zone-card" style="margin-top: 24px;">
+      <div class="danger-header">
+        <div class="danger-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3>System Administrator Control (Danger Zone)</h3>
+          <p>Execute administrative database operations. <strong>Warning:</strong> All destructive actions are permanent and cannot be reversed.</p>
+        </div>
+      </div>
+
+      <div class="danger-actions-grid">
+        
+        <div class="danger-action-box">
+          <div class="action-desc">
+            <h4>Clear Attendance Logs</h4>
+            <p>Deletes all historical attendance scans while keeping student & faculty accounts intact.</p>
+          </div>
+          <button mat-stroked-button color="warn" (click)="clearAllRecords()" class="danger-btn">
+            <i class="fa-solid fa-calendar-minus"></i> Clear Logs Only
+          </button>
+        </div>
+
+        <div class="danger-action-box">
+          <div class="action-desc">
+            <h4>Wipe Student Directory</h4>
+            <p>Deletes all student profiles, master roster entries, facial embeddings, and student accounts.</p>
+          </div>
+          <button mat-stroked-button color="warn" (click)="clearStudents()" class="danger-btn">
+            <i class="fa-solid fa-user-xmark"></i> Wipe Students
+          </button>
+        </div>
+
+        <div class="danger-action-box">
+          <div class="action-desc">
+            <h4>Wipe Faculty Directory</h4>
+            <p>Deletes all faculty members, assigned subjects, and faculty logins from the database.</p>
+          </div>
+          <button mat-stroked-button color="warn" (click)="clearFaculty()" class="danger-btn">
+            <i class="fa-solid fa-user-lock"></i> Wipe Faculty
+          </button>
+        </div>
+
+        <div class="danger-action-box reset-box">
+          <div class="action-desc">
+            <h4>Complete Factory Reset</h4>
+            <p>Wipes the entire database (students, faculty, subjects, logs) leaving only your Administrator account.</p>
+          </div>
+          <button mat-flat-button color="warn" (click)="resetAllData()" class="factory-reset-btn">
+            <i class="fa-solid fa-dumpster-fire"></i> Complete Factory Reset
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

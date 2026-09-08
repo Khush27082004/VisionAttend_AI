@@ -380,3 +380,107 @@ input, select, textarea {
   }
 }
 
+/* ========================================
+   Dark Theme System Tokens & Overrides
+   ======================================== */
+body.dark-theme {
+  --bg: #0F172A;
+  --bg-main: #0B0F19;
+  --bg-card: #1E293B;
+  --surface: #1E293B;
+  --border: #334155;
+  --border-color: #334155;
+  --border-strong: #475569;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --primary-light: rgba(99, 102, 241, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+  background-color: var(--bg-main);
+  color: var(--text-main);
+
+  .va-card {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  .stat-value {
+    color: #FFFFFF;
+  }
+
+  .va-table {
+    th {
+      background: #0F172A;
+      color: var(--text-muted);
+      border-bottom-color: var(--border-color);
+    }
+
+    td {
+      border-bottom-color: var(--border-color);
+      color: var(--text-main);
+    }
+  }
+
+  .badge-neutral {
+    background-color: #334155;
+    color: #CBD5E1;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    background-color: #1E293B !important;
+  }
+
+  .mat-mdc-form-field input,
+  .mat-mdc-form-field .mat-mdc-select-value {
+    color: #F8FAFC !important;
+  }
+
+  .mat-mdc-select-panel,
+  .mat-mdc-autocomplete-panel {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+
+    .mat-mdc-option {
+      background-color: #1E293B !important;
+      color: #F8FAFC !important;
+
+      &:hover,
+      &.mat-mdc-option-active {
+        background-color: #334155 !important;
+      }
+    }
+  }
+
+  .mat-datepicker-content,
+  .mat-datepicker-dialog {
+    background-color: #1E293B !important;
+    border-color: #334155 !important;
+
+    .mat-datepicker-content-container {
+      background-color: #1E293B !important;
+    }
+
+    .mat-datepicker-actions {
+      background: #1E293B !important;
+      border-top-color: #334155 !important;
+    }
+
+    .mat-calendar-table-header th {
+      color: #94A3B8 !important;
+    }
+
+    .mat-calendar-body-cell-content {
+      color: #F8FAFC !important;
+    }
+  }
+}
+

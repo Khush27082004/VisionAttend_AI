@@ -21,7 +21,7 @@ export class Sidebar implements OnInit {
   primaryItems: NavItem[] = [];
 
   systemItems: NavItem[] = [
-    { icon: 'fa-gear', label: 'Settings' }
+    { icon: 'fa-gear', label: 'Settings', route: '/dashboard/settings' }
   ];
 
   userName    = '';

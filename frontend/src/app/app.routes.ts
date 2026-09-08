@@ -20,6 +20,7 @@ import { FacultySubjectsComponent } from './features/faculty/subjects/faculty-su
 import { MasterRosterComponent } from './features/admin/roster/master-roster/master-roster';
 import { ReportList } from './features/reports/report-list/report-list';
 import { FacultyReportComponent } from './features/admin/faculty/faculty-report/faculty-report';
+import { AppSettingsComponent } from './features/settings/app-settings/app-settings';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -44,7 +45,8 @@ export const routes: Routes = [
       { path: 'admin/reports', component: FacultyReportComponent },
       { path: 'admin/roster', component: MasterRosterComponent },
       { path: 'subjects', component: SubjectListComponent },
-      { path: 'subjects/add', component: AddSubjectComponent }
+      { path: 'subjects/add', component: AddSubjectComponent },
+      { path: 'settings', component: AppSettingsComponent }
     ]
   },
   { path: '**', redirectTo: '' }
