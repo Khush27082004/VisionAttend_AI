@@ -92,10 +92,10 @@
                    (touchstart)="startDrag($event)"
                    (touchmove)="onDrag($event)"
                    (touchend)="stopDrag()">
-                <canvas #cropCanvas width="400" height="400" class="crop-interactive-canvas"></canvas>
+                <canvas #cropCanvas width="340" height="340" class="crop-interactive-canvas"></canvas>
                 <div class="drag-hint">
                   <i class="fa-solid fa-arrows-up-down-left-right"></i>
-                  <span>Drag to reposition</span>
+                  <span>Drag photo to center</span>
                 </div>
               </div>
 
@@ -104,46 +104,46 @@
                 
                 <div class="control-row">
                   <div class="control-label">
-                    <i class="fa-solid fa-magnifying-glass-plus"></i>
-                    <span>Zoom Scale</span>
+                    <div class="label-left">
+                      <i class="fa-solid fa-magnifying-glass-plus"></i>
+                      <span>Zoom Scale</span>
+                    </div>
                     <strong class="ctrl-val">{{ zoom.toFixed(1) }}x</strong>
                   </div>
-                  <mat-slider min="1.0" max="2.5" step="0.05" class="custom-slider">
-                    <input matSliderThumb [ngModel]="zoom" (ngModelChange)="onZoomChange($event)">
-                  </mat-slider>
+                  <input type="range" min="1.0" max="2.5" step="0.05" [ngModel]="zoom" (ngModelChange)="onZoomChange($event)" class="modern-slider" />
                 </div>
 
                 <div class="control-row">
                   <div class="control-label">
-                    <i class="fa-solid fa-rotate"></i>
-                    <span>Face Tilt / Rotate</span>
+                    <div class="label-left">
+                      <i class="fa-solid fa-rotate"></i>
+                      <span>Face Tilt / Rotate</span>
+                    </div>
                     <strong class="ctrl-val">{{ rotation }}°</strong>
                   </div>
-                  <mat-slider min="-30" max="30" step="1" class="custom-slider">
-                    <input matSliderThumb [ngModel]="rotation" (ngModelChange)="onRotationChange($event)">
-                  </mat-slider>
+                  <input type="range" min="-30" max="30" step="1" [ngModel]="rotation" (ngModelChange)="onRotationChange($event)" class="modern-slider" />
                 </div>
 
-                <div class="control-row-grid">
-                  <div class="control-row">
-                    <div class="control-label">
+                <div class="control-row">
+                  <div class="control-label">
+                    <div class="label-left">
                       <i class="fa-solid fa-arrows-left-right"></i>
-                      <span>Horizontal Pan</span>
+                      <span>Horizontal Position</span>
                     </div>
-                    <mat-slider min="-150" max="150" step="2" class="custom-slider">
-                      <input matSliderThumb [ngModel]="panX" (ngModelChange)="onPanXChange($event)">
-                    </mat-slider>
+                    <strong class="ctrl-val">{{ panX }}px</strong>
                   </div>
+                  <input type="range" min="-120" max="120" step="2" [ngModel]="panX" (ngModelChange)="onPanXChange($event)" class="modern-slider" />
+                </div>
 
-                  <div class="control-row">
-                    <div class="control-label">
+                <div class="control-row">
+                  <div class="control-label">
+                    <div class="label-left">
                       <i class="fa-solid fa-arrows-up-down"></i>
-                      <span>Vertical Pan</span>
+                      <span>Vertical Position</span>
                     </div>
-                    <mat-slider min="-150" max="150" step="2" class="custom-slider">
-                      <input matSliderThumb [ngModel]="panY" (ngModelChange)="onPanYChange($event)">
-                    </mat-slider>
+                    <strong class="ctrl-val">{{ panY }}px</strong>
                   </div>
+                  <input type="range" min="-120" max="120" step="2" [ngModel]="panY" (ngModelChange)="onPanYChange($event)" class="modern-slider" />
                 </div>
 
                 <div class="reset-row">

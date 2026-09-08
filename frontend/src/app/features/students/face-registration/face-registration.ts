@@ -243,7 +243,7 @@ export class FaceRegistrationComponent implements OnInit, AfterViewInit {
     ctx.clip();
 
     // Transform and draw
-    ctx.translate(size / 2 + (this.panX * (size / 400)), size / 2 + (this.panY * (size / 400)));
+    ctx.translate(size / 2 + (this.panX * (size / 340)), size / 2 + (this.panY * (size / 340)));
     ctx.rotate((this.rotation * Math.PI) / 180);
     ctx.scale(this.zoom, this.zoom);
 
@@ -276,12 +276,12 @@ export class FaceRegistrationComponent implements OnInit, AfterViewInit {
       ctx.fillRect(0, 0, size, size);
 
       ctx.save();
-      const scaleFactor = size / 400; // ratio against viewport
+      const scaleFactor = size / 340; // ratio against viewport
       ctx.translate(size / 2 + (this.panX * scaleFactor), size / 2 + (this.panY * scaleFactor));
       ctx.rotate((this.rotation * Math.PI) / 180);
       ctx.scale(this.zoom * scaleFactor, this.zoom * scaleFactor);
 
-      const baseWidth = 400;
+      const baseWidth = 340;
       const imgHeight = (this.loadedImage.height / this.loadedImage.width) * baseWidth;
       ctx.drawImage(this.loadedImage, -baseWidth / 2, -imgHeight / 2, baseWidth, imgHeight);
       ctx.restore();
