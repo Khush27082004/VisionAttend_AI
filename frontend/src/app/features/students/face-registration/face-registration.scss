@@ -1,66 +1,91 @@
 /* ========================================
-   Face Registration Styles
+   Face Registration & Cropping Styles
    ======================================== */
 
-.registration-card {
+.face-reg-page {
   max-width: 1100px;
+}
+
+.registration-card {
   padding: 0 !important;
-  border: 1px solid var(--border) !important;
+  border: 1px solid var(--border-color) !important;
   box-shadow: var(--shadow-md) !important;
   border-radius: var(--radius-lg) !important;
+  overflow: hidden;
 }
 
 .reg-layout {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  min-height: 520px;
+  grid-template-columns: 320px 1fr;
+  min-height: 560px;
 }
 
-/* ── Instructions Panel ───────────────── */
+/* ── Instructions & Preview Panel ───────────────── */
 .reg-instructions {
   background: linear-gradient(160deg, #1E1B4B 0%, #312E81 100%);
   padding: 32px 24px;
   border-radius: var(--radius-lg) 0 0 var(--radius-lg);
   color: rgba(255,255,255,.9);
+  display: flex;
+  flex-direction: column;
 }
 
 .reg-icon {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-radius: 16px;
   background: rgba(255,255,255,.12);
   border: 1px solid rgba(255,255,255,.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  margin-bottom: 20px;
+  font-size: 24px;
+  margin-bottom: 18px;
+  color: #818CF8;
 }
 
 .reg-instructions h3 {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  color: #FFFFFF;
 }
 
 .instruction-steps {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .step {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+
+  &.step-active {
+    opacity: 1;
+
+    .step-num {
+      background: #4F46E5;
+      color: #FFFFFF;
+      box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+    }
+
+    p {
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+  }
 }
 
 .step-num {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: rgba(79,70,229,.5);
-  border: 1px solid rgba(129,140,248,.4);
+  background: rgba(79,70,229,.4);
+  border: 1px solid rgba(129,140,248,.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,10 +96,10 @@
 }
 
 .step p {
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgba(255,255,255,.75);
-  padding-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: rgba(255,255,255,.8);
+  padding-top: 1px;
 }
 
 .tips-box {
@@ -85,38 +110,98 @@
   border: 1px solid rgba(6,182,212,.25);
   border-radius: 10px;
   padding: 12px;
-  margin-top: 24px;
+  margin-top: 18px;
+
+  i {
+    color: #22D3EE;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    font-size: 11.5px;
+    color: rgba(255,255,255,.8);
+    line-height: 1.4;
+    margin: 0;
+  }
 }
 
-.tips-box i {
-  color: #22D3EE;
-  font-size: 14px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.tips-box p {
-  font-size: 12px;
-  color: rgba(255,255,255,.7);
-  line-height: 1.5;
-}
-
-/* ── Camera Panel ─────────────────────── */
-.reg-camera-panel {
-  padding: 28px 32px;
+.preview-thumbnail-box {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  h4 {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #A5B4FC;
+    margin: 0;
+  }
+
+  .thumb-wrapper {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #6366F1;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    background: #000;
+  }
+
+  .preview-circle-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .preview-badge {
+    background: #10B981;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+/* ── Camera & Crop Workspace Panel ───────── */
+.reg-camera-panel {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+}
+
+.camera-step-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 20px;
 }
 
 .camera-wrapper {
   position: relative;
-  width: 520px;
-  height: 390px;
-  margin: 0 auto;
+  width: 480px;
+  height: 360px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: #0F172A;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+
+  @media (max-width: 600px) {
+    width: 100%;
+    height: 300px;
+  }
 }
 
 ::ng-deep webcam {
@@ -147,75 +232,203 @@
 }
 
 .camera-frame {
-  width: 240px;
-  height: 300px;
-  border: 2px solid rgba(79,70,229,.7);
+  width: 220px;
+  height: 280px;
+  border: 2px solid rgba(79,70,229,.8);
   border-radius: 50%;
   box-shadow: 0 0 0 2000px rgba(0,0,0,.35);
 }
 
-/* Preview */
-.preview-section {
-  text-align: center;
-}
-
-.preview-section h4 {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-}
-
-.preview-img {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--primary);
-  box-shadow: 0 4px 20px rgba(79,70,229,.3);
-}
-
-/* Actions */
-.camera-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.capture-btn {
+.capture-main-btn {
+  background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  padding: 12px 36px !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 10px 24px !important;
-  font-weight: 600 !important;
-  border-radius: var(--radius-sm) !important;
-  border-color: var(--primary) !important;
-  color: var(--primary) !important;
-  font-size: 14px !important;
+  height: 48px !important;
+
+  &:hover:not([disabled]) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45) !important;
+  }
 }
 
-.capture-btn:hover:not([disabled]) {
-  background: #EEF2FF !important;
+/* ── STEP 2: Interactive Cropping View ───────── */
+.crop-step-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.crop-view-wrapper {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 20px;
+  align-items: center;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+.canvas-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0B0F19;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .crop-interactive-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .drag-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    color: #E2E8F0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+}
+
+.adjustment-controls-panel {
+  background: var(--bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  .control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .control-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+
+      i {
+        color: var(--primary);
+        font-size: 13px;
+      }
+
+      .ctrl-val {
+        margin-left: auto;
+        color: var(--primary);
+        font-weight: 700;
+      }
+    }
+
+    .custom-slider {
+      width: 100%;
+      height: 32px;
+    }
+  }
+
+  .control-row-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .reset-row {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+
+    .reset-btn {
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: var(--text-muted) !important;
+    }
+  }
+}
+
+.crop-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.retake-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  height: 44px !important;
 }
 
 .register-btn {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 10px 28px !important;
-  font-weight: 700 !important;
-  background: linear-gradient(135deg, #4F46E5 0%, #818CF8 100%) !important;
+  padding: 12px 32px !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
   color: #fff !important;
   border-radius: var(--radius-sm) !important;
-  font-size: 14px !important;
-  box-shadow: 0 4px 14px rgba(79,70,229,.35) !important;
-}
+  font-size: 14.5px !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, .35) !important;
+  height: 46px !important;
 
-.register-btn[disabled] { opacity: .6; }
+  &:hover:not([disabled]) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(16, 185, 129, .45) !important;
+  }
+
+  &[disabled] {
+    opacity: 0.6;
+  }
+}
 
 /* Responsive */
-@media (max-width: 700px) {
-  .reg-layout { grid-template-columns: 1fr; }
-  .reg-instructions { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+@media (max-width: 800px) {
+  .reg-layout {
+    grid-template-columns: 1fr;
+  }
+  .reg-instructions {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
 }
+

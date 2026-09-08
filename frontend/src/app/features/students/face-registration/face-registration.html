@@ -1,9 +1,9 @@
-<div class="page-wrapper">
+<div class="page-wrapper face-reg-page">
 
   <div class="page-header">
     <div>
       <h1 class="page-title">{{ isEditMode ? 'Update Face Biometrics' : 'Face Registration' }}</h1>
-      <p class="page-subtitle">{{ isEditMode ? 'Capture a new clear face photo to update your AI biometric recognition profile' : 'Capture a clear face image to enable AI-powered attendance' }}</p>
+      <p class="page-subtitle">{{ isEditMode ? 'Capture and adjust a clear face photo to update your AI biometric recognition profile' : 'Capture and position your face for accurate AI-powered attendance recognition' }}</p>
     </div>
   </div>
 
@@ -14,72 +14,167 @@
       <!-- Instructions Panel -->
       <div class="reg-instructions">
         <div class="reg-icon">
-          <i class="fa-solid" [ngClass]="isEditMode ? 'fa-user-pen' : 'fa-face-smile'"></i>
+          <i class="fa-solid" [ngClass]="isEditMode ? 'fa-user-pen' : 'fa-crop-simple'"></i>
         </div>
-        <h3>{{ isEditMode ? 'Updating Face Data' : 'How it works' }}</h3>
+        <h3>{{ currentStep === 'capture' ? 'Step 1: Capture Photo' : 'Step 2: Crop & Adjust Face' }}</h3>
+        
         <div class="instruction-steps">
-          <div class="step">
+          <div class="step" [class.step-active]="currentStep === 'capture'">
             <div class="step-num">1</div>
-            <p>Position your face clearly in the camera frame</p>
+            <p>Position your face in the camera oval and click <strong>Capture</strong></p>
           </div>
-          <div class="step">
+          <div class="step" [class.step-active]="currentStep === 'crop'">
             <div class="step-num">2</div>
-            <p>Make sure you have good lighting and look straight</p>
+            <p>Drag the photo and use sliders to <strong>Zoom, Tilt & Center</strong> your face</p>
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <p>Click <strong>Capture</strong> to take the photo</p>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <p>Review the preview, then click <strong>{{ isEditMode ? 'Save & Update Face' : 'Register Face' }}</strong></p>
+            <p>Verify the circular preview and click <strong>{{ isEditMode ? 'Save & Update Face' : 'Register Face' }}</strong></p>
           </div>
         </div>
+
         <div class="tips-box">
           <i class="fa-solid fa-lightbulb"></i>
-          <p>Tip: Ensure only one face is visible in the frame for accurate AI recognition.</p>
+          <p>{{ currentStep === 'capture' ? 'Tip: Ensure bright lighting and look straight ahead.' : 'Tip: Drag on the image directly or use sliders to center your eyes and nose inside the guide.' }}</p>
         </div>
+
+        <!-- Live Thumbnail Preview (when in crop step) -->
+        @if (currentStep === 'crop') {
+          <div class="preview-thumbnail-box">
+            <h4>Final Biometric Preview</h4>
+            <div class="thumb-wrapper">
+              <canvas #previewCanvas width="120" height="120" class="preview-circle-canvas"></canvas>
+            </div>
+            <span class="preview-badge"><i class="fa-solid fa-circle-check"></i> AI Crop Ready</span>
+          </div>
+        }
       </div>
 
-      <!-- Camera Panel -->
+      <!-- Main Workspace Panel -->
       <div class="reg-camera-panel">
 
         @if (cameraError) {
-          <div class="error-banner" style="background: #FFF1F2; border: 1px solid #FECDD3; border-radius: 10px; padding: 12px; margin-bottom: 16px; color: #9F1239; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+          <div class="error-banner">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <span>{{ cameraError }}</span>
           </div>
         }
 
-        <div class="camera-wrapper">
-          <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" (initError)="handleCameraError($event)" class="webcam-feed"></webcam>
-          <div class="camera-overlay">
-            <div class="camera-frame"></div>
-          </div>
-        </div>
+        <!-- STEP 1: Live Camera Feed -->
+        @if (currentStep === 'capture') {
+          <div class="camera-step-container">
+            <div class="camera-wrapper">
+              <webcam [trigger]="triggerObservable" (imageCapture)="handleImage($event)" (initError)="handleCameraError($event)" class="webcam-feed"></webcam>
+              <div class="camera-overlay">
+                <div class="camera-frame"></div>
+              </div>
+            </div>
 
-        @if (webcamImage) {
-          <div class="preview-section">
-            <h4>Captured Preview</h4>
-            <img class="preview-img" [src]="webcamImage.imageAsDataUrl" alt="Captured face preview" />
+            <div class="camera-actions">
+              <button mat-flat-button type="button" (click)="capture()" [disabled]="saving" class="capture-main-btn" id="face-capture-btn">
+                <i class="fa-solid fa-camera"></i>
+                <span>Take Photo</span>
+              </button>
+            </div>
           </div>
         }
 
-        <div class="camera-actions">
-          <button mat-stroked-button type="button" (click)="capture()" [disabled]="saving" class="capture-btn" id="face-capture-btn">
-            <i class="fa-solid fa-camera"></i>
-            Capture
-          </button>
-          <button mat-flat-button type="button" (click)="register()" [disabled]="!webcamImage || saving" class="register-btn" id="face-register-btn">
-            @if (saving) {
-              <mat-spinner diameter="18" color="accent"></mat-spinner>
-              <span>{{ isEditMode ? 'Updating…' : 'Registering…' }}</span>
-            } @else {
-              <i class="fa-solid" [ngClass]="isEditMode ? 'fa-floppy-disk' : 'fa-fingerprint'"></i>
-              <span>{{ isEditMode ? 'Update Face Profile' : 'Register Face' }}</span>
-            }
-          </button>
-        </div>
+        <!-- STEP 2: Interactive Cropping & Adjustment Workspace -->
+        @if (currentStep === 'crop') {
+          <div class="crop-step-container">
+            
+            <div class="crop-view-wrapper">
+              <div class="canvas-container" 
+                   (mousedown)="startDrag($event)" 
+                   (mousemove)="onDrag($event)" 
+                   (mouseup)="stopDrag()" 
+                   (mouseleave)="stopDrag()"
+                   (touchstart)="startDrag($event)"
+                   (touchmove)="onDrag($event)"
+                   (touchend)="stopDrag()">
+                <canvas #cropCanvas width="400" height="400" class="crop-interactive-canvas"></canvas>
+                <div class="drag-hint">
+                  <i class="fa-solid fa-arrows-up-down-left-right"></i>
+                  <span>Drag to reposition</span>
+                </div>
+              </div>
+
+              <!-- Adjustment Sliders Toolbar -->
+              <div class="adjustment-controls-panel">
+                
+                <div class="control-row">
+                  <div class="control-label">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                    <span>Zoom Scale</span>
+                    <strong class="ctrl-val">{{ zoom.toFixed(1) }}x</strong>
+                  </div>
+                  <mat-slider min="1.0" max="2.5" step="0.05" class="custom-slider">
+                    <input matSliderThumb [ngModel]="zoom" (ngModelChange)="onZoomChange($event)">
+                  </mat-slider>
+                </div>
+
+                <div class="control-row">
+                  <div class="control-label">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Face Tilt / Rotate</span>
+                    <strong class="ctrl-val">{{ rotation }}°</strong>
+                  </div>
+                  <mat-slider min="-30" max="30" step="1" class="custom-slider">
+                    <input matSliderThumb [ngModel]="rotation" (ngModelChange)="onRotationChange($event)">
+                  </mat-slider>
+                </div>
+
+                <div class="control-row-grid">
+                  <div class="control-row">
+                    <div class="control-label">
+                      <i class="fa-solid fa-arrows-left-right"></i>
+                      <span>Horizontal Pan</span>
+                    </div>
+                    <mat-slider min="-150" max="150" step="2" class="custom-slider">
+                      <input matSliderThumb [ngModel]="panX" (ngModelChange)="onPanXChange($event)">
+                    </mat-slider>
+                  </div>
+
+                  <div class="control-row">
+                    <div class="control-label">
+                      <i class="fa-solid fa-arrows-up-down"></i>
+                      <span>Vertical Pan</span>
+                    </div>
+                    <mat-slider min="-150" max="150" step="2" class="custom-slider">
+                      <input matSliderThumb [ngModel]="panY" (ngModelChange)="onPanYChange($event)">
+                    </mat-slider>
+                  </div>
+                </div>
+
+                <div class="reset-row">
+                  <button mat-button type="button" (click)="resetAdjustments()" class="reset-btn">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Reset Position
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Crop Step Bottom Action Buttons -->
+            <div class="crop-actions-bar">
+              <button mat-stroked-button type="button" (click)="retake()" [disabled]="saving" class="retake-btn" id="face-retake-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Retake Photo</span>
+              </button>
+
+              <button mat-flat-button type="button" (click)="register()" [disabled]="saving" class="register-btn" id="face-register-btn">
+                @if (saving) {
+                  <mat-spinner diameter="18" color="accent"></mat-spinner>
+                  <span>{{ isEditMode ? 'Updating Profile…' : 'Registering Face…' }}</span>
+                } @else {
+                  <i class="fa-solid" [ngClass]="isEditMode ? 'fa-floppy-disk' : 'fa-check-double'"></i>
+                  <span>{{ isEditMode ? 'Confirm & Update Face' : 'Confirm & Register Face' }}</span>
+                }
+              </button>
+            </div>
+
+          </div>
+        }
 
       </div>
 
@@ -88,3 +183,4 @@
   </mat-card>
 
 </div>
+
